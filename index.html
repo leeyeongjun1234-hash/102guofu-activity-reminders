@@ -177,16 +177,16 @@
     }
 
     .cards {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 12px;
+      column-count: 3;
+      column-gap: 12px;
       padding: 16px;
     }
 
     .card {
       display: grid;
       gap: 8px;
-      min-height: 160px;
+      break-inside: avoid;
+      margin: 0 0 12px;
       padding: 14px;
       border: 1px solid var(--line);
       border-radius: 8px;
@@ -206,6 +206,26 @@
 
     .meta span {
       color: var(--muted);
+    }
+
+    .package-block {
+      display: grid;
+      gap: 6px;
+      margin-top: 8px;
+      padding-top: 12px;
+      border-top: 1px solid var(--line);
+    }
+
+    .package-title {
+      color: var(--muted);
+      font-weight: 700;
+    }
+
+    .package-lines {
+      display: grid;
+      gap: 3px;
+      font-weight: 700;
+      word-break: break-word;
     }
 
     .action {
@@ -250,6 +270,16 @@
         align-items: flex-start;
         flex-direction: column;
       }
+
+      .cards {
+        column-count: 1;
+      }
+    }
+
+    @media (min-width: 721px) and (max-width: 980px) {
+      .cards {
+        column-count: 2;
+      }
     }
   </style>
 </head>
@@ -278,7 +308,11 @@
     <section class="summary-card">
       <div class="summary-label">下一次要开什么<span class="next-badge">下一次</span></div>
       <div class="summary-date">2026-06-12</div>
-      <div class="summary-meta"><div>29145: 火力全开:进攻土拨鼠128~648</div></div>
+      <div class="summary-meta"><div>29145: 火力全开:进攻土拨鼠128~648</div>
+<div>1900148: 限时自选补给</div>
+<div>1900133: 连续充值（进化开启第二套）
+1900162: 连续充值（进化开启第三套）
+1900163: 连续充值（改造，开启进化第2/3套以外的服务器）</div></div>
     </section>
     
     </section>
@@ -288,7 +322,7 @@
             <details class="day" open>
               <summary>
                 <span class="date">2026-06-12<span class="inline-badge">下一次</span></span>
-                <span class="count">1 个提醒</span>
+                <span class="count">3 个提醒</span>
               </summary>
               <div class="cards">
                 
@@ -297,6 +331,27 @@
       
       <div class="meta"><span>服务器：</span>S1-S854</div>
       <div class="meta"><span>时间：</span>2026-06-14 08:00:00 ~ 2026-06-15 07:59:59（1天） UTC+8</div>
+      
+    </article>
+    
+
+    <article class="card">
+      <h3>1900148: 限时自选补给</h3>
+      
+      <div class="meta"><span>服务器：</span>S1-S844</div>
+      <div class="meta"><span>时间：</span>2026-06-15 08:00:00 ~ 2026-06-22 07:59:59（7天） UTC+8</div>
+      
+    </article>
+    
+
+    <article class="card">
+      <h3>1900133: 连续充值（进化开启第二套）
+1900162: 连续充值（进化开启第三套）
+1900163: 连续充值（改造，开启进化第2/3套以外的服务器）</h3>
+      
+      <div class="meta"><span>服务器：</span>S1-S854</div>
+      <div class="meta"><span>时间：</span>2026-06-15 08:00:00 ~ 2026-06-22 07:59:59（7天） UTC+8</div>
+      
     </article>
     
               </div>
@@ -314,6 +369,7 @@
       
       <div class="meta"><span>服务器：</span>S855，S1-S853</div>
       <div class="meta"><span>时间：</span>2026-06-15 08:00:00 ~ 2026-06-20 07:59:59（5天） UTC+8</div>
+      
     </article>
     
               </div>
@@ -322,7 +378,7 @@
             <details class="day" open>
               <summary>
                 <span class="date">2026-06-14</span>
-                <span class="count">3 个提醒</span>
+                <span class="count">1 个提醒</span>
               </summary>
               <div class="cards">
                 
@@ -331,24 +387,7 @@
       
       <div class="meta"><span>服务器：</span>S1-S834</div>
       <div class="meta"><span>时间：</span>2026-06-15 08:00:00 ~ 2026-06-21 07:59:59（6天） UTC+8</div>
-    </article>
-    
-
-    <article class="card">
-      <h3>自选周卡</h3>
       
-      <div class="meta"><span>服务器：</span>S1-S844</div>
-      <div class="meta"><span>时间：</span>2026-06-15 08:00:00 ~ 2026-06-22 07:59:59（7天） UTC+8</div>
-    </article>
-    
-
-    <article class="card">
-      <h3>1900133: 连续充值（进化开启第二套）
-1900162: 连续充值（进化开启第三套）
-1900163: 连续充值（改造，开启进化第2/3套以外的服务器）</h3>
-      
-      <div class="meta"><span>服务器：</span>S1-S854</div>
-      <div class="meta"><span>时间：</span>2026-06-15 08:00:00 ~ 2026-06-22 07:59:59（7天） UTC+8</div>
     </article>
     
               </div>
@@ -366,6 +405,7 @@
       
       <div class="meta"><span>服务器：</span>S854</div>
       <div class="meta"><span>时间：</span>2026-06-15 08:00:00 ~ 2036-06-16 07:59:59（10年） UTC+8</div>
+      
     </article>
     
 
@@ -374,6 +414,7 @@
       
       <div class="meta"><span>服务器：</span>S1-S854</div>
       <div class="meta"><span>时间：</span>2026-06-15 08:00:00 ~ 2026-06-22 07:59:59（7天） UTC+8</div>
+      
     </article>
     
 
@@ -382,14 +423,25 @@
       
       <div class="meta"><span>服务器：</span>S1-S852</div>
       <div class="meta"><span>时间：</span>2026-06-16 08:00:00 ~ 2026-06-23 07:59:59（7天） UTC+8</div>
+      
+      <div class="package-block">
+        <div class="package-title">配套礼包</div>
+        <div class="package-lines"><div>29118: 万物新生神秘特供</div></div>
+        <div class="meta">服务器：S1-S852</div>
+<div class="meta">时间：2026-06-16 08:00:00 ~ 2026-06-23 07:59:59（7天） UTC+8</div>
+<div class="meta">每日刷新：是</div>
+<div class="meta">新服自动开启：否</div>
+      </div>
+    
     </article>
     
 
     <article class="card">
-      <h3>端午节签到</h3>
+      <h3>1000914:国服-端午节签到</h3>
       
-      <div class="meta"><span>服务器：</span>排期表未标明</div>
+      <div class="meta"><span>服务器：</span>全服</div>
       <div class="meta"><span>时间：</span>2026-06-16 08:00:00 ~ 2026-06-26 07:59:59（10天） UTC+8</div>
+      
     </article>
     
 
@@ -398,6 +450,7 @@
       
       <div class="meta"><span>服务器：</span>S1-S855</div>
       <div class="meta"><span>时间：</span>2026-06-20 08:00:00 ~ 2026-06-22 07:59:59（2天） UTC+8</div>
+      
     </article>
     
 
@@ -406,6 +459,7 @@
       
       <div class="meta"><span>服务器：</span>S857</div>
       <div class="meta"><span>时间：</span>2026-06-22 08:00:00 ~ 2026-06-27 07:59:59（5天） UTC+8</div>
+      
     </article>
     
               </div>
@@ -419,10 +473,11 @@
               <div class="cards">
                 
     <article class="card">
-      <h3>特化蚁对决</h3>
+      <h3>1000143:特化蚁对决</h3>
       
-      <div class="meta"><span>服务器：</span>排期表未标明</div>
-      <div class="meta"><span>时间：</span>2026-06-17 08:00:00 ~ 2026-07-01 07:59:59（14天） UTC+8</div>
+      <div class="meta"><span>服务器：</span>S1-S850</div>
+      <div class="meta"><span>时间：</span>2026-06-17 08:15:00 ~ 2026-07-01 08:14:59（14天） UTC+8</div>
+      
     </article>
     
               </div>
@@ -436,10 +491,22 @@
               <div class="cards">
                 
     <article class="card">
-      <h3>蜂群宝藏</h3>
+      <h3>1000178:蜂群宝藏</h3>
       
-      <div class="meta"><span>服务器：</span>S1-Sxxx</div>
+      <div class="meta"><span>服务器：</span>S1-S850</div>
       <div class="meta"><span>时间：</span>2026-06-19 08:00:00 ~ 2026-06-22 07:59:59（3天） UTC+8</div>
+      
+      <div class="package-block">
+        <div class="package-title">配套礼包</div>
+        <div class="package-lines"><div>29811:小雏菊特供I 30 POP1</div>
+<div>29812:小雏菊特供II 68 POP2</div>
+<div>29813:小雏菊特供III 128 POP3</div>
+<div>29814:小雏菊特供IV 328 POP4</div></div>
+        <div class="meta">服务器：S1-S850</div>
+<div class="meta">时间：2026-06-19 08:00:00 ~ 2026-06-22 07:59:59（3天） UTC+8</div>
+<div class="meta">每日刷新，新服不自动开启</div>
+      </div>
+    
     </article>
     
               </div>
@@ -457,6 +524,7 @@
       
       <div class="meta"><span>服务器：</span>全服</div>
       <div class="meta"><span>时间：</span>2026-06-20 08:00:00 ~ 2026-06-21 07:59:59（1天） UTC+8</div>
+      
     </article>
     
 
@@ -465,6 +533,7 @@
       
       <div class="meta"><span>服务器：</span>排期表未标明</div>
       <div class="meta"><span>时间：</span>2026-06-21 08:00:00 ~ 2026-06-22 07:59:59（1天） UTC+8</div>
+      
     </article>
     
               </div>
@@ -482,6 +551,7 @@
       
       <div class="meta"><span>服务器：</span>S856</div>
       <div class="meta"><span>时间：</span>2026-06-22 08:00:00 ~ 2026-06-27 07:59:59（5天） UTC+8</div>
+      
     </article>
     
               </div>
@@ -499,6 +569,7 @@
       
       <div class="meta"><span>服务器：</span>S1-S834</div>
       <div class="meta"><span>时间：</span>2026-06-22 08:00:00 ~ 2026-06-28 07:59:59（6天） UTC+8</div>
+      
     </article>
     
               </div>
@@ -516,6 +587,7 @@
       
       <div class="meta"><span>服务器：</span>S855</div>
       <div class="meta"><span>时间：</span>2026-06-22 08:00:00 ~ 2036-06-23 07:59:59（10年） UTC+8</div>
+      
     </article>
     
 
@@ -524,14 +596,7 @@
       
       <div class="meta"><span>服务器：</span>S1-S855</div>
       <div class="meta"><span>时间：</span>2026-06-22 08:00:00 ~ 2026-06-29 07:59:59（7天） UTC+8</div>
-    </article>
-    
-
-    <article class="card">
-      <h3>5代买蚂蚁送觉醒活动</h3>
       
-      <div class="meta"><span>服务器：</span>排期表未标明</div>
-      <div class="meta"><span>时间：</span>2026-06-23 08:00:00 ~ 2026-06-29 07:59:59（6天） UTC+8</div>
     </article>
     
 
@@ -540,30 +605,74 @@
       
       <div class="meta"><span>服务器：</span>S1-S853</div>
       <div class="meta"><span>时间：</span>2026-06-23 08:00:00 ~ 2026-06-30 07:59:59（7天） UTC+8</div>
-    </article>
-    
-
-    <article class="card">
-      <h3>珍宝商店</h3>
       
-      <div class="meta"><span>服务器：</span>排期表未标明</div>
-      <div class="meta"><span>时间：</span>2026-06-23 08:00:00 ~ 2026-06-29 07:59:59（6天） UTC+8</div>
+      <div class="package-block">
+        <div class="package-title">配套礼包</div>
+        <div class="package-lines"><div>29119: 潮起潮落神秘特供</div></div>
+        <div class="meta">服务器：S1-S853</div>
+<div class="meta">时间：2026-06-23 08:00:00 ~ 2026-06-30 07:59:59（7天） UTC+8</div>
+<div class="meta">每日刷新：是</div>
+<div class="meta">新服自动开启：否</div>
+      </div>
+    
     </article>
     
 
     <article class="card">
-      <h3>落潮海岸</h3>
+      <h3>1000357:特化蚁的馈赠</h3>
       
-      <div class="meta"><span>服务器：</span>S1-SXXX</div>
-      <div class="meta"><span>时间：</span>2026-06-23 08:00:00 ~ 2026-06-29 07:59:59（6天） UTC+8</div>
+      <div class="meta"><span>服务器：</span>S1-S857</div>
+      <div class="meta"><span>时间：</span>2026-06-23 08:00:00 ~ 2026-07-03 07:59:59（10天） UTC+8</div>
+      
     </article>
     
 
     <article class="card">
-      <h3>黑骑士</h3>
+      <h3>1000151: 蚁巢装扮兑换商店</h3>
+      
+      <div class="meta"><span>服务器：</span>S1-S857</div>
+      <div class="meta"><span>时间：</span>2026-06-23 08:00:00 ~ 2026-06-29 07:59:59（6天） UTC+8</div>
+      
+    </article>
+    
+
+    <article class="card">
+      <h3>1000150:落潮海岸</h3>
+      
+      <div class="meta"><span>服务器：</span>S1-S857</div>
+      <div class="meta"><span>时间：</span>2026-06-23 08:00:00 ~ 2026-06-29 07:59:59（6天） UTC+8</div>
+      
+      <div class="package-block">
+        <div class="package-title">每日刷新礼包（5天）</div>
+        <div class="package-lines"><div>32346: 落潮海岸限定特惠Ⅱ（有拼图）30 pop2</div>
+<div>32347: 落潮海岸限定特惠Ⅲ（有拼图）128 pop3</div>
+<div>32348: 落潮海岸限定特惠Ⅳ（有拼图）328 pop4</div>
+<div>31937: 落潮海岸特供：组合自选礼包30-328 pop5</div>
+<div>31938: 落潮海岸尊享：组合自选礼包648 pop6</div>
+<div>32351: 落潮海岸：钻石特惠（有拼图）5000 pop7</div></div>
+        <div class="meta">服务器：S1-S857</div>
+<div class="meta">2026-06-23 08:00:00 ~2026-06-28 07:59:59 UTC+8（5天）</div>
+<div class="meta">每日刷新：是，新服自动开启：否</div>
+      </div>
+    
+
+      <div class="package-block">
+        <div class="package-title">每日刷新礼包（6天）</div>
+        <div class="package-lines"><div>32345: 落潮海岸限定特惠Ⅰ（有拼图）6-328——pop：1</div></div>
+        <div class="meta">服务器：S1-S857</div>
+<div class="meta">2026-06-23 08:00:00 ~2026-06-29 07:59:59 UTC+8（6天）</div>
+<div class="meta">每日刷新：是，新服自动开启：否</div>
+      </div>
+    
+    </article>
+    
+
+    <article class="card">
+      <h3>1000906:国服-土拨鼠复仇</h3>
       
       <div class="meta"><span>服务器：</span>客户端 S1-S853；小程序 S205-S751</div>
       <div class="meta"><span>时间：</span>2026-06-24 08:00:00 ~ 2026-06-25 07:59:59（1天） UTC+8</div>
+      
     </article>
     
 
@@ -572,6 +681,7 @@
       
       <div class="meta"><span>服务器：</span>S1-S856</div>
       <div class="meta"><span>时间：</span>2026-06-27 08:00:00 ~ 2026-06-29 07:59:59（2天） UTC+8</div>
+      
     </article>
     
 
@@ -580,6 +690,7 @@
       
       <div class="meta"><span>服务器：</span>S858</div>
       <div class="meta"><span>时间：</span>2026-06-29 08:00:00 ~ 2026-07-04 07:59:59（5天） UTC+8</div>
+      
     </article>
     
               </div>
@@ -597,6 +708,7 @@
       
       <div class="meta"><span>服务器：</span>S1-S856</div>
       <div class="meta"><span>时间：</span>2026-06-28 08:00:00 ~ 2026-06-29 07:59:59（1天） UTC+8</div>
+      
     </article>
     
               </div>
@@ -605,15 +717,25 @@
             <details class="day" open>
               <summary>
                 <span class="date">2026-06-27</span>
-                <span class="count">1 个提醒</span>
+                <span class="count">2 个提醒</span>
               </summary>
               <div class="cards">
                 
+    <article class="card">
+      <h3>1000179:蚁群嘉年华</h3>
+      
+      <div class="meta"><span>服务器：</span>S1-S858</div>
+      <div class="meta"><span>时间：</span>2026-06-28 08:00:00 ~ 2026-07-03 07:59:59（5天） UTC+8</div>
+      
+    </article>
+    
+
     <article class="card">
       <h3>1000905:国服-拯救蚜虫-跨服</h3>
       
       <div class="meta"><span>服务器：</span>S857</div>
       <div class="meta"><span>时间：</span>2026-06-29 08:00:00 ~ 2026-07-04 07:59:59（5天） UTC+8</div>
+      
     </article>
     
               </div>
@@ -631,14 +753,27 @@
       
       <div class="meta"><span>服务器：</span>S1-S834</div>
       <div class="meta"><span>时间：</span>2026-06-29 08:00:00 ~ 2026-07-05 07:59:59（6天） UTC+8</div>
+      
     </article>
     
 
     <article class="card">
-      <h3>惊喜转盘</h3>
+      <h3>1000296:惊喜转盘（二代）</h3>
       
-      <div class="meta"><span>服务器：</span>S1-Sxxx</div>
+      <div class="meta"><span>服务器：</span>S1-S858</div>
       <div class="meta"><span>时间：</span>2026-06-29 08:00:00 ~ 2026-07-06 07:59:59（7天） UTC+8</div>
+      
+      <div class="package-block">
+        <div class="package-title">配套礼包</div>
+        <div class="package-lines"><div>31444: 惊喜叶片限定30</div>
+<div>31445: 惊喜叶片限定68</div>
+<div>31446: 惊喜叶片限定128</div>
+<div>31447: 惊喜叶片限定328</div></div>
+        <div class="meta">服务器：S1-S858</div>
+<div class="meta">新服不自动开，每日不刷新</div>
+<div class="meta">2026-06-29 08:00:00 ~2026-07-06 07:59:59 UTC+8</div>
+      </div>
+    
     </article>
     
 
@@ -647,14 +782,40 @@
       
       <div class="meta"><span>服务器：</span>S1-S856</div>
       <div class="meta"><span>时间：</span>2026-06-29 08:00:00 ~ 2026-07-06 07:59:59（7天） UTC+8</div>
+      
     </article>
     
 
     <article class="card">
       <h3>蚁群狂欢</h3>
       
-      <div class="meta"><span>服务器：</span>S1-Sxxx</div>
+      <div class="meta"><span>服务器：</span>S1-S858</div>
       <div class="meta"><span>时间：</span>2026-06-29 08:00:00 ~ 2026-07-02 07:59:59（3天） UTC+8</div>
+      
+      <div class="package-block">
+        <div class="package-title">免费礼包</div>
+        <div class="package-lines"><div>31714: 蚁群狂欢：免费礼物-08210</div>
+<div>2026-06-29 08:00:00~2026-06-30 07:59:59 UTC+8</div>
+<div>31715: 蚁群狂欢：免费礼物-08220</div>
+<div>2026-06-30 08:00:00~2026-07-01 07:59:59 UTC+8</div>
+<div>31716: 蚁群狂欢：免费礼物-08230</div>
+<div>2026-07-01 08:00:00~2026-07-02 07:59:59 UTC+8</div></div>
+        <div class="meta">服务器：S1-S858</div>
+      </div>
+    
+
+      <div class="package-block">
+        <div class="package-title">付费礼包</div>
+        <div class="package-lines"><div>32295: 蚁群狂欢：混合自选专供（四代宝箱）</div>
+<div>32163: 蚁群狂欢：野怪养成专属68</div>
+<div>32164: 蚁群狂欢：变异自选热卖68</div>
+<div>32165: 蚁群狂欢：兵种改造特惠128</div>
+<div>32166: 蚁群狂欢：特化蚁进化特供328</div></div>
+        <div class="meta">服务器：S1-S858</div>
+<div class="meta">2026-06-29 08:00:00 ~2026-07-02 07:59:59 UTC+8</div>
+<div class="meta">新服不自动开启，每日不刷新</div>
+      </div>
+    
     </article>
     
               </div>
@@ -672,6 +833,7 @@
       
       <div class="meta"><span>服务器：</span>S856</div>
       <div class="meta"><span>时间：</span>2026-06-29 08:00:00 ~ 2036-06-30 07:59:59（10年） UTC+8</div>
+      
     </article>
     
 
@@ -680,6 +842,7 @@
       
       <div class="meta"><span>服务器：</span>S1-S856</div>
       <div class="meta"><span>时间：</span>2026-06-29 08:00:00 ~ 2026-07-06 07:59:59（7天） UTC+8</div>
+      
     </article>
     
 
@@ -688,6 +851,16 @@
       
       <div class="meta"><span>服务器：</span>S1-S854</div>
       <div class="meta"><span>时间：</span>2026-06-30 08:00:00 ~ 2026-07-07 07:59:59（7天） UTC+8</div>
+      
+      <div class="package-block">
+        <div class="package-title">配套礼包</div>
+        <div class="package-lines"><div>29120: 旱季来临神秘特供</div></div>
+        <div class="meta">服务器：S1-S854</div>
+<div class="meta">时间：2026-06-30 08:00:00 ~ 2026-07-07 07:59:59（7天） UTC+8</div>
+<div class="meta">每日刷新：是</div>
+<div class="meta">新服自动开启：否</div>
+      </div>
+    
     </article>
     
 
@@ -696,6 +869,7 @@
       
       <div class="meta"><span>服务器：</span>S1-S857</div>
       <div class="meta"><span>时间：</span>2026-07-04 08:00:00 ~ 2026-07-06 07:59:59（2天） UTC+8</div>
+      
     </article>
     
 
@@ -704,6 +878,7 @@
       
       <div class="meta"><span>服务器：</span>S859</div>
       <div class="meta"><span>时间：</span>2026-07-06 08:00:00 ~ 2026-07-11 07:59:59（5天） UTC+8</div>
+      
     </article>
     
               </div>
@@ -717,10 +892,11 @@
               <div class="cards">
                 
     <article class="card">
-      <h3>特化蚁对决</h3>
+      <h3>1000143:特化蚁对决</h3>
       
       <div class="meta"><span>服务器：</span>排期表未标明</div>
-      <div class="meta"><span>时间：</span>2026-07-02 08:00:00 ~ 2026-07-16 07:59:59（14天） UTC+8</div>
+      <div class="meta"><span>时间：</span>2026-07-02 08:15:00 ~ 2026-07-16 08:14:59（14天） UTC+8</div>
+      
     </article>
     
               </div>
@@ -738,6 +914,7 @@
       
       <div class="meta"><span>服务器：</span>S1-Sxxx</div>
       <div class="meta"><span>时间：</span>2026-07-03 08:00:00 ~ 2026-07-07 07:59:59（4天） UTC+8</div>
+      
     </article>
     
               </div>
@@ -755,6 +932,7 @@
       
       <div class="meta"><span>服务器：</span>全服</div>
       <div class="meta"><span>时间：</span>2026-07-04 08:00:00 ~ 2026-07-05 07:59:59（1天） UTC+8</div>
+      
     </article>
     
 
@@ -763,6 +941,7 @@
       
       <div class="meta"><span>服务器：</span>排期表未标明</div>
       <div class="meta"><span>时间：</span>2026-07-05 08:00:00 ~ 2026-07-06 07:59:59（1天） UTC+8</div>
+      
     </article>
     
               </div>
@@ -780,6 +959,7 @@
       
       <div class="meta"><span>服务器：</span>S858</div>
       <div class="meta"><span>时间：</span>2026-07-06 08:00:00 ~ 2026-07-11 07:59:59（5天） UTC+8</div>
+      
     </article>
     
               </div>
@@ -797,6 +977,7 @@
       
       <div class="meta"><span>服务器：</span>S1-S834</div>
       <div class="meta"><span>时间：</span>2026-07-06 08:00:00 ~ 2026-07-12 07:59:59（6天） UTC+8</div>
+      
     </article>
     
 
@@ -805,6 +986,7 @@
       
       <div class="meta"><span>服务器：</span>S1-Sxxx</div>
       <div class="meta"><span>时间：</span>2026-07-06 08:00:00 ~ 2026-07-13 07:59:59（7天） UTC+8</div>
+      
     </article>
     
               </div>
@@ -822,6 +1004,7 @@
       
       <div class="meta"><span>服务器：</span>S857</div>
       <div class="meta"><span>时间：</span>2026-07-06 08:00:00 ~ 2036-07-07 07:59:59（10年） UTC+8</div>
+      
     </article>
     
 
@@ -830,6 +1013,7 @@
       
       <div class="meta"><span>服务器：</span>S1-S857</div>
       <div class="meta"><span>时间：</span>2026-07-06 08:00:00 ~ 2026-07-13 07:59:59（7天） UTC+8</div>
+      
     </article>
     
 
@@ -838,6 +1022,16 @@
       
       <div class="meta"><span>服务器：</span>S1-S855</div>
       <div class="meta"><span>时间：</span>2026-07-07 08:00:00 ~ 2026-07-14 07:59:59（7天） UTC+8</div>
+      
+      <div class="package-block">
+        <div class="package-title">配套礼包</div>
+        <div class="package-lines"><div>29121: 回归自然神秘特供</div></div>
+        <div class="meta">服务器：S1-S855</div>
+<div class="meta">时间：2026-07-07 08:00:00 ~ 2026-07-14 07:59:59（7天） UTC+8</div>
+<div class="meta">每日刷新：是</div>
+<div class="meta">新服自动开启：否</div>
+      </div>
+    
     </article>
     
 
@@ -846,14 +1040,16 @@
       
       <div class="meta"><span>服务器：</span>S1-Sxxx</div>
       <div class="meta"><span>时间：</span>2026-07-07 08:00:00 ~ 2026-07-13 07:59:59（6天） UTC+8</div>
+      
     </article>
     
 
     <article class="card">
-      <h3>珍宝商店</h3>
+      <h3>1000151: 蚁巢装扮兑换商店</h3>
       
       <div class="meta"><span>服务器：</span>排期表未标明</div>
       <div class="meta"><span>时间：</span>2026-07-07 08:00:00 ~ 2026-07-13 07:59:59（6天） UTC+8</div>
+      
     </article>
     
 
@@ -862,14 +1058,16 @@
       
       <div class="meta"><span>服务器：</span>排期表未标明</div>
       <div class="meta"><span>时间：</span>2026-07-07 08:00:00 ~ 2026-07-13 07:59:59（6天） UTC+8</div>
+      
     </article>
     
 
     <article class="card">
-      <h3>黑骑士</h3>
+      <h3>1000906:国服-土拨鼠复仇</h3>
       
       <div class="meta"><span>服务器：</span>客户端 S1-S853；小程序 S205-S751</div>
       <div class="meta"><span>时间：</span>2026-07-08 08:00:00 ~ 2026-07-09 07:59:59（1天） UTC+8</div>
+      
     </article>
     
 
@@ -878,6 +1076,7 @@
       
       <div class="meta"><span>服务器：</span>S1-S858</div>
       <div class="meta"><span>时间：</span>2026-07-11 08:00:00 ~ 2026-07-13 07:59:59（2天） UTC+8</div>
+      
     </article>
     
 
@@ -886,6 +1085,7 @@
       
       <div class="meta"><span>服务器：</span>S860</div>
       <div class="meta"><span>时间：</span>2026-07-13 08:00:00 ~ 2026-07-18 07:59:59（5天） UTC+8</div>
+      
     </article>
     
               </div>
@@ -903,6 +1103,7 @@
       
       <div class="meta"><span>服务器：</span>S1-S858</div>
       <div class="meta"><span>时间：</span>2026-07-12 08:00:00 ~ 2026-07-13 07:59:59（1天） UTC+8</div>
+      
     </article>
     
               </div>
@@ -920,6 +1121,7 @@
       
       <div class="meta"><span>服务器：</span>S859，S1-S857</div>
       <div class="meta"><span>时间：</span>2026-07-13 08:00:00 ~ 2026-07-18 07:59:59（5天） UTC+8</div>
+      
     </article>
     
               </div>
@@ -937,6 +1139,7 @@
       
       <div class="meta"><span>服务器：</span>S1-S834</div>
       <div class="meta"><span>时间：</span>2026-07-13 08:00:00 ~ 2026-07-19 07:59:59（6天） UTC+8</div>
+      
     </article>
     
 
@@ -946,6 +1149,7 @@
       
       <div class="meta"><span>服务器：</span>S1-S858</div>
       <div class="meta"><span>时间：</span>2026-07-13 08:00:00 ~ 2026-07-20 07:59:59（7天） UTC+8</div>
+      
     </article>
     
 
@@ -954,6 +1158,7 @@
       
       <div class="meta"><span>服务器：</span>S1-Sxxx</div>
       <div class="meta"><span>时间：</span>2026-07-13 08:00:00 ~ 2026-07-15 07:59:59（2天） UTC+8</div>
+      
     </article>
     
               </div>
@@ -971,6 +1176,7 @@
       
       <div class="meta"><span>服务器：</span>S858</div>
       <div class="meta"><span>时间：</span>2026-07-13 08:00:00 ~ 2036-07-14 07:59:59（10年） UTC+8</div>
+      
     </article>
     
 
@@ -979,6 +1185,7 @@
       
       <div class="meta"><span>服务器：</span>S1-S858</div>
       <div class="meta"><span>时间：</span>2026-07-13 08:00:00 ~ 2026-07-20 07:59:59（7天） UTC+8</div>
+      
     </article>
     
 
@@ -987,6 +1194,16 @@
       
       <div class="meta"><span>服务器：</span>S1-S856</div>
       <div class="meta"><span>时间：</span>2026-07-14 08:00:00 ~ 2026-07-21 07:59:59（7天） UTC+8</div>
+      
+      <div class="package-block">
+        <div class="package-title">配套礼包</div>
+        <div class="package-lines"><div>29118: 万物新生神秘特供</div></div>
+        <div class="meta">服务器：S1-S856</div>
+<div class="meta">时间：2026-07-14 08:00:00 ~ 2026-07-21 07:59:59（7天） UTC+8</div>
+<div class="meta">每日刷新：是</div>
+<div class="meta">新服自动开启：否</div>
+      </div>
+    
     </article>
     
 
@@ -995,6 +1212,7 @@
       
       <div class="meta"><span>服务器：</span>S1-S859</div>
       <div class="meta"><span>时间：</span>2026-07-18 08:00:00 ~ 2026-07-20 07:59:59（2天） UTC+8</div>
+      
     </article>
     
 
@@ -1003,6 +1221,7 @@
       
       <div class="meta"><span>服务器：</span>S861</div>
       <div class="meta"><span>时间：</span>2026-07-20 08:00:00 ~ 2026-07-25 07:59:59（5天） UTC+8</div>
+      
     </article>
     
               </div>
@@ -1020,6 +1239,7 @@
       
       <div class="meta"><span>服务器：</span>S1-SXXX</div>
       <div class="meta"><span>时间：</span>2026-07-16 08:00:00 ~ 2026-07-19 07:59:59（3天） UTC+8</div>
+      
     </article>
     
               </div>
@@ -1033,10 +1253,11 @@
               <div class="cards">
                 
     <article class="card">
-      <h3>特化蚁对决</h3>
+      <h3>1000143:特化蚁对决</h3>
       
       <div class="meta"><span>服务器：</span>排期表未标明</div>
-      <div class="meta"><span>时间：</span>2026-07-17 08:00:00 ~ 2026-07-31 07:59:59（14天） UTC+8</div>
+      <div class="meta"><span>时间：</span>2026-07-17 08:15:00 ~ 2026-07-31 08:14:59（14天） UTC+8</div>
+      
     </article>
     
               </div>
@@ -1054,6 +1275,7 @@
       
       <div class="meta"><span>服务器：</span>全服</div>
       <div class="meta"><span>时间：</span>2026-07-18 08:00:00 ~ 2026-07-19 07:59:59（1天） UTC+8</div>
+      
     </article>
     
 
@@ -1062,6 +1284,7 @@
       
       <div class="meta"><span>服务器：</span>排期表未标明</div>
       <div class="meta"><span>时间：</span>2026-07-19 08:00:00 ~ 2026-07-20 07:59:59（1天） UTC+8</div>
+      
     </article>
     
               </div>
@@ -1079,6 +1302,7 @@
       
       <div class="meta"><span>服务器：</span>S860</div>
       <div class="meta"><span>时间：</span>2026-07-20 08:00:00 ~ 2026-07-25 07:59:59（5天） UTC+8</div>
+      
     </article>
     
               </div>
@@ -1092,10 +1316,11 @@
               <div class="cards">
                 
     <article class="card">
-      <h3>蚁后对决</h3>
+      <h3>1000135:蚁后对决</h3>
       
       <div class="meta"><span>服务器：</span>S1-Sxxx</div>
-      <div class="meta"><span>时间：</span>2026-07-20 08:00:00 ~ 2026-09-03 07:59:59（45天） UTC+8</div>
+      <div class="meta"><span>时间：</span>2026-07-20 08:15:00 ~ 2026-09-03 08:14:59（45天） UTC+8</div>
+      
     </article>
     
               </div>
@@ -1113,6 +1338,7 @@
       
       <div class="meta"><span>服务器：</span>S859</div>
       <div class="meta"><span>时间：</span>2026-07-20 08:00:00 ~ 2036-07-21 07:59:59（10年） UTC+8</div>
+      
     </article>
     
 
@@ -1121,6 +1347,7 @@
       
       <div class="meta"><span>服务器：</span>S1-S859</div>
       <div class="meta"><span>时间：</span>2026-07-20 08:00:00 ~ 2026-07-27 07:59:59（7天） UTC+8</div>
+      
     </article>
     
 
@@ -1129,6 +1356,7 @@
       
       <div class="meta"><span>服务器：</span>S1-Sxxx</div>
       <div class="meta"><span>时间：</span>2026-07-21 08:00:00 ~ 2026-07-28 07:59:59（7天） UTC+8</div>
+      
     </article>
     
 
@@ -1137,6 +1365,7 @@
       
       <div class="meta"><span>服务器：</span>排期表未标明</div>
       <div class="meta"><span>时间：</span>2026-07-21 08:00:00 ~ 2026-07-27 07:59:59（6天） UTC+8</div>
+      
     </article>
     
 
@@ -1145,22 +1374,34 @@
       
       <div class="meta"><span>服务器：</span>S1-S857</div>
       <div class="meta"><span>时间：</span>2026-07-21 08:00:00 ~ 2026-07-28 07:59:59（7天） UTC+8</div>
+      
+      <div class="package-block">
+        <div class="package-title">配套礼包</div>
+        <div class="package-lines"><div>29119: 潮起潮落神秘特供</div></div>
+        <div class="meta">服务器：S1-S857</div>
+<div class="meta">时间：2026-07-21 08:00:00 ~ 2026-07-28 07:59:59（7天） UTC+8</div>
+<div class="meta">每日刷新：是</div>
+<div class="meta">新服自动开启：否</div>
+      </div>
+    
     </article>
     
 
     <article class="card">
-      <h3>珍宝商店</h3>
+      <h3>1000151: 蚁巢装扮兑换商店</h3>
       
       <div class="meta"><span>服务器：</span>排期表未标明</div>
       <div class="meta"><span>时间：</span>2026-07-21 08:00:00 ~ 2026-07-27 07:59:59（6天） UTC+8</div>
+      
     </article>
     
 
     <article class="card">
-      <h3>黑骑士</h3>
+      <h3>1000906:国服-土拨鼠复仇</h3>
       
       <div class="meta"><span>服务器：</span>客户端 S1-S853；小程序 S205-S751</div>
       <div class="meta"><span>时间：</span>2026-07-22 08:00:00 ~ 2026-07-23 07:59:59（1天） UTC+8</div>
+      
     </article>
     
 
@@ -1169,6 +1410,7 @@
       
       <div class="meta"><span>服务器：</span>S1-S860</div>
       <div class="meta"><span>时间：</span>2026-07-25 08:00:00 ~ 2026-07-27 07:59:59（2天） UTC+8</div>
+      
     </article>
     
 
@@ -1177,6 +1419,7 @@
       
       <div class="meta"><span>服务器：</span>S862</div>
       <div class="meta"><span>时间：</span>2026-07-27 08:00:00 ~ 2026-08-01 07:59:59（5天） UTC+8</div>
+      
     </article>
     
               </div>
@@ -1185,7 +1428,7 @@
             <details class="day" open>
               <summary>
                 <span class="date">2026-07-24</span>
-                <span class="count">1 个提醒</span>
+                <span class="count">2 个提醒</span>
               </summary>
               <div class="cards">
                 
@@ -1194,6 +1437,18 @@
       
       <div class="meta"><span>服务器：</span>S1-S860</div>
       <div class="meta"><span>时间：</span>2026-07-26 08:00:00 ~ 2026-07-27 07:59:59（1天） UTC+8</div>
+      
+    </article>
+    
+
+    <article class="card">
+      <h3>1900133: 连续充值（进化开启第二套）
+1900162: 连续充值（进化开启第三套）
+1900163: 连续充值（改造，开启进化第2/3套以外的服务器）</h3>
+      
+      <div class="meta"><span>服务器：</span>S1-S860</div>
+      <div class="meta"><span>时间：</span>2026-07-27 08:00:00 ~ 2026-08-03 07:59:59（7天） UTC+8</div>
+      
     </article>
     
               </div>
@@ -1211,6 +1466,7 @@
       
       <div class="meta"><span>服务器：</span>S861</div>
       <div class="meta"><span>时间：</span>2026-07-27 08:00:00 ~ 2026-08-01 07:59:59（5天） UTC+8</div>
+      
     </article>
     
               </div>
@@ -1219,7 +1475,7 @@
             <details class="day" open>
               <summary>
                 <span class="date">2026-07-26</span>
-                <span class="count">2 个提醒</span>
+                <span class="count">1 个提醒</span>
               </summary>
               <div class="cards">
                 
@@ -1228,16 +1484,7 @@
       
       <div class="meta"><span>服务器：</span>S1-Sxxx</div>
       <div class="meta"><span>时间：</span>2026-07-27 08:00:00 ~ 2026-08-03 07:59:59（7天） UTC+8</div>
-    </article>
-    
-
-    <article class="card">
-      <h3>1900133: 连续充值（进化开启第二套）
-1900162: 连续充值（进化开启第三套）
-1900163: 连续充值（改造，开启进化第2/3套以外的服务器）</h3>
       
-      <div class="meta"><span>服务器：</span>S1-S860</div>
-      <div class="meta"><span>时间：</span>2026-07-27 08:00:00 ~ 2026-08-03 07:59:59（7天） UTC+8</div>
     </article>
     
               </div>
@@ -1255,6 +1502,7 @@
       
       <div class="meta"><span>服务器：</span>S860</div>
       <div class="meta"><span>时间：</span>2026-07-27 08:00:00 ~ 2036-07-28 07:59:59（10年） UTC+8</div>
+      
     </article>
     
 
@@ -1263,6 +1511,7 @@
       
       <div class="meta"><span>服务器：</span>S1-S860</div>
       <div class="meta"><span>时间：</span>2026-07-27 08:00:00 ~ 2026-08-03 07:59:59（7天） UTC+8</div>
+      
     </article>
     
 
@@ -1271,6 +1520,16 @@
       
       <div class="meta"><span>服务器：</span>S1-S858</div>
       <div class="meta"><span>时间：</span>2026-07-28 08:00:00 ~ 2026-08-04 07:59:59（7天） UTC+8</div>
+      
+      <div class="package-block">
+        <div class="package-title">配套礼包</div>
+        <div class="package-lines"><div>29120: 旱季来临神秘特供</div></div>
+        <div class="meta">服务器：S1-S858</div>
+<div class="meta">时间：2026-07-28 08:00:00 ~ 2026-08-04 07:59:59（7天） UTC+8</div>
+<div class="meta">每日刷新：是</div>
+<div class="meta">新服自动开启：否</div>
+      </div>
+    
     </article>
     
 
@@ -1279,6 +1538,7 @@
       
       <div class="meta"><span>服务器：</span>S1-S861</div>
       <div class="meta"><span>时间：</span>2026-08-01 08:00:00 ~ 2026-08-03 07:59:59（2天） UTC+8</div>
+      
     </article>
     
               </div>
@@ -1296,6 +1556,7 @@
       
       <div class="meta"><span>服务器：</span>S1-Sxxx</div>
       <div class="meta"><span>时间：</span>2026-07-29 08:00:00 ~ 2026-08-01 07:59:59（3天） UTC+8</div>
+      
     </article>
     
 
@@ -1304,6 +1565,7 @@
       
       <div class="meta"><span>服务器：</span>S1-Sxxx</div>
       <div class="meta"><span>时间：</span>2026-07-29 08:00:00 ~ 2026-08-01 07:59:59（3天） UTC+8</div>
+      
     </article>
     
               </div>
@@ -1321,6 +1583,7 @@
       
       <div class="meta"><span>服务器：</span>全服</div>
       <div class="meta"><span>时间：</span>2026-08-01 08:00:00 ~ 2026-08-02 07:59:59（1天） UTC+8</div>
+      
     </article>
     
 
@@ -1329,6 +1592,7 @@
       
       <div class="meta"><span>服务器：</span>排期表未标明</div>
       <div class="meta"><span>时间：</span>2026-08-02 08:00:00 ~ 2026-08-03 07:59:59（1天） UTC+8</div>
+      
     </article>
     
               </div>
