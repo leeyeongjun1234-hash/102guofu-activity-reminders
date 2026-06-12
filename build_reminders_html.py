@@ -711,7 +711,8 @@ def build_html(reminders: list[Reminder]) -> str:
   </div>
 
   <script>
-    const AUTH_KEY = 'activity-reminders-authenticated';
+    const AUTH_KEY = 'activity-reminders-authenticated-until';
+    const AUTH_TTL_MS = 48 * 60 * 60 * 1000;
     const PASSWORD_HASH = '542df2c1e629af51b87cf02f575af7fc8cd25a26d6cf9a54e7ac3775bce0d8f6';
     const lockForm = document.getElementById('lockForm');
     const lockPassword = document.getElementById('lockPassword');
@@ -727,15 +728,18 @@ def build_html(reminders: list[Reminder]) -> str:
       return [...new Uint8Array(digest)].map((byte) => byte.toString(16).padStart(2, '0')).join('');
     }}
 
-    if (sessionStorage.getItem(AUTH_KEY) === '1') {{
+    const authenticatedUntil = Number(localStorage.getItem(AUTH_KEY) || 0);
+    if (authenticatedUntil > Date.now()) {{
       unlockPage();
+    }} else {{
+      localStorage.removeItem(AUTH_KEY);
     }}
 
     lockForm.addEventListener('submit', async (event) => {{
       event.preventDefault();
       const inputHash = await sha256(lockPassword.value);
       if (inputHash === PASSWORD_HASH) {{
-        sessionStorage.setItem(AUTH_KEY, '1');
+        localStorage.setItem(AUTH_KEY, String(Date.now() + AUTH_TTL_MS));
         lockPassword.value = '';
         lockError.textContent = '';
         unlockPage();
