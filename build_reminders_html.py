@@ -561,6 +561,74 @@ def build_html(reminders: list[Reminder]) -> str:
       display: none;
     }}
 
+    body.locked .wrap {{
+      display: none;
+    }}
+
+    body:not(.locked) .lock-screen {{
+      display: none;
+    }}
+
+    .lock-screen {{
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+    }}
+
+    .lock-panel {{
+      width: min(420px, 100%);
+      display: grid;
+      gap: 14px;
+      padding: 24px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel);
+      box-shadow: var(--shadow);
+    }}
+
+    .lock-panel h1 {{
+      font-size: 24px;
+    }}
+
+    .lock-panel label {{
+      color: var(--muted);
+      font-weight: 700;
+    }}
+
+    .lock-row {{
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 10px;
+    }}
+
+    .lock-row input {{
+      min-width: 0;
+      padding: 10px 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel);
+      color: var(--text);
+      font: inherit;
+    }}
+
+    .lock-row button {{
+      padding: 10px 14px;
+      border: 1px solid #166534;
+      border-radius: 8px;
+      background: #166534;
+      color: #ffffff;
+      cursor: pointer;
+      font: inherit;
+      font-weight: 700;
+    }}
+
+    .lock-error {{
+      min-height: 20px;
+      color: #b91c1c;
+      font-weight: 700;
+    }}
+
     @media (max-width: 720px) {{
       .wrap {{
         padding: 16px;
@@ -595,6 +663,10 @@ def build_html(reminders: list[Reminder]) -> str:
       .cards {{
         column-count: 1;
       }}
+
+      .lock-row {{
+        grid-template-columns: 1fr;
+      }}
     }}
 
     @media (min-width: 721px) and (max-width: 980px) {{
@@ -604,7 +676,18 @@ def build_html(reminders: list[Reminder]) -> str:
     }}
   </style>
 </head>
-<body>
+<body class="locked">
+  <section class="lock-screen" aria-label="密码验证">
+    <form id="lockForm" class="lock-panel">
+      <h1>请输入密码</h1>
+      <label for="lockPassword">密码</label>
+      <div class="lock-row">
+        <input id="lockPassword" type="password" autocomplete="current-password" autofocus>
+        <button type="submit">进入</button>
+      </div>
+      <div id="lockError" class="lock-error" role="alert"></div>
+    </form>
+  </section>
   <div class="wrap">
     <header class="top">
       <h1>全部每日活动提醒</h1>
@@ -628,6 +711,41 @@ def build_html(reminders: list[Reminder]) -> str:
   </div>
 
   <script>
+    const AUTH_KEY = 'activity-reminders-authenticated';
+    const PASSWORD_HASH = '542df2c1e629af51b87cf02f575af7fc8cd25a26d6cf9a54e7ac3775bce0d8f6';
+    const lockForm = document.getElementById('lockForm');
+    const lockPassword = document.getElementById('lockPassword');
+    const lockError = document.getElementById('lockError');
+
+    function unlockPage() {{
+      document.body.classList.remove('locked');
+    }}
+
+    async function sha256(value) {{
+      const bytes = new TextEncoder().encode(value);
+      const digest = await crypto.subtle.digest('SHA-256', bytes);
+      return [...new Uint8Array(digest)].map((byte) => byte.toString(16).padStart(2, '0')).join('');
+    }}
+
+    if (sessionStorage.getItem(AUTH_KEY) === '1') {{
+      unlockPage();
+    }}
+
+    lockForm.addEventListener('submit', async (event) => {{
+      event.preventDefault();
+      const inputHash = await sha256(lockPassword.value);
+      if (inputHash === PASSWORD_HASH) {{
+        sessionStorage.setItem(AUTH_KEY, '1');
+        lockPassword.value = '';
+        lockError.textContent = '';
+        unlockPage();
+        return;
+      }}
+
+      lockError.textContent = '密码错误';
+      lockPassword.select();
+    }});
+
     const search = document.getElementById('search');
     const dayNodes = [...document.querySelectorAll('.day')];
     const expandAll = document.getElementById('expandAll');
