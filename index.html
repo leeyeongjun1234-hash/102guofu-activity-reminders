@@ -240,6 +240,10 @@
       display: none;
     }
 
+    .hidden-by-date {
+      display: none;
+    }
+
     @media (max-width: 720px) {
       .wrap {
         padding: 16px;
@@ -298,15 +302,8 @@
 
     <section class="summary-grid">
       
-        <section class="summary-card">
-          <div class="summary-label">当天要开什么</div>
-          <div class="summary-date">今天没有要开的活动</div>
-          <div class="summary-meta">当前没有可展示的提醒</div>
-        </section>
-        
-      
-    <section class="summary-card">
-      <div class="summary-label">下一次要开什么<span class="next-badge">下一次</span></div>
+    <section class="summary-card" id="todaySummary">
+      <div class="summary-label">今天要设置什么</div>
       <div class="summary-date">2026-06-12</div>
       <div class="summary-meta"><div>29145: 火力全开:进攻土拨鼠128~648</div>
 <div>1900148: 限时自选补给</div>
@@ -315,13 +312,20 @@
 1900163: 连续充值（改造，开启进化第2/3套以外的服务器）</div></div>
     </section>
     
+      
+    <section class="summary-card" id="nextSummary">
+      <div class="summary-label">下一次要设置什么<span class="next-badge">下一次</span></div>
+      <div class="summary-date">2026-06-13</div>
+      <div class="summary-meta"><div>1000905:国服-拯救蚜虫-跨服</div></div>
+    </section>
+    
     </section>
 
     <main id="days">
       
-            <details class="day" open>
+            <details class="day" data-date="2026-06-12" open>
               <summary>
-                <span class="date">2026-06-12<span class="inline-badge">下一次</span></span>
+                <span class="date"><span class="date-text">2026-06-12</span></span>
                 <span class="count">3 个提醒</span>
               </summary>
               <div class="cards">
@@ -357,9 +361,9 @@
               </div>
             </details>
             
-            <details class="day" open>
+            <details class="day" data-date="2026-06-13" open>
               <summary>
-                <span class="date">2026-06-13</span>
+                <span class="date"><span class="date-text">2026-06-13</span><span class="inline-badge">下一次</span></span>
                 <span class="count">1 个提醒</span>
               </summary>
               <div class="cards">
@@ -375,9 +379,9 @@
               </div>
             </details>
             
-            <details class="day" open>
+            <details class="day" data-date="2026-06-14" open>
               <summary>
-                <span class="date">2026-06-14</span>
+                <span class="date"><span class="date-text">2026-06-14</span></span>
                 <span class="count">1 个提醒</span>
               </summary>
               <div class="cards">
@@ -393,9 +397,9 @@
               </div>
             </details>
             
-            <details class="day" open>
+            <details class="day" data-date="2026-06-15" open>
               <summary>
-                <span class="date">2026-06-15</span>
+                <span class="date"><span class="date-text">2026-06-15</span></span>
                 <span class="count">6 个提醒</span>
               </summary>
               <div class="cards">
@@ -465,9 +469,9 @@
               </div>
             </details>
             
-            <details class="day" open>
+            <details class="day" data-date="2026-06-16" open>
               <summary>
-                <span class="date">2026-06-16</span>
+                <span class="date"><span class="date-text">2026-06-16</span></span>
                 <span class="count">1 个提醒</span>
               </summary>
               <div class="cards">
@@ -483,9 +487,9 @@
               </div>
             </details>
             
-            <details class="day" open>
+            <details class="day" data-date="2026-06-18" open>
               <summary>
-                <span class="date">2026-06-18</span>
+                <span class="date"><span class="date-text">2026-06-18</span></span>
                 <span class="count">1 个提醒</span>
               </summary>
               <div class="cards">
@@ -512,9 +516,9 @@
               </div>
             </details>
             
-            <details class="day" open>
+            <details class="day" data-date="2026-06-19" open>
               <summary>
-                <span class="date">2026-06-19</span>
+                <span class="date"><span class="date-text">2026-06-19</span></span>
                 <span class="count">2 个提醒</span>
               </summary>
               <div class="cards">
@@ -539,9 +543,9 @@
               </div>
             </details>
             
-            <details class="day" open>
+            <details class="day" data-date="2026-06-20" open>
               <summary>
-                <span class="date">2026-06-20</span>
+                <span class="date"><span class="date-text">2026-06-20</span></span>
                 <span class="count">1 个提醒</span>
               </summary>
               <div class="cards">
@@ -557,9 +561,9 @@
               </div>
             </details>
             
-            <details class="day" open>
+            <details class="day" data-date="2026-06-21" open>
               <summary>
-                <span class="date">2026-06-21</span>
+                <span class="date"><span class="date-text">2026-06-21</span></span>
                 <span class="count">1 个提醒</span>
               </summary>
               <div class="cards">
@@ -575,9 +579,9 @@
               </div>
             </details>
             
-            <details class="day" open>
+            <details class="day" data-date="2026-06-22" open>
               <summary>
-                <span class="date">2026-06-22</span>
+                <span class="date"><span class="date-text">2026-06-22</span></span>
                 <span class="count">9 个提醒</span>
               </summary>
               <div class="cards">
@@ -696,9 +700,9 @@
               </div>
             </details>
             
-            <details class="day" open>
+            <details class="day" data-date="2026-06-26" open>
               <summary>
-                <span class="date">2026-06-26</span>
+                <span class="date"><span class="date-text">2026-06-26</span></span>
                 <span class="count">1 个提醒</span>
               </summary>
               <div class="cards">
@@ -714,9 +718,9 @@
               </div>
             </details>
             
-            <details class="day" open>
+            <details class="day" data-date="2026-06-27" open>
               <summary>
-                <span class="date">2026-06-27</span>
+                <span class="date"><span class="date-text">2026-06-27</span></span>
                 <span class="count">2 个提醒</span>
               </summary>
               <div class="cards">
@@ -741,9 +745,9 @@
               </div>
             </details>
             
-            <details class="day" open>
+            <details class="day" data-date="2026-06-28" open>
               <summary>
-                <span class="date">2026-06-28</span>
+                <span class="date"><span class="date-text">2026-06-28</span></span>
                 <span class="count">4 个提醒</span>
               </summary>
               <div class="cards">
@@ -821,9 +825,9 @@
               </div>
             </details>
             
-            <details class="day" open>
+            <details class="day" data-date="2026-06-29" open>
               <summary>
-                <span class="date">2026-06-29</span>
+                <span class="date"><span class="date-text">2026-06-29</span></span>
                 <span class="count">5 个提醒</span>
               </summary>
               <div class="cards">
@@ -884,9 +888,9 @@
               </div>
             </details>
             
-            <details class="day" open>
+            <details class="day" data-date="2026-07-01" open>
               <summary>
-                <span class="date">2026-07-01</span>
+                <span class="date"><span class="date-text">2026-07-01</span></span>
                 <span class="count">1 个提醒</span>
               </summary>
               <div class="cards">
@@ -902,9 +906,9 @@
               </div>
             </details>
             
-            <details class="day" open>
+            <details class="day" data-date="2026-07-02" open>
               <summary>
-                <span class="date">2026-07-02</span>
+                <span class="date"><span class="date-text">2026-07-02</span></span>
                 <span class="count">1 个提醒</span>
               </summary>
               <div class="cards">
@@ -920,9 +924,9 @@
               </div>
             </details>
             
-            <details class="day" open>
+            <details class="day" data-date="2026-07-03" open>
               <summary>
-                <span class="date">2026-07-03</span>
+                <span class="date"><span class="date-text">2026-07-03</span></span>
                 <span class="count">2 个提醒</span>
               </summary>
               <div class="cards">
@@ -947,9 +951,9 @@
               </div>
             </details>
             
-            <details class="day" open>
+            <details class="day" data-date="2026-07-04" open>
               <summary>
-                <span class="date">2026-07-04</span>
+                <span class="date"><span class="date-text">2026-07-04</span></span>
                 <span class="count">1 个提醒</span>
               </summary>
               <div class="cards">
@@ -965,9 +969,9 @@
               </div>
             </details>
             
-            <details class="day" open>
+            <details class="day" data-date="2026-07-05" open>
               <summary>
-                <span class="date">2026-07-05</span>
+                <span class="date"><span class="date-text">2026-07-05</span></span>
                 <span class="count">2 个提醒</span>
               </summary>
               <div class="cards">
@@ -992,9 +996,9 @@
               </div>
             </details>
             
-            <details class="day" open>
+            <details class="day" data-date="2026-07-06" open>
               <summary>
-                <span class="date">2026-07-06</span>
+                <span class="date"><span class="date-text">2026-07-06</span></span>
                 <span class="count">9 个提醒</span>
               </summary>
               <div class="cards">
@@ -1091,9 +1095,9 @@
               </div>
             </details>
             
-            <details class="day" open>
+            <details class="day" data-date="2026-07-10" open>
               <summary>
-                <span class="date">2026-07-10</span>
+                <span class="date"><span class="date-text">2026-07-10</span></span>
                 <span class="count">1 个提醒</span>
               </summary>
               <div class="cards">
@@ -1109,9 +1113,9 @@
               </div>
             </details>
             
-            <details class="day" open>
+            <details class="day" data-date="2026-07-11" open>
               <summary>
-                <span class="date">2026-07-11</span>
+                <span class="date"><span class="date-text">2026-07-11</span></span>
                 <span class="count">1 个提醒</span>
               </summary>
               <div class="cards">
@@ -1127,9 +1131,9 @@
               </div>
             </details>
             
-            <details class="day" open>
+            <details class="day" data-date="2026-07-12" open>
               <summary>
-                <span class="date">2026-07-12</span>
+                <span class="date"><span class="date-text">2026-07-12</span></span>
                 <span class="count">3 个提醒</span>
               </summary>
               <div class="cards">
@@ -1164,9 +1168,9 @@
               </div>
             </details>
             
-            <details class="day" open>
+            <details class="day" data-date="2026-07-13" open>
               <summary>
-                <span class="date">2026-07-13</span>
+                <span class="date"><span class="date-text">2026-07-13</span></span>
                 <span class="count">5 个提醒</span>
               </summary>
               <div class="cards">
@@ -1227,9 +1231,9 @@
               </div>
             </details>
             
-            <details class="day" open>
+            <details class="day" data-date="2026-07-15" open>
               <summary>
-                <span class="date">2026-07-15</span>
+                <span class="date"><span class="date-text">2026-07-15</span></span>
                 <span class="count">1 个提醒</span>
               </summary>
               <div class="cards">
@@ -1245,9 +1249,9 @@
               </div>
             </details>
             
-            <details class="day" open>
+            <details class="day" data-date="2026-07-16" open>
               <summary>
-                <span class="date">2026-07-16</span>
+                <span class="date"><span class="date-text">2026-07-16</span></span>
                 <span class="count">1 个提醒</span>
               </summary>
               <div class="cards">
@@ -1263,9 +1267,9 @@
               </div>
             </details>
             
-            <details class="day" open>
+            <details class="day" data-date="2026-07-17" open>
               <summary>
-                <span class="date">2026-07-17</span>
+                <span class="date"><span class="date-text">2026-07-17</span></span>
                 <span class="count">2 个提醒</span>
               </summary>
               <div class="cards">
@@ -1290,9 +1294,9 @@
               </div>
             </details>
             
-            <details class="day" open>
+            <details class="day" data-date="2026-07-18" open>
               <summary>
-                <span class="date">2026-07-18</span>
+                <span class="date"><span class="date-text">2026-07-18</span></span>
                 <span class="count">1 个提醒</span>
               </summary>
               <div class="cards">
@@ -1308,9 +1312,9 @@
               </div>
             </details>
             
-            <details class="day" open>
+            <details class="day" data-date="2026-07-19" open>
               <summary>
-                <span class="date">2026-07-19</span>
+                <span class="date"><span class="date-text">2026-07-19</span></span>
                 <span class="count">1 个提醒</span>
               </summary>
               <div class="cards">
@@ -1326,9 +1330,9 @@
               </div>
             </details>
             
-            <details class="day" open>
+            <details class="day" data-date="2026-07-20" open>
               <summary>
-                <span class="date">2026-07-20</span>
+                <span class="date"><span class="date-text">2026-07-20</span></span>
                 <span class="count">9 个提醒</span>
               </summary>
               <div class="cards">
@@ -1425,9 +1429,9 @@
               </div>
             </details>
             
-            <details class="day" open>
+            <details class="day" data-date="2026-07-24" open>
               <summary>
-                <span class="date">2026-07-24</span>
+                <span class="date"><span class="date-text">2026-07-24</span></span>
                 <span class="count">2 个提醒</span>
               </summary>
               <div class="cards">
@@ -1454,9 +1458,9 @@
               </div>
             </details>
             
-            <details class="day" open>
+            <details class="day" data-date="2026-07-25" open>
               <summary>
-                <span class="date">2026-07-25</span>
+                <span class="date"><span class="date-text">2026-07-25</span></span>
                 <span class="count">1 个提醒</span>
               </summary>
               <div class="cards">
@@ -1472,9 +1476,9 @@
               </div>
             </details>
             
-            <details class="day" open>
+            <details class="day" data-date="2026-07-26" open>
               <summary>
-                <span class="date">2026-07-26</span>
+                <span class="date"><span class="date-text">2026-07-26</span></span>
                 <span class="count">1 个提醒</span>
               </summary>
               <div class="cards">
@@ -1490,9 +1494,9 @@
               </div>
             </details>
             
-            <details class="day" open>
+            <details class="day" data-date="2026-07-27" open>
               <summary>
-                <span class="date">2026-07-27</span>
+                <span class="date"><span class="date-text">2026-07-27</span></span>
                 <span class="count">4 个提醒</span>
               </summary>
               <div class="cards">
@@ -1544,9 +1548,9 @@
               </div>
             </details>
             
-            <details class="day" open>
+            <details class="day" data-date="2026-07-28" open>
               <summary>
-                <span class="date">2026-07-28</span>
+                <span class="date"><span class="date-text">2026-07-28</span></span>
                 <span class="count">2 个提醒</span>
               </summary>
               <div class="cards">
@@ -1571,9 +1575,9 @@
               </div>
             </details>
             
-            <details class="day" open>
+            <details class="day" data-date="2026-07-31" open>
               <summary>
-                <span class="date">2026-07-31</span>
+                <span class="date"><span class="date-text">2026-07-31</span></span>
                 <span class="count">2 个提醒</span>
               </summary>
               <div class="cards">
@@ -1606,10 +1610,84 @@
     const dayNodes = [...document.querySelectorAll('.day')];
     const expandAll = document.getElementById('expandAll');
     const collapseAll = document.getElementById('collapseAll');
+    const todaySummary = document.getElementById('todaySummary');
+    const nextSummary = document.getElementById('nextSummary');
+
+    function todayString() {
+      const now = new Date();
+      const year = now.getFullYear();
+      const month = String(now.getMonth() + 1).padStart(2, '0');
+      const day = String(now.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    }
+
+    function uniqueCardNames(day, limit = 3) {
+      const names = [...day.querySelectorAll('.card h3')].map((node) => node.textContent.trim());
+      const unique = [...new Set(names)];
+      const shown = unique.slice(0, limit);
+      if (unique.length > limit) shown.push(`等${unique.length}个`);
+      return shown;
+    }
+
+    function setSummary(card, title, day, emptyText, badgeText = '') {
+      const label = card.querySelector('.summary-label');
+      const summaryDate = card.querySelector('.summary-date');
+      const meta = card.querySelector('.summary-meta');
+      label.textContent = title;
+      if (badgeText) {
+        const badge = document.createElement('span');
+        badge.className = 'next-badge';
+        badge.textContent = badgeText;
+        label.appendChild(badge);
+      }
+
+      meta.replaceChildren();
+      if (!day) {
+        summaryDate.textContent = emptyText;
+        const empty = document.createElement('div');
+        empty.textContent = '当前没有可展示的提醒';
+        meta.appendChild(empty);
+        return;
+      }
+
+      summaryDate.textContent = day.dataset.date;
+      uniqueCardNames(day).forEach((name) => {
+        const row = document.createElement('div');
+        row.textContent = name;
+        meta.appendChild(row);
+      });
+    }
+
+    function syncDateState() {
+      const today = todayString();
+      const availableDays = [];
+      dayNodes.forEach((day) => {
+        const isPast = day.dataset.date < today;
+        day.classList.toggle('hidden-by-date', isPast);
+        day.querySelectorAll('.inline-badge').forEach((badge) => badge.remove());
+        if (!isPast) availableDays.push(day);
+      });
+
+      const todayDay = availableDays.find((day) => day.dataset.date === today);
+      const nextDay = availableDays.find((day) => day.dataset.date > today);
+      if (nextDay) {
+        const badge = document.createElement('span');
+        badge.className = 'inline-badge';
+        badge.textContent = '下一次';
+        nextDay.querySelector('.date').appendChild(badge);
+      }
+
+      setSummary(todaySummary, '今天要设置什么', todayDay, '今天没有要设置的活动');
+      setSummary(nextSummary, '下一次要设置什么', nextDay, '没有下一次提醒', '下一次');
+    }
 
     function applyFilter() {
       const query = search.value.trim().toLowerCase();
       dayNodes.forEach((day) => {
+        if (day.classList.contains('hidden-by-date')) {
+          day.classList.add('hidden');
+          return;
+        }
         const text = day.textContent.toLowerCase();
         const matched = !query || text.includes(query);
         day.classList.toggle('hidden', !matched);
@@ -1620,6 +1698,8 @@
     search.addEventListener('input', applyFilter);
     expandAll.addEventListener('click', () => dayNodes.forEach((day) => day.open = true));
     collapseAll.addEventListener('click', () => dayNodes.forEach((day) => day.open = false));
+    syncDateState();
+    applyFilter();
   </script>
 </body>
 </html>
