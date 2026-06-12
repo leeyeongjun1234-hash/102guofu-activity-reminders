@@ -16,6 +16,44 @@ python3 build_reminders_html.py
 - `index.html`
 - `site/index.html`
 
+## 日常更新
+
+### Mac
+
+编辑并保存 `102国服活动排期表.xlsx` 后，双击：
+
+```text
+一键同步GitHub.command
+```
+
+它会自动完成：
+
+- 重新生成提醒文本和 HTML
+- 提交本地修改
+- 拉取 GitHub 最新内容
+- 推送到 GitHub
+
+### Windows
+
+编辑并保存 `102国服活动排期表.xlsx` 后，双击：
+
+```text
+一键同步GitHub.bat
+```
+
+如果只想本地生成、不推送 GitHub，双击：
+
+```text
+一键更新提醒.bat
+```
+
+## 协作规则
+
+- 每次改排期表之前，先从 GitHub 拉取最新版本。
+- 同一时间尽量只让一个人编辑 `102国服活动排期表.xlsx`，避免 xlsx 冲突。
+- 改完后保存 xlsx，再运行一键同步脚本。
+- 如果同步时提示冲突，先不要强推，手动确认谁的表格版本是最新的。
+
 ## GitHub Pages
 
 推荐在 GitHub 仓库设置里开启 Pages：
