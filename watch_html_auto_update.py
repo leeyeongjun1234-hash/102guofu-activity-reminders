@@ -1,0 +1,83 @@
+from __future__ import annotations
+
+import subprocess
+import sys
+import time
+from datetime import datetime
+from pathlib import Path
+
+
+ROOT = Path(__file__).resolve().parent
+WATCHED_FILES = [
+    ROOT / "102国服活动排期表.xlsx",
+    ROOT / "活动与礼包对应关系.xlsx",
+    ROOT / "daily_reminder.py",
+    ROOT / "build_reminders_html.py",
+]
+INTERVAL_SECONDS = 3
+
+
+def file_signature(path: Path) -> tuple[int, int] | None:
+    try:
+        stat = path.stat()
+    except FileNotFoundError:
+        return None
+    return (stat.st_mtime_ns, stat.st_size)
+
+
+def watched_signature() -> dict[str, tuple[int, int] | None]:
+    return {str(path): file_signature(path) for path in WATCHED_FILES}
+
+
+def log(message: str) -> None:
+    now = datetime.now().strftime("%H:%M:%S")
+    print(f"[{now}] {message}", flush=True)
+
+
+def rebuild() -> bool:
+    log("开始更新 HTML...")
+    result = subprocess.run(
+        [sys.executable, str(ROOT / "build_reminders_html.py")],
+        cwd=ROOT,
+        text=True,
+    )
+    if result.returncode == 0:
+        log("HTML 已更新：全部每日提醒.html / site/index.html")
+        return True
+
+    log("HTML 更新失败，请查看上面的错误信息。")
+    return False
+
+
+def main() -> None:
+    missing = [path.name for path in WATCHED_FILES if not path.exists()]
+    if missing:
+        raise SystemExit("缺少文件：" + "、".join(missing))
+
+    log("自动更新 HTML 已启动。按 Ctrl+C 停止。")
+    rebuild()
+    last_signature = watched_signature()
+
+    while True:
+        time.sleep(INTERVAL_SECONDS)
+        current_signature = watched_signature()
+        if current_signature == last_signature:
+            continue
+
+        changed = [
+            Path(path).name
+            for path, signature in current_signature.items()
+            if signature != last_signature.get(path)
+        ]
+        log("检测到变动：" + "、".join(changed))
+        if rebuild():
+            last_signature = watched_signature()
+        else:
+            last_signature = current_signature
+
+
+if __name__ == "__main__":
+    try:
+        main()
+    except KeyboardInterrupt:
+        log("自动更新 HTML 已停止。")

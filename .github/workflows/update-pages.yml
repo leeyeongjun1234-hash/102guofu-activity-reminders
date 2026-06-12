@@ -1,0 +1,46 @@
+name: Update reminder page
+
+on:
+  workflow_dispatch:
+  schedule:
+    # Beijing 00:05. GitHub schedules use UTC.
+    - cron: "5 16 * * *"
+    # Beijing 08:05, as a backup after the workday starts.
+    - cron: "5 0 * * *"
+  push:
+    branches:
+      - main
+    paths:
+      - "102国服活动排期表.xlsx"
+      - "活动与礼包对应关系.xlsx"
+      - "daily_reminder.py"
+      - "build_reminders_html.py"
+      - ".github/workflows/update-pages.yml"
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      TZ: Asia/Shanghai
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Generate reminder files
+        run: |
+          python daily_reminder.py
+          python build_reminders_html.py
+
+      - name: Commit generated files
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "chore: update reminder page"
+          file_pattern: "index.html site/index.html 全部每日提醒.html 每日活动提醒.txt"

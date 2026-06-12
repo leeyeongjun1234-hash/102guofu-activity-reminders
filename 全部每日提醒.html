@@ -1,0 +1,1773 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>全部每日活动提醒</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f5f6f8;
+      --panel: #ffffff;
+      --panel-2: #f0f3f8;
+      --text: #1f2937;
+      --muted: #586274;
+      --line: #d8dee8;
+      --accent: #c2410c;
+      --accent-soft: #fff1ea;
+      --shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font: 14px/1.5 "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+    }
+
+    .wrap {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 24px;
+    }
+
+    .top {
+      display: grid;
+      gap: 8px;
+      margin-bottom: 20px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 28px;
+      font-weight: 700;
+    }
+
+    .sub {
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+
+    .summary-card {
+      display: grid;
+      gap: 6px;
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel);
+      box-shadow: var(--shadow);
+      min-height: 112px;
+    }
+
+    .summary-label {
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 15px;
+    }
+
+    .summary-date {
+      font-size: 34px;
+      font-weight: 700;
+      line-height: 1.1;
+    }
+
+    .summary-meta {
+      color: var(--text);
+      font-size: 14px;
+      display: grid;
+      gap: 4px;
+      word-break: break-word;
+    }
+
+    .summary-name {
+      display: grid;
+      gap: 2px;
+    }
+
+    .activity-name {
+      word-break: break-word;
+      overflow-wrap: anywhere;
+    }
+
+    .activity-name-line {
+      display: block;
+    }
+
+    .next-badge,
+    .inline-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: #dcfce7;
+      color: #166534;
+      font-size: 12px;
+      font-weight: 700;
+      vertical-align: middle;
+    }
+
+    .inline-badge {
+      margin-left: 8px;
+    }
+
+    .toolbar {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      padding: 12px 0 16px;
+      background: linear-gradient(to bottom, var(--bg) 75%, rgba(245, 246, 248, 0));
+    }
+
+    .search {
+      flex: 1;
+      min-width: 220px;
+      padding: 10px 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel);
+      color: var(--text);
+      font: inherit;
+    }
+
+    .toolbar button {
+      padding: 10px 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel);
+      color: var(--text);
+      cursor: pointer;
+      font: inherit;
+    }
+
+    .day {
+      margin-bottom: 16px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .day summary {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      list-style: none;
+      cursor: pointer;
+      padding: 14px 16px;
+      background: var(--panel-2);
+    }
+
+    .day summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .date {
+      font-size: 18px;
+      font-weight: 700;
+    }
+
+    .count {
+      color: var(--muted);
+      white-space: nowrap;
+    }
+
+    .cards {
+      column-count: 3;
+      column-gap: 12px;
+      padding: 16px;
+    }
+
+    .card {
+      display: grid;
+      gap: 8px;
+      break-inside: avoid;
+      margin: 0 0 12px;
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+    }
+
+    .card h3 {
+      margin: 0;
+      font-size: 18px;
+      line-height: 1.3;
+    }
+
+    .meta {
+      color: var(--text);
+      word-break: break-word;
+    }
+
+    .meta span {
+      color: var(--muted);
+    }
+
+    .meta-lines {
+      display: grid;
+      gap: 3px;
+    }
+
+    .text-line {
+      display: block;
+    }
+
+    .package-block {
+      display: grid;
+      gap: 6px;
+      margin-top: 8px;
+      padding-top: 12px;
+      border-top: 1px solid var(--line);
+    }
+
+    .package-title {
+      color: var(--muted);
+      font-weight: 700;
+    }
+
+    .package-lines {
+      display: grid;
+      gap: 3px;
+      font-weight: 700;
+      word-break: break-word;
+    }
+
+    .action {
+      color: var(--accent);
+      background: var(--accent-soft);
+      border-radius: 6px;
+      padding: 6px 8px;
+      width: fit-content;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .hidden-by-date {
+      display: none;
+    }
+
+    @media (max-width: 720px) {
+      .wrap {
+        padding: 16px;
+      }
+
+      h1 {
+        font-size: 24px;
+      }
+
+      .summary-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .summary-date {
+        font-size: 28px;
+      }
+
+      .toolbar {
+        flex-wrap: wrap;
+      }
+
+      .toolbar button,
+      .search {
+        width: 100%;
+      }
+
+      .day summary {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .cards {
+        column-count: 1;
+      }
+    }
+
+    @media (min-width: 721px) and (max-width: 980px) {
+      .cards {
+        column-count: 2;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header class="top">
+      <h1>全部每日活动提醒</h1>
+      <div class="sub">按设置日期汇总展示，日期与时间均按北京时间 UTC+8 计算。</div>
+    </header>
+
+    <div class="toolbar">
+      <input id="search" class="search" type="search" placeholder="搜索日期、活动名、服务器">
+      <button type="button" id="expandAll">全部展开</button>
+      <button type="button" id="collapseAll">全部收起</button>
+    </div>
+
+    <section class="summary-grid">
+      
+    <section class="summary-card" id="todaySummary">
+      <div class="summary-label">今天要设置什么</div>
+      <div class="summary-date">2026-06-12</div>
+      <div class="summary-meta"><div class="summary-name activity-name"><span class="activity-name-line">29145: 火力全开:进攻土拨鼠128~648</span></div>
+<div class="summary-name activity-name"><span class="activity-name-line">1900148: 限时自选补给</span></div>
+<div class="summary-name activity-name"><span class="activity-name-line">1900133: 连续充值（进化开启第二套）</span>
+<span class="activity-name-line">1900162: 连续充值（进化开启第三套）</span>
+<span class="activity-name-line">1900163: 连续充值（改造，开启进化第2/3套以外的服务器）</span>
+<span class="activity-name-line">1900084:【国服】五日随心储</span></div></div>
+    </section>
+    
+      
+    <section class="summary-card" id="nextSummary">
+      <div class="summary-label">下一次要设置什么<span class="next-badge">下一次</span></div>
+      <div class="summary-date">2026-06-13</div>
+      <div class="summary-meta"><div class="summary-name activity-name"><span class="activity-name-line">1000905:国服-拯救蚜虫-跨服</span></div></div>
+    </section>
+    
+    </section>
+
+    <main id="days">
+      
+            <details class="day" data-date="2026-06-12" open>
+              <summary>
+                <span class="date"><span class="date-text">2026-06-12</span></span>
+                <span class="count">3 个提醒</span>
+              </summary>
+              <div class="cards">
+                
+    <article class="card">
+      <h3 class="activity-name"><span class="activity-name-line">29145: 火力全开:进攻土拨鼠128~648</span></h3>
+      
+      <div class="meta"><span>服务器：</span>S1-S854</div>
+      <div class="meta"><span>时间：</span>2026-06-14 08:00:00 ~ 2026-06-15 07:59:59（1天） UTC+8</div>
+      
+    </article>
+    
+
+    <article class="card">
+      <h3 class="activity-name"><span class="activity-name-line">1900148: 限时自选补给</span></h3>
+      
+      <div class="meta"><span>服务器：</span>S1-S844</div>
+      <div class="meta"><span>时间：</span>2026-06-15 08:00:00 ~ 2026-06-22 07:59:59（7天） UTC+8</div>
+      
+    </article>
+    
+
+    <article class="card">
+      <h3 class="activity-name"><span class="activity-name-line">1900133: 连续充值（进化开启第二套）</span>
+<span class="activity-name-line">1900162: 连续充值（进化开启第三套）</span>
+<span class="activity-name-line">1900163: 连续充值（改造，开启进化第2/3套以外的服务器）</span>
+<span class="activity-name-line">1900084:【国服】五日随心储</span></h3>
+      
+      <div class="meta meta-lines"><span class="text-line">1900133: 连续充值（进化开启第二套）</span>
+<span class="text-line">1900162: 连续充值（进化开启第三套）</span>
+<span class="text-line">1900163: 连续充值（改造，开启进化第2/3套以外的服务器）</span>
+<span class="text-line">服务器：平台设置全服，实际开启读取配置</span>
+<span class="text-line text-line-empty"></span>
+<span class="text-line">1900084:【国服】五日随心储</span>
+<span class="text-line">服务器：1～S854（读实际配置）</span></div>
+      <div class="meta"><span>时间：</span>2026-06-15 08:00:00 ~ 2026-06-22 07:59:59（7天） UTC+8</div>
+      
+    </article>
+    
+              </div>
+            </details>
+            
+            <details class="day" data-date="2026-06-13" open>
+              <summary>
+                <span class="date"><span class="date-text">2026-06-13</span><span class="inline-badge">下一次</span></span>
+                <span class="count">1 个提醒</span>
+              </summary>
+              <div class="cards">
+                
+    <article class="card">
+      <h3 class="activity-name"><span class="activity-name-line">1000905:国服-拯救蚜虫-跨服</span></h3>
+      
+      <div class="meta"><span>服务器：</span>S855，S1-S853</div>
+      <div class="meta"><span>时间：</span>2026-06-15 08:00:00 ~ 2026-06-20 07:59:59（5天） UTC+8</div>
+      
+    </article>
+    
+              </div>
+            </details>
+            
+            <details class="day" data-date="2026-06-14" open>
+              <summary>
+                <span class="date"><span class="date-text">2026-06-14</span></span>
+                <span class="count">1 个提醒</span>
+              </summary>
+              <div class="cards">
+                
+    <article class="card">
+      <h3 class="activity-name"><span class="activity-name-line">1000927:飞蜥之战</span></h3>
+      
+      <div class="meta"><span>服务器：</span>S1-S834</div>
+      <div class="meta"><span>时间：</span>2026-06-15 08:00:00 ~ 2026-06-21 07:59:59（6天） UTC+8</div>
+      
+    </article>
+    
+              </div>
+            </details>
+            
+            <details class="day" data-date="2026-06-15" open>
+              <summary>
+                <span class="date"><span class="date-text">2026-06-15</span></span>
+                <span class="count">6 个提醒</span>
+              </summary>
+              <div class="cards">
+                
+    <article class="card">
+      <h3 class="activity-name"><span class="activity-name-line">1000301: 最强战区-功勋商店</span></h3>
+      
+      <div class="meta"><span>服务器：</span>S854</div>
+      <div class="meta"><span>时间：</span>2026-06-15 08:00:00 ~ 2036-06-16 07:59:59（10年） UTC+8</div>
+      
+    </article>
+    
+
+    <article class="card">
+      <h3 class="activity-name"><span class="activity-name-line">1000118:战场-主题1</span></h3>
+      
+      <div class="meta"><span>服务器：</span>S1-S854</div>
+      <div class="meta"><span>时间：</span>2026-06-15 08:00:00 ~ 2026-06-22 07:59:59（7天） UTC+8</div>
+      
+    </article>
+    
+
+    <article class="card">
+      <h3 class="activity-name"><span class="activity-name-line">1000109:万物新生</span></h3>
+      
+      <div class="meta"><span>服务器：</span>S1-S852</div>
+      <div class="meta"><span>时间：</span>2026-06-16 08:00:00 ~ 2026-06-23 07:59:59（7天） UTC+8</div>
+      
+      <div class="package-block">
+        <div class="package-title">配套礼包</div>
+        <div class="package-lines"><div>29118: 万物新生神秘特供</div></div>
+        <div class="meta">服务器：S1-S852</div>
+<div class="meta">时间：2026-06-16 08:00:00 ~ 2026-06-23 07:59:59（7天） UTC+8</div>
+<div class="meta">每日刷新：是</div>
+<div class="meta">新服自动开启：否</div>
+      </div>
+    
+    </article>
+    
+
+    <article class="card">
+      <h3 class="activity-name"><span class="activity-name-line">1000914:国服-端午节签到</span></h3>
+      
+      <div class="meta"><span>服务器：</span>全服</div>
+      <div class="meta"><span>时间：</span>2026-06-16 08:00:00 ~ 2026-06-26 07:59:59（10天） UTC+8</div>
+      
+    </article>
+    
+
+    <article class="card">
+      <h3 class="activity-name"><span class="activity-name-line">1000125:VIP商店</span></h3>
+      
+      <div class="meta"><span>服务器：</span>S1-S855</div>
+      <div class="meta"><span>时间：</span>2026-06-20 08:00:00 ~ 2026-06-22 07:59:59（2天） UTC+8</div>
+      
+    </article>
+    
+
+    <article class="card">
+      <h3 class="activity-name"><span class="activity-name-line">1000902:国服-拯救蚜虫-本服</span></h3>
+      
+      <div class="meta"><span>服务器：</span>S857</div>
+      <div class="meta"><span>时间：</span>2026-06-22 08:00:00 ~ 2026-06-27 07:59:59（5天） UTC+8</div>
+      
+    </article>
+    
+              </div>
+            </details>
+            
+            <details class="day" data-date="2026-06-16" open>
+              <summary>
+                <span class="date"><span class="date-text">2026-06-16</span></span>
+                <span class="count">1 个提醒</span>
+              </summary>
+              <div class="cards">
+                
+    <article class="card">
+      <h3 class="activity-name"><span class="activity-name-line">1000143:特化蚁对决</span></h3>
+      
+      <div class="meta"><span>服务器：</span>S1-S850</div>
+      <div class="meta"><span>时间：</span>2026-06-17 08:15:00 ~ 2026-07-01 08:14:59（14天） UTC+8</div>
+      
+    </article>
+    
+              </div>
+            </details>
+            
+            <details class="day" data-date="2026-06-18" open>
+              <summary>
+                <span class="date"><span class="date-text">2026-06-18</span></span>
+                <span class="count">1 个提醒</span>
+              </summary>
+              <div class="cards">
+                
+    <article class="card">
+      <h3 class="activity-name"><span class="activity-name-line">1000178:蜂群宝藏</span></h3>
+      
+      <div class="meta"><span>服务器：</span>S1-S850</div>
+      <div class="meta"><span>时间：</span>2026-06-19 08:00:00 ~ 2026-06-22 07:59:59（3天） UTC+8</div>
+      
+      <div class="package-block">
+        <div class="package-title">配套礼包</div>
+        <div class="package-lines"><div>29811:小雏菊特供I 30 POP1</div>
+<div>29812:小雏菊特供II 68 POP2</div>
+<div>29813:小雏菊特供III 128 POP3</div>
+<div>29814:小雏菊特供IV 328 POP4</div></div>
+        <div class="meta">服务器：S1-S850</div>
+<div class="meta">时间：2026-06-19 08:00:00 ~ 2026-06-22 07:59:59（3天） UTC+8</div>
+<div class="meta">每日刷新，新服不自动开启</div>
+      </div>
+    
+    </article>
+    
+              </div>
+            </details>
+            
+            <details class="day" data-date="2026-06-19" open>
+              <summary>
+                <span class="date"><span class="date-text">2026-06-19</span></span>
+                <span class="count">2 个提醒</span>
+              </summary>
+              <div class="cards">
+                
+    <article class="card">
+      <h3 class="activity-name"><span class="activity-name-line">31328:最强限定:战斗特供</span></h3>
+      
+      <div class="meta"><span>服务器：</span>全服</div>
+      <div class="meta"><span>时间：</span>2026-06-20 08:00:00 ~ 2026-06-21 07:59:59（1天） UTC+8</div>
+      
+    </article>
+    
+
+    <article class="card">
+      <h3 class="activity-name"><span class="activity-name-line">29145: 火力全开:进攻土拨鼠128~648</span></h3>
+      
+      <div class="meta"><span>服务器：</span>排期表未标明</div>
+      <div class="meta"><span>时间：</span>2026-06-21 08:00:00 ~ 2026-06-22 07:59:59（1天） UTC+8</div>
+      
+    </article>
+    
+              </div>
+            </details>
+            
+            <details class="day" data-date="2026-06-20" open>
+              <summary>
+                <span class="date"><span class="date-text">2026-06-20</span></span>
+                <span class="count">1 个提醒</span>
+              </summary>
+              <div class="cards">
+                
+    <article class="card">
+      <h3 class="activity-name"><span class="activity-name-line">1000905:国服-拯救蚜虫-跨服</span></h3>
+      
+      <div class="meta"><span>服务器：</span>S856</div>
+      <div class="meta"><span>时间：</span>2026-06-22 08:00:00 ~ 2026-06-27 07:59:59（5天） UTC+8</div>
+      
+    </article>
+    
+              </div>
+            </details>
+            
+            <details class="day" data-date="2026-06-21" open>
+              <summary>
+                <span class="date"><span class="date-text">2026-06-21</span></span>
+                <span class="count">1 个提醒</span>
+              </summary>
+              <div class="cards">
+                
+    <article class="card">
+      <h3 class="activity-name"><span class="activity-name-line">1000927:飞蜥之战</span></h3>
+      
+      <div class="meta"><span>服务器：</span>S1-S834</div>
+      <div class="meta"><span>时间：</span>2026-06-22 08:00:00 ~ 2026-06-28 07:59:59（6天） UTC+8</div>
+      
+    </article>
+    
+              </div>
+            </details>
+            
+            <details class="day" data-date="2026-06-22" open>
+              <summary>
+                <span class="date"><span class="date-text">2026-06-22</span></span>
+                <span class="count">9 个提醒</span>
+              </summary>
+              <div class="cards">
+                
+    <article class="card">
+      <h3 class="activity-name"><span class="activity-name-line">1000301: 最强战区-功勋商店</span></h3>
+      
+      <div class="meta"><span>服务器：</span>S855</div>
+      <div class="meta"><span>时间：</span>2026-06-22 08:00:00 ~ 2036-06-23 07:59:59（10年） UTC+8</div>
+      
+    </article>
+    
+
+    <article class="card">
+      <h3 class="activity-name"><span class="activity-name-line">1000118:战场-主题1</span></h3>
+      
+      <div class="meta"><span>服务器：</span>S1-S855</div>
+      <div class="meta"><span>时间：</span>2026-06-22 08:00:00 ~ 2026-06-29 07:59:59（7天） UTC+8</div>
+      
+    </article>
+    
+
+    <article class="card">
+      <h3 class="activity-name"><span class="activity-name-line">1000110:潮起潮落</span></h3>
+      
+      <div class="meta"><span>服务器：</span>S1-S853</div>
+      <div class="meta"><span>时间：</span>2026-06-23 08:00:00 ~ 2026-06-30 07:59:59（7天） UTC+8</div>
+      
+      <div class="package-block">
+        <div class="package-title">配套礼包</div>
+        <div class="package-lines"><div>29119: 潮起潮落神秘特供</div></div>
+        <div class="meta">服务器：S1-S853</div>
+<div class="meta">时间：2026-06-23 08:00:00 ~ 2026-06-30 07:59:59（7天） UTC+8</div>
+<div class="meta">每日刷新：是</div>
+<div class="meta">新服自动开启：否</div>
+      </div>
+    
+    </article>
+    
+
+    <article class="card">
+      <h3 class="activity-name"><span class="activity-name-line">1000357:特化蚁的馈赠</span></h3>
+      
+      <div class="meta"><span>服务器：</span>S1-S857</div>
+      <div class="meta"><span>时间：</span>2026-06-23 08:00:00 ~ 2026-07-03 07:59:59（10天） UTC+8</div>
+      
+    </article>
+    
+
+    <article class="card">
+      <h3 class="activity-name"><span class="activity-name-line">1000151: 蚁巢装扮兑换商店</span></h3>
+      
+      <div class="meta"><span>服务器：</span>S1-S857</div>
+      <div class="meta"><span>时间：</span>2026-06-23 08:00:00 ~ 2026-06-29 07:59:59（6天） UTC+8</div>
+      
+    </article>
+    
+
+    <article class="card">
+      <h3 class="activity-name"><span class="activity-name-line">1000150:落潮海岸</span></h3>
+      
+      <div class="meta"><span>服务器：</span>S1-S857</div>
+      <div class="meta"><span>时间：</span>2026-06-23 08:00:00 ~ 2026-06-29 07:59:59（6天） UTC+8</div>
+      
+      <div class="package-block">
+        <div class="package-title">每日刷新礼包（5天）</div>
+        <div class="package-lines"><div>32346: 落潮海岸限定特惠Ⅱ（有拼图）30 pop2</div>
+<div>32347: 落潮海岸限定特惠Ⅲ（有拼图）128 pop3</div>
+<div>32348: 落潮海岸限定特惠Ⅳ（有拼图）328 pop4</div>
+<div>31937: 落潮海岸特供：组合自选礼包30-328 pop5</div>
+<div>31938: 落潮海岸尊享：组合自选礼包648 pop6</div>
+<div>32351: 落潮海岸：钻石特惠（有拼图）5000 pop7</div></div>
+        <div class="meta">服务器：S1-S857</div>
+<div class="meta">2026-06-23 08:00:00 ~2026-06-28 07:59:59 UTC+8（5天）</div>
+<div class="meta">每日刷新：是，新服自动开启：否</div>
+      </div>
+    
+
+      <div class="package-block">
+        <div class="package-title">每日刷新礼包（6天）</div>
+        <div class="package-lines"><div>32345: 落潮海岸限定特惠Ⅰ（有拼图）6-328——pop：1</div></div>
+        <div class="meta">服务器：S1-S857</div>
+<div class="meta">2026-06-23 08:00:00 ~2026-06-29 07:59:59 UTC+8（6天）</div>
+<div class="meta">每日刷新：是，新服自动开启：否</div>
+      </div>
+    
+    </article>
+    
+
+    <article class="card">
+      <h3 class="activity-name"><span class="activity-name-line">1000906:国服-土拨鼠复仇</span></h3>
+      
+      <div class="meta"><span>服务器：</span>客户端 S1-S853；小程序 S205-S751</div>
+      <div class="meta"><span>时间：</span>2026-06-24 08:00:00 ~ 2026-06-25 07:59:59（1天） UTC+8</div>
+      
+    </article>
+    
+
+    <article class="card">
+      <h3 class="activity-name"><span class="activity-name-line">1000125:VIP商店</span></h3>
+      
+      <div class="meta"><span>服务器：</span>S1-S856</div>
+      <div class="meta"><span>时间：</span>2026-06-27 08:00:00 ~ 2026-06-29 07:59:59（2天） UTC+8</div>
+      
+    </article>
+    
+
+    <article class="card">
+      <h3 class="activity-name"><span class="activity-name-line">1000902:国服-拯救蚜虫-本服</span></h3>
+      
+      <div class="meta"><span>服务器：</span>S858</div>
+      <div class="meta"><span>时间：</span>2026-06-29 08:00:00 ~ 2026-07-04 07:59:59（5天） UTC+8</div>
+      
+    </article>
+    
+              </div>
+            </details>
+            
+            <details class="day" data-date="2026-06-26" open>
+              <summary>
+                <span class="date"><span class="date-text">2026-06-26</span></span>
+                <span class="count">1 个提醒</span>
+              </summary>
+              <div class="cards">
+                
+    <article class="card">
+      <h3 class="activity-name"><span class="activity-name-line">29145: 火力全开:进攻土拨鼠128~648</span></h3>
+      
+      <div class="meta"><span>服务器：</span>S1-S856</div>
+      <div class="meta"><span>时间：</span>2026-06-28 08:00:00 ~ 2026-06-29 07:59:59（1天） UTC+8</div>
+      
+    </article>
+    
+              </div>
+            </details>
+            
+            <details class="day" data-date="2026-06-27" open>
+              <summary>
+                <span class="date"><span class="date-text">2026-06-27</span></span>
+                <span class="count">2 个提醒</span>
+              </summary>
+              <div class="cards">
+                
+    <article class="card">
+      <h3 class="activity-name"><span class="activity-name-line">1000179:蚁群嘉年华</span></h3>
+      
+      <div class="meta"><span>服务器：</span>S1-S858</div>
+      <div class="meta"><span>时间：</span>2026-06-28 08:00:00 ~ 2026-07-03 07:59:59（5天） UTC+8</div>
+      
+    </article>
+    
+
+    <article class="card">
+      <h3 class="activity-name"><span class="activity-name-line">1000905:国服-拯救蚜虫-跨服</span></h3>
+      
+      <div class="meta"><span>服务器：</span>S857</div>
+      <div class="meta"><span>时间：</span>2026-06-29 08:00:00 ~ 2026-07-04 07:59:59（5天） UTC+8</div>
+      
+    </article>
+    
+              </div>
+            </details>
+            
+            <details class="day" data-date="2026-06-28" open>
+              <summary>
+                <span class="date"><span class="date-text">2026-06-28</span></span>
+                <span class="count">4 个提醒</span>
+              </summary>
+              <div class="cards">
+                
+    <article class="card">
+      <h3 class="activity-name"><span class="activity-name-line">1000927:飞蜥之战</span></h3>
+      
+      <div class="meta"><span>服务器：</span>S1-S834</div>
+      <div class="meta"><span>时间：</span>2026-06-29 08:00:00 ~ 2026-07-05 07:59:59（6天） UTC+8</div>
+      
+    </article>
+    
+
+    <article class="card">
+      <h3 class="activity-name"><span class="activity-name-line">1000296:惊喜转盘（二代）</span></h3>
+      
+      <div class="meta"><span>服务器：</span>S1-S858</div>
+      <div class="meta"><span>时间：</span>2026-06-29 08:00:00 ~ 2026-07-06 07:59:59（7天） UTC+8</div>
+      
+      <div class="package-block">
+        <div class="package-title">配套礼包</div>
+        <div class="package-lines"><div>31444: 惊喜叶片限定30</div>
+<div>31445: 惊喜叶片限定68</div>
+<div>31446: 惊喜叶片限定128</div>
+<div>31447: 惊喜叶片限定328</div></div>
+        <div class="meta">服务器：S1-S858</div>
+<div class="meta">新服不自动开，每日不刷新</div>
+<div class="meta">2026-06-29 08:00:00 ~2026-07-06 07:59:59 UTC+8</div>
+      </div>
+    
+    </article>
+    
+
+    <article class="card">
+      <h3 class="activity-name"><span class="activity-name-line">1900132: 连续充值（野怪开服30天以上）</span></h3>
+      
+      <div class="meta"><span>服务器：</span>S1-S856</div>
+      <div class="meta"><span>时间：</span>2026-06-29 08:00:00 ~ 2026-07-06 07:59:59（7天） UTC+8</div>
+      
+    </article>
+    
+
+    <article class="card">
+      <h3 class="activity-name"><span class="activity-name-line">蚁群狂欢</span></h3>
+      
+      <div class="meta"><span>服务器：</span>S1-S858</div>
+      <div class="meta"><span>时间：</span>2026-06-29 08:00:00 ~ 2026-07-02 07:59:59（3天） UTC+8</div>
+      
+      <div class="package-block">
+        <div class="package-title">免费礼包</div>
+        <div class="package-lines"><div>31714: 蚁群狂欢：免费礼物-08210</div>
+<div>2026-06-29 08:00:00~2026-06-30 07:59:59 UTC+8</div>
+<div>31715: 蚁群狂欢：免费礼物-08220</div>
+<div>2026-06-30 08:00:00~2026-07-01 07:59:59 UTC+8</div>
+<div>31716: 蚁群狂欢：免费礼物-08230</div>
+<div>2026-07-01 08:00:00~2026-07-02 07:59:59 UTC+8</div></div>
+        <div class="meta">服务器：S1-S858</div>
+      </div>
+    
+
+      <div class="package-block">
+        <div class="package-title">付费礼包</div>
+        <div class="package-lines"><div>32295: 蚁群狂欢：混合自选专供（四代宝箱）</div>
+<div>32163: 蚁群狂欢：野怪养成专属68</div>
+<div>32164: 蚁群狂欢：变异自选热卖68</div>
+<div>32165: 蚁群狂欢：兵种改造特惠128</div>
+<div>32166: 蚁群狂欢：特化蚁进化特供328</div></div>
+        <div class="meta">服务器：S1-S858</div>
+<div class="meta">2026-06-29 08:00:00 ~2026-07-02 07:59:59 UTC+8</div>
+<div class="meta">新服不自动开启，每日不刷新</div>
+      </div>
+    
+    </article>
+    
+              </div>
+            </details>
+            
+            <details class="day" data-date="2026-06-29" open>
+              <summary>
+                <span class="date"><span class="date-text">2026-06-29</span></span>
+                <span class="count">5 个提醒</span>
+              </summary>
+              <div class="cards">
+                
+    <article class="card">
+      <h3 class="activity-name"><span class="activity-name-line">1000301: 最强战区-功勋商店</span></h3>
+      
+      <div class="meta"><span>服务器：</span>S856</div>
+      <div class="meta"><span>时间：</span>2026-06-29 08:00:00 ~ 2036-06-30 07:59:59（10年） UTC+8</div>
+      
+    </article>
+    
+
+    <article class="card">
+      <h3 class="activity-name"><span class="activity-name-line">1000118:战场-主题1</span></h3>
+      
+      <div class="meta"><span>服务器：</span>S1-S856</div>
+      <div class="meta"><span>时间：</span>2026-06-29 08:00:00 ~ 2026-07-06 07:59:59（7天） UTC+8</div>
+      
+    </article>
+    
+
+    <article class="card">
+      <h3 class="activity-name"><span class="activity-name-line">1000111:旱季来临</span></h3>
+      
+      <div class="meta"><span>服务器：</span>S1-S854</div>
+      <div class="meta"><span>时间：</span>2026-06-30 08:00:00 ~ 2026-07-07 07:59:59（7天） UTC+8</div>
+      
+      <div class="package-block">
+        <div class="package-title">配套礼包</div>
+        <div class="package-lines"><div>29120: 旱季来临神秘特供</div></div>
+        <div class="meta">服务器：S1-S854</div>
+<div class="meta">时间：2026-06-30 08:00:00 ~ 2026-07-07 07:59:59（7天） UTC+8</div>
+<div class="meta">每日刷新：是</div>
+<div class="meta">新服自动开启：否</div>
+      </div>
+    
+    </article>
+    
+
+    <article class="card">
+      <h3 class="activity-name"><span class="activity-name-line">1000125:VIP商店</span></h3>
+      
+      <div class="meta"><span>服务器：</span>S1-S857</div>
+      <div class="meta"><span>时间：</span>2026-07-04 08:00:00 ~ 2026-07-06 07:59:59（2天） UTC+8</div>
+      
+    </article>
+    
+
+    <article class="card">
+      <h3 class="activity-name"><span class="activity-name-line">1000902:国服-拯救蚜虫-本服</span></h3>
+      
+      <div class="meta"><span>服务器：</span>S859</div>
+      <div class="meta"><span>时间：</span>2026-07-06 08:00:00 ~ 2026-07-11 07:59:59（5天） UTC+8</div>
+      
+    </article>
+    
+              </div>
+            </details>
+            
+            <details class="day" data-date="2026-07-01" open>
+              <summary>
+                <span class="date"><span class="date-text">2026-07-01</span></span>
+                <span class="count">1 个提醒</span>
+              </summary>
+              <div class="cards">
+                
+    <article class="card">
+      <h3 class="activity-name"><span class="activity-name-line">1000143:特化蚁对决</span></h3>
+      
+      <div class="meta"><span>服务器：</span>排期表未标明</div>
+      <div class="meta"><span>时间：</span>2026-07-02 08:15:00 ~ 2026-07-16 08:14:59（14天） UTC+8</div>
+      
+    </article>
+    
+              </div>
+            </details>
+            
+            <details class="day" data-date="2026-07-02" open>
+              <summary>
+                <span class="date"><span class="date-text">2026-07-02</span></span>
+                <span class="count">1 个提醒</span>
+              </summary>
+              <div class="cards">
+                
+    <article class="card">
+      <h3 class="activity-name"><span class="activity-name-line">双倍券BP活动</span></h3>
+      
+      <div class="meta"><span>服务器：</span>S1-Sxxx</div>
+      <div class="meta"><span>时间：</span>2026-07-03 08:00:00 ~ 2026-07-07 07:59:59（4天） UTC+8</div>
+      
+    </article>
+    
+              </div>
+            </details>
+            
+            <details class="day" data-date="2026-07-03" open>
+              <summary>
+                <span class="date"><span class="date-text">2026-07-03</span></span>
+                <span class="count">2 个提醒</span>
+              </summary>
+              <div class="cards">
+                
+    <article class="card">
+      <h3 class="activity-name"><span class="activity-name-line">31328:最强限定:战斗特供</span></h3>
+      
+      <div class="meta"><span>服务器：</span>全服</div>
+      <div class="meta"><span>时间：</span>2026-07-04 08:00:00 ~ 2026-07-05 07:59:59（1天） UTC+8</div>
+      
+    </article>
+    
+
+    <article class="card">
+      <h3 class="activity-name"><span class="activity-name-line">29145: 火力全开:进攻土拨鼠128~648</span></h3>
+      
+      <div class="meta"><span>服务器：</span>排期表未标明</div>
+      <div class="meta"><span>时间：</span>2026-07-05 08:00:00 ~ 2026-07-06 07:59:59（1天） UTC+8</div>
+      
+    </article>
+    
+              </div>
+            </details>
+            
+            <details class="day" data-date="2026-07-04" open>
+              <summary>
+                <span class="date"><span class="date-text">2026-07-04</span></span>
+                <span class="count">1 个提醒</span>
+              </summary>
+              <div class="cards">
+                
+    <article class="card">
+      <h3 class="activity-name"><span class="activity-name-line">1000905:国服-拯救蚜虫-跨服</span></h3>
+      
+      <div class="meta"><span>服务器：</span>S858</div>
+      <div class="meta"><span>时间：</span>2026-07-06 08:00:00 ~ 2026-07-11 07:59:59（5天） UTC+8</div>
+      
+    </article>
+    
+              </div>
+            </details>
+            
+            <details class="day" data-date="2026-07-05" open>
+              <summary>
+                <span class="date"><span class="date-text">2026-07-05</span></span>
+                <span class="count">2 个提醒</span>
+              </summary>
+              <div class="cards">
+                
+    <article class="card">
+      <h3 class="activity-name"><span class="activity-name-line">1000927:飞蜥之战</span></h3>
+      
+      <div class="meta"><span>服务器：</span>S1-S834</div>
+      <div class="meta"><span>时间：</span>2026-07-06 08:00:00 ~ 2026-07-12 07:59:59（6天） UTC+8</div>
+      
+    </article>
+    
+
+    <article class="card">
+      <h3 class="activity-name"><span class="activity-name-line">1900128: 野怪孵化周活动</span></h3>
+      
+      <div class="meta"><span>服务器：</span>S1-Sxxx</div>
+      <div class="meta"><span>时间：</span>2026-07-06 08:00:00 ~ 2026-07-13 07:59:59（7天） UTC+8</div>
+      
+    </article>
+    
+              </div>
+            </details>
+            
+            <details class="day" data-date="2026-07-06" open>
+              <summary>
+                <span class="date"><span class="date-text">2026-07-06</span></span>
+                <span class="count">9 个提醒</span>
+              </summary>
+              <div class="cards">
+                
+    <article class="card">
+      <h3 class="activity-name"><span class="activity-name-line">1000301: 最强战区-功勋商店</span></h3>
+      
+      <div class="meta"><span>服务器：</span>S857</div>
+      <div class="meta"><span>时间：</span>2026-07-06 08:00:00 ~ 2036-07-07 07:59:59（10年） UTC+8</div>
+      
+    </article>
+    
+
+    <article class="card">
+      <h3 class="activity-name"><span class="activity-name-line">1000118:战场-主题1</span></h3>
+      
+      <div class="meta"><span>服务器：</span>S1-S857</div>
+      <div class="meta"><span>时间：</span>2026-07-06 08:00:00 ~ 2026-07-13 07:59:59（7天） UTC+8</div>
+      
+    </article>
+    
+
+    <article class="card">
+      <h3 class="activity-name"><span class="activity-name-line">1000112:回归自然</span></h3>
+      
+      <div class="meta"><span>服务器：</span>S1-S855</div>
+      <div class="meta"><span>时间：</span>2026-07-07 08:00:00 ~ 2026-07-14 07:59:59（7天） UTC+8</div>
+      
+      <div class="package-block">
+        <div class="package-title">配套礼包</div>
+        <div class="package-lines"><div>29121: 回归自然神秘特供</div></div>
+        <div class="meta">服务器：S1-S855</div>
+<div class="meta">时间：2026-07-07 08:00:00 ~ 2026-07-14 07:59:59（7天） UTC+8</div>
+<div class="meta">每日刷新：是</div>
+<div class="meta">新服自动开启：否</div>
+      </div>
+    
+    </article>
+    
+
+    <article class="card">
+      <h3 class="activity-name"><span class="activity-name-line">标头展示活动 / 强力野怪</span></h3>
+      
+      <div class="meta"><span>服务器：</span>S1-Sxxx</div>
+      <div class="meta"><span>时间：</span>2026-07-07 08:00:00 ~ 2026-07-13 07:59:59（6天） UTC+8</div>
+      
+    </article>
+    
+
+    <article class="card">
+      <h3 class="activity-name"><span class="activity-name-line">1000151: 蚁巢装扮兑换商店</span></h3>
+      
+      <div class="meta"><span>服务器：</span>排期表未标明</div>
+      <div class="meta"><span>时间：</span>2026-07-07 08:00:00 ~ 2026-07-13 07:59:59（6天） UTC+8</div>
+      
+    </article>
+    
+
+    <article class="card">
+      <h3 class="activity-name"><span class="activity-name-line">蚁群派对</span></h3>
+      
+      <div class="meta"><span>服务器：</span>排期表未标明</div>
+      <div class="meta"><span>时间：</span>2026-07-07 08:00:00 ~ 2026-07-13 07:59:59（6天） UTC+8</div>
+      
+    </article>
+    
+
+    <article class="card">
+      <h3 class="activity-name"><span class="activity-name-line">1000906:国服-土拨鼠复仇</span></h3>
+      
+      <div class="meta"><span>服务器：</span>客户端 S1-S853；小程序 S205-S751</div>
+      <div class="meta"><span>时间：</span>2026-07-08 08:00:00 ~ 2026-07-09 07:59:59（1天） UTC+8</div>
+      
+    </article>
+    
+
+    <article class="card">
+      <h3 class="activity-name"><span class="activity-name-line">1000125:VIP商店</span></h3>
+      
+      <div class="meta"><span>服务器：</span>S1-S858</div>
+      <div class="meta"><span>时间：</span>2026-07-11 08:00:00 ~ 2026-07-13 07:59:59（2天） UTC+8</div>
+      
+    </article>
+    
+
+    <article class="card">
+      <h3 class="activity-name"><span class="activity-name-line">1000902:国服-拯救蚜虫-本服</span></h3>
+      
+      <div class="meta"><span>服务器：</span>S860</div>
+      <div class="meta"><span>时间：</span>2026-07-13 08:00:00 ~ 2026-07-18 07:59:59（5天） UTC+8</div>
+      
+    </article>
+    
+              </div>
+            </details>
+            
+            <details class="day" data-date="2026-07-10" open>
+              <summary>
+                <span class="date"><span class="date-text">2026-07-10</span></span>
+                <span class="count">1 个提醒</span>
+              </summary>
+              <div class="cards">
+                
+    <article class="card">
+      <h3 class="activity-name"><span class="activity-name-line">29145: 火力全开:进攻土拨鼠128~648</span></h3>
+      
+      <div class="meta"><span>服务器：</span>S1-S858</div>
+      <div class="meta"><span>时间：</span>2026-07-12 08:00:00 ~ 2026-07-13 07:59:59（1天） UTC+8</div>
+      
+    </article>
+    
+              </div>
+            </details>
+            
+            <details class="day" data-date="2026-07-11" open>
+              <summary>
+                <span class="date"><span class="date-text">2026-07-11</span></span>
+                <span class="count">1 个提醒</span>
+              </summary>
+              <div class="cards">
+                
+    <article class="card">
+      <h3 class="activity-name"><span class="activity-name-line">1000905:国服-拯救蚜虫-跨服</span></h3>
+      
+      <div class="meta"><span>服务器：</span>S859，S1-S857</div>
+      <div class="meta"><span>时间：</span>2026-07-13 08:00:00 ~ 2026-07-18 07:59:59（5天） UTC+8</div>
+      
+    </article>
+    
+              </div>
+            </details>
+            
+            <details class="day" data-date="2026-07-12" open>
+              <summary>
+                <span class="date"><span class="date-text">2026-07-12</span></span>
+                <span class="count">3 个提醒</span>
+              </summary>
+              <div class="cards">
+                
+    <article class="card">
+      <h3 class="activity-name"><span class="activity-name-line">1000927:飞蜥之战</span></h3>
+      
+      <div class="meta"><span>服务器：</span>S1-S834</div>
+      <div class="meta"><span>时间：</span>2026-07-13 08:00:00 ~ 2026-07-19 07:59:59（6天） UTC+8</div>
+      
+    </article>
+    
+
+    <article class="card">
+      <h3 class="activity-name"><span class="activity-name-line">1900131: 连续充值（变异（全服））</span>
+<span class="activity-name-line">1900084:【国服】五日随心储</span></h3>
+      
+      <div class="meta"><span>服务器：</span>S1-S858</div>
+      <div class="meta"><span>时间：</span>2026-07-13 08:00:00 ~ 2026-07-20 07:59:59（7天） UTC+8</div>
+      
+    </article>
+    
+
+    <article class="card">
+      <h3 class="activity-name"><span class="activity-name-line">1000252: 无限寻宝</span></h3>
+      
+      <div class="meta"><span>服务器：</span>S1-Sxxx</div>
+      <div class="meta"><span>时间：</span>2026-07-13 08:00:00 ~ 2026-07-15 07:59:59（2天） UTC+8</div>
+      
+    </article>
+    
+              </div>
+            </details>
+            
+            <details class="day" data-date="2026-07-13" open>
+              <summary>
+                <span class="date"><span class="date-text">2026-07-13</span></span>
+                <span class="count">5 个提醒</span>
+              </summary>
+              <div class="cards">
+                
+    <article class="card">
+      <h3 class="activity-name"><span class="activity-name-line">1000301: 最强战区-功勋商店</span></h3>
+      
+      <div class="meta"><span>服务器：</span>S858</div>
+      <div class="meta"><span>时间：</span>2026-07-13 08:00:00 ~ 2036-07-14 07:59:59（10年） UTC+8</div>
+      
+    </article>
+    
+
+    <article class="card">
+      <h3 class="activity-name"><span class="activity-name-line">1000118:战场-主题1</span></h3>
+      
+      <div class="meta"><span>服务器：</span>S1-S858</div>
+      <div class="meta"><span>时间：</span>2026-07-13 08:00:00 ~ 2026-07-20 07:59:59（7天） UTC+8</div>
+      
+    </article>
+    
+
+    <article class="card">
+      <h3 class="activity-name"><span class="activity-name-line">1000109:万物新生</span></h3>
+      
+      <div class="meta"><span>服务器：</span>S1-S856</div>
+      <div class="meta"><span>时间：</span>2026-07-14 08:00:00 ~ 2026-07-21 07:59:59（7天） UTC+8</div>
+      
+      <div class="package-block">
+        <div class="package-title">配套礼包</div>
+        <div class="package-lines"><div>29118: 万物新生神秘特供</div></div>
+        <div class="meta">服务器：S1-S856</div>
+<div class="meta">时间：2026-07-14 08:00:00 ~ 2026-07-21 07:59:59（7天） UTC+8</div>
+<div class="meta">每日刷新：是</div>
+<div class="meta">新服自动开启：否</div>
+      </div>
+    
+    </article>
+    
+
+    <article class="card">
+      <h3 class="activity-name"><span class="activity-name-line">1000125:VIP商店</span></h3>
+      
+      <div class="meta"><span>服务器：</span>S1-S859</div>
+      <div class="meta"><span>时间：</span>2026-07-18 08:00:00 ~ 2026-07-20 07:59:59（2天） UTC+8</div>
+      
+    </article>
+    
+
+    <article class="card">
+      <h3 class="activity-name"><span class="activity-name-line">1000902:国服-拯救蚜虫-本服</span></h3>
+      
+      <div class="meta"><span>服务器：</span>S861</div>
+      <div class="meta"><span>时间：</span>2026-07-20 08:00:00 ~ 2026-07-25 07:59:59（5天） UTC+8</div>
+      
+    </article>
+    
+              </div>
+            </details>
+            
+            <details class="day" data-date="2026-07-15" open>
+              <summary>
+                <span class="date"><span class="date-text">2026-07-15</span></span>
+                <span class="count">1 个提醒</span>
+              </summary>
+              <div class="cards">
+                
+    <article class="card">
+      <h3 class="activity-name"><span class="activity-name-line">蜂群宝藏</span></h3>
+      
+      <div class="meta"><span>服务器：</span>S1-SXXX</div>
+      <div class="meta"><span>时间：</span>2026-07-16 08:00:00 ~ 2026-07-19 07:59:59（3天） UTC+8</div>
+      
+    </article>
+    
+              </div>
+            </details>
+            
+            <details class="day" data-date="2026-07-16" open>
+              <summary>
+                <span class="date"><span class="date-text">2026-07-16</span></span>
+                <span class="count">1 个提醒</span>
+              </summary>
+              <div class="cards">
+                
+    <article class="card">
+      <h3 class="activity-name"><span class="activity-name-line">1000143:特化蚁对决</span></h3>
+      
+      <div class="meta"><span>服务器：</span>排期表未标明</div>
+      <div class="meta"><span>时间：</span>2026-07-17 08:15:00 ~ 2026-07-31 08:14:59（14天） UTC+8</div>
+      
+    </article>
+    
+              </div>
+            </details>
+            
+            <details class="day" data-date="2026-07-17" open>
+              <summary>
+                <span class="date"><span class="date-text">2026-07-17</span></span>
+                <span class="count">2 个提醒</span>
+              </summary>
+              <div class="cards">
+                
+    <article class="card">
+      <h3 class="activity-name"><span class="activity-name-line">31328:最强限定:战斗特供</span></h3>
+      
+      <div class="meta"><span>服务器：</span>全服</div>
+      <div class="meta"><span>时间：</span>2026-07-18 08:00:00 ~ 2026-07-19 07:59:59（1天） UTC+8</div>
+      
+    </article>
+    
+
+    <article class="card">
+      <h3 class="activity-name"><span class="activity-name-line">29145: 火力全开:进攻土拨鼠128~648</span></h3>
+      
+      <div class="meta"><span>服务器：</span>排期表未标明</div>
+      <div class="meta"><span>时间：</span>2026-07-19 08:00:00 ~ 2026-07-20 07:59:59（1天） UTC+8</div>
+      
+    </article>
+    
+              </div>
+            </details>
+            
+            <details class="day" data-date="2026-07-18" open>
+              <summary>
+                <span class="date"><span class="date-text">2026-07-18</span></span>
+                <span class="count">1 个提醒</span>
+              </summary>
+              <div class="cards">
+                
+    <article class="card">
+      <h3 class="activity-name"><span class="activity-name-line">1000905:国服-拯救蚜虫-跨服</span></h3>
+      
+      <div class="meta"><span>服务器：</span>S860</div>
+      <div class="meta"><span>时间：</span>2026-07-20 08:00:00 ~ 2026-07-25 07:59:59（5天） UTC+8</div>
+      
+    </article>
+    
+              </div>
+            </details>
+            
+            <details class="day" data-date="2026-07-19" open>
+              <summary>
+                <span class="date"><span class="date-text">2026-07-19</span></span>
+                <span class="count">1 个提醒</span>
+              </summary>
+              <div class="cards">
+                
+    <article class="card">
+      <h3 class="activity-name"><span class="activity-name-line">1000135:蚁后对决</span></h3>
+      
+      <div class="meta"><span>服务器：</span>S1-Sxxx</div>
+      <div class="meta"><span>时间：</span>2026-07-20 08:15:00 ~ 2026-09-03 08:14:59（45天） UTC+8</div>
+      
+    </article>
+    
+              </div>
+            </details>
+            
+            <details class="day" data-date="2026-07-20" open>
+              <summary>
+                <span class="date"><span class="date-text">2026-07-20</span></span>
+                <span class="count">9 个提醒</span>
+              </summary>
+              <div class="cards">
+                
+    <article class="card">
+      <h3 class="activity-name"><span class="activity-name-line">1000301: 最强战区-功勋商店</span></h3>
+      
+      <div class="meta"><span>服务器：</span>S859</div>
+      <div class="meta"><span>时间：</span>2026-07-20 08:00:00 ~ 2036-07-21 07:59:59（10年） UTC+8</div>
+      
+    </article>
+    
+
+    <article class="card">
+      <h3 class="activity-name"><span class="activity-name-line">1000118:战场-主题1</span></h3>
+      
+      <div class="meta"><span>服务器：</span>S1-S859</div>
+      <div class="meta"><span>时间：</span>2026-07-20 08:00:00 ~ 2026-07-27 07:59:59（7天） UTC+8</div>
+      
+    </article>
+    
+
+    <article class="card">
+      <h3 class="activity-name"><span class="activity-name-line">常规小事典</span></h3>
+      
+      <div class="meta"><span>服务器：</span>S1-Sxxx</div>
+      <div class="meta"><span>时间：</span>2026-07-21 08:00:00 ~ 2026-07-28 07:59:59（7天） UTC+8</div>
+      
+    </article>
+    
+
+    <article class="card">
+      <h3 class="activity-name"><span class="activity-name-line">洞穴探险</span></h3>
+      
+      <div class="meta"><span>服务器：</span>排期表未标明</div>
+      <div class="meta"><span>时间：</span>2026-07-21 08:00:00 ~ 2026-07-27 07:59:59（6天） UTC+8</div>
+      
+    </article>
+    
+
+    <article class="card">
+      <h3 class="activity-name"><span class="activity-name-line">1000110:潮起潮落</span></h3>
+      
+      <div class="meta"><span>服务器：</span>S1-S857</div>
+      <div class="meta"><span>时间：</span>2026-07-21 08:00:00 ~ 2026-07-28 07:59:59（7天） UTC+8</div>
+      
+      <div class="package-block">
+        <div class="package-title">配套礼包</div>
+        <div class="package-lines"><div>29119: 潮起潮落神秘特供</div></div>
+        <div class="meta">服务器：S1-S857</div>
+<div class="meta">时间：2026-07-21 08:00:00 ~ 2026-07-28 07:59:59（7天） UTC+8</div>
+<div class="meta">每日刷新：是</div>
+<div class="meta">新服自动开启：否</div>
+      </div>
+    
+    </article>
+    
+
+    <article class="card">
+      <h3 class="activity-name"><span class="activity-name-line">1000151: 蚁巢装扮兑换商店</span></h3>
+      
+      <div class="meta"><span>服务器：</span>排期表未标明</div>
+      <div class="meta"><span>时间：</span>2026-07-21 08:00:00 ~ 2026-07-27 07:59:59（6天） UTC+8</div>
+      
+    </article>
+    
+
+    <article class="card">
+      <h3 class="activity-name"><span class="activity-name-line">1000906:国服-土拨鼠复仇</span></h3>
+      
+      <div class="meta"><span>服务器：</span>客户端 S1-S853；小程序 S205-S751</div>
+      <div class="meta"><span>时间：</span>2026-07-22 08:00:00 ~ 2026-07-23 07:59:59（1天） UTC+8</div>
+      
+    </article>
+    
+
+    <article class="card">
+      <h3 class="activity-name"><span class="activity-name-line">1000125:VIP商店</span></h3>
+      
+      <div class="meta"><span>服务器：</span>S1-S860</div>
+      <div class="meta"><span>时间：</span>2026-07-25 08:00:00 ~ 2026-07-27 07:59:59（2天） UTC+8</div>
+      
+    </article>
+    
+
+    <article class="card">
+      <h3 class="activity-name"><span class="activity-name-line">1000902:国服-拯救蚜虫-本服</span></h3>
+      
+      <div class="meta"><span>服务器：</span>S862</div>
+      <div class="meta"><span>时间：</span>2026-07-27 08:00:00 ~ 2026-08-01 07:59:59（5天） UTC+8</div>
+      
+    </article>
+    
+              </div>
+            </details>
+            
+            <details class="day" data-date="2026-07-24" open>
+              <summary>
+                <span class="date"><span class="date-text">2026-07-24</span></span>
+                <span class="count">2 个提醒</span>
+              </summary>
+              <div class="cards">
+                
+    <article class="card">
+      <h3 class="activity-name"><span class="activity-name-line">29145: 火力全开:进攻土拨鼠128~648</span></h3>
+      
+      <div class="meta"><span>服务器：</span>S1-S860</div>
+      <div class="meta"><span>时间：</span>2026-07-26 08:00:00 ~ 2026-07-27 07:59:59（1天） UTC+8</div>
+      
+    </article>
+    
+
+    <article class="card">
+      <h3 class="activity-name"><span class="activity-name-line">1900133: 连续充值（进化开启第二套）</span>
+<span class="activity-name-line">1900162: 连续充值（进化开启第三套）</span>
+<span class="activity-name-line">1900163: 连续充值（改造，开启进化第2/3套以外的服务器）</span>
+<span class="activity-name-line">1900084:【国服】五日随心储</span></h3>
+      
+      <div class="meta meta-lines"><span class="text-line">1900133: 连续充值（进化开启第二套）</span>
+<span class="text-line">1900162: 连续充值（进化开启第三套）</span>
+<span class="text-line">1900163: 连续充值（改造，开启进化第2/3套以外的服务器）</span>
+<span class="text-line">服务器：平台设置全服，实际开启读取配置</span>
+<span class="text-line text-line-empty"></span>
+<span class="text-line">1900084:【国服】五日随心储</span>
+<span class="text-line">服务器：1～S860（读实际配置）</span></div>
+      <div class="meta"><span>时间：</span>2026-07-27 08:00:00 ~ 2026-08-03 07:59:59（7天） UTC+8</div>
+      
+    </article>
+    
+              </div>
+            </details>
+            
+            <details class="day" data-date="2026-07-25" open>
+              <summary>
+                <span class="date"><span class="date-text">2026-07-25</span></span>
+                <span class="count">1 个提醒</span>
+              </summary>
+              <div class="cards">
+                
+    <article class="card">
+      <h3 class="activity-name"><span class="activity-name-line">1000905:国服-拯救蚜虫-跨服</span></h3>
+      
+      <div class="meta"><span>服务器：</span>S861</div>
+      <div class="meta"><span>时间：</span>2026-07-27 08:00:00 ~ 2026-08-01 07:59:59（5天） UTC+8</div>
+      
+    </article>
+    
+              </div>
+            </details>
+            
+            <details class="day" data-date="2026-07-26" open>
+              <summary>
+                <span class="date"><span class="date-text">2026-07-26</span></span>
+                <span class="count">1 个提醒</span>
+              </summary>
+              <div class="cards">
+                
+    <article class="card">
+      <h3 class="activity-name"><span class="activity-name-line">惊喜转盘</span></h3>
+      
+      <div class="meta"><span>服务器：</span>S1-Sxxx</div>
+      <div class="meta"><span>时间：</span>2026-07-27 08:00:00 ~ 2026-08-03 07:59:59（7天） UTC+8</div>
+      
+    </article>
+    
+              </div>
+            </details>
+            
+            <details class="day" data-date="2026-07-27" open>
+              <summary>
+                <span class="date"><span class="date-text">2026-07-27</span></span>
+                <span class="count">4 个提醒</span>
+              </summary>
+              <div class="cards">
+                
+    <article class="card">
+      <h3 class="activity-name"><span class="activity-name-line">1000301: 最强战区-功勋商店</span></h3>
+      
+      <div class="meta"><span>服务器：</span>S860</div>
+      <div class="meta"><span>时间：</span>2026-07-27 08:00:00 ~ 2036-07-28 07:59:59（10年） UTC+8</div>
+      
+    </article>
+    
+
+    <article class="card">
+      <h3 class="activity-name"><span class="activity-name-line">1000118:战场-主题1</span></h3>
+      
+      <div class="meta"><span>服务器：</span>S1-S860</div>
+      <div class="meta"><span>时间：</span>2026-07-27 08:00:00 ~ 2026-08-03 07:59:59（7天） UTC+8</div>
+      
+    </article>
+    
+
+    <article class="card">
+      <h3 class="activity-name"><span class="activity-name-line">1000111:旱季来临</span></h3>
+      
+      <div class="meta"><span>服务器：</span>S1-S858</div>
+      <div class="meta"><span>时间：</span>2026-07-28 08:00:00 ~ 2026-08-04 07:59:59（7天） UTC+8</div>
+      
+      <div class="package-block">
+        <div class="package-title">配套礼包</div>
+        <div class="package-lines"><div>29120: 旱季来临神秘特供</div></div>
+        <div class="meta">服务器：S1-S858</div>
+<div class="meta">时间：2026-07-28 08:00:00 ~ 2026-08-04 07:59:59（7天） UTC+8</div>
+<div class="meta">每日刷新：是</div>
+<div class="meta">新服自动开启：否</div>
+      </div>
+    
+    </article>
+    
+
+    <article class="card">
+      <h3 class="activity-name"><span class="activity-name-line">1000125:VIP商店</span></h3>
+      
+      <div class="meta"><span>服务器：</span>S1-S861</div>
+      <div class="meta"><span>时间：</span>2026-08-01 08:00:00 ~ 2026-08-03 07:59:59（2天） UTC+8</div>
+      
+    </article>
+    
+              </div>
+            </details>
+            
+            <details class="day" data-date="2026-07-28" open>
+              <summary>
+                <span class="date"><span class="date-text">2026-07-28</span></span>
+                <span class="count">2 个提醒</span>
+              </summary>
+              <div class="cards">
+                
+    <article class="card">
+      <h3 class="activity-name"><span class="activity-name-line">十连抽</span></h3>
+      
+      <div class="meta"><span>服务器：</span>S1-Sxxx</div>
+      <div class="meta"><span>时间：</span>2026-07-29 08:00:00 ~ 2026-08-01 07:59:59（3天） UTC+8</div>
+      
+    </article>
+    
+
+    <article class="card">
+      <h3 class="activity-name"><span class="activity-name-line">蚁群狂欢</span></h3>
+      
+      <div class="meta"><span>服务器：</span>S1-Sxxx</div>
+      <div class="meta"><span>时间：</span>2026-07-29 08:00:00 ~ 2026-08-01 07:59:59（3天） UTC+8</div>
+      
+    </article>
+    
+              </div>
+            </details>
+            
+            <details class="day" data-date="2026-07-31" open>
+              <summary>
+                <span class="date"><span class="date-text">2026-07-31</span></span>
+                <span class="count">2 个提醒</span>
+              </summary>
+              <div class="cards">
+                
+    <article class="card">
+      <h3 class="activity-name"><span class="activity-name-line">31328:最强限定:战斗特供</span></h3>
+      
+      <div class="meta"><span>服务器：</span>全服</div>
+      <div class="meta"><span>时间：</span>2026-08-01 08:00:00 ~ 2026-08-02 07:59:59（1天） UTC+8</div>
+      
+    </article>
+    
+
+    <article class="card">
+      <h3 class="activity-name"><span class="activity-name-line">29145: 火力全开:进攻土拨鼠128~648</span></h3>
+      
+      <div class="meta"><span>服务器：</span>排期表未标明</div>
+      <div class="meta"><span>时间：</span>2026-08-02 08:00:00 ~ 2026-08-03 07:59:59（1天） UTC+8</div>
+      
+    </article>
+    
+              </div>
+            </details>
+            
+    </main>
+  </div>
+
+  <script>
+    const search = document.getElementById('search');
+    const dayNodes = [...document.querySelectorAll('.day')];
+    const expandAll = document.getElementById('expandAll');
+    const collapseAll = document.getElementById('collapseAll');
+    const todaySummary = document.getElementById('todaySummary');
+    const nextSummary = document.getElementById('nextSummary');
+
+    function todayString() {
+      const formatter = new Intl.DateTimeFormat('en-CA', {
+        timeZone: 'Asia/Shanghai',
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+      });
+      const parts = Object.fromEntries(
+        formatter.formatToParts(new Date()).map((part) => [part.type, part.value])
+      );
+      return `${parts.year}-${parts.month}-${parts.day}`;
+    }
+
+    function localTodayString() {
+      const now = new Date();
+      const year = now.getFullYear();
+      const month = String(now.getMonth() + 1).padStart(2, '0');
+      const day = String(now.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    }
+
+    function activityNameText(node) {
+      const lines = [...node.querySelectorAll('.activity-name-line')]
+        .map((line) => line.textContent.trim())
+        .filter(Boolean);
+      return lines.length ? lines.join('\n') : node.textContent.trim();
+    }
+
+    function appendActivityNameLines(container, name) {
+      name.split('\n').map((line) => line.trim()).filter(Boolean).forEach((line) => {
+        const lineNode = document.createElement('span');
+        lineNode.className = 'activity-name-line';
+        lineNode.textContent = line;
+        container.appendChild(lineNode);
+      });
+    }
+
+    function uniqueCardNames(day, limit = 3) {
+      const names = [...day.querySelectorAll('.card h3')].map(activityNameText);
+      const unique = [...new Set(names)];
+      const shown = unique.slice(0, limit);
+      if (unique.length > limit) shown.push(`等${unique.length}个`);
+      return shown;
+    }
+
+    function setSummary(card, title, day, emptyText, badgeText = '') {
+      const label = card.querySelector('.summary-label');
+      const summaryDate = card.querySelector('.summary-date');
+      const meta = card.querySelector('.summary-meta');
+      label.textContent = title;
+      if (badgeText) {
+        const badge = document.createElement('span');
+        badge.className = 'next-badge';
+        badge.textContent = badgeText;
+        label.appendChild(badge);
+      }
+
+      meta.replaceChildren();
+      if (!day) {
+        summaryDate.textContent = emptyText;
+        const empty = document.createElement('div');
+        empty.textContent = '当前没有可展示的提醒';
+        meta.appendChild(empty);
+        return;
+      }
+
+      summaryDate.textContent = day.dataset.date;
+      uniqueCardNames(day).forEach((name) => {
+        const row = document.createElement('div');
+        row.className = 'summary-name activity-name';
+        appendActivityNameLines(row, name);
+        meta.appendChild(row);
+      });
+    }
+
+    function syncDateState() {
+      const today = todayString();
+      const availableDays = [];
+      dayNodes.forEach((day) => {
+        const isPast = day.dataset.date < today;
+        day.classList.toggle('hidden-by-date', isPast);
+        day.querySelectorAll('.inline-badge').forEach((badge) => badge.remove());
+        if (!isPast) availableDays.push(day);
+      });
+
+      const todayDay = availableDays.find((day) => day.dataset.date === today);
+      const nextDay = availableDays.find((day) => day.dataset.date > today);
+      if (nextDay) {
+        const badge = document.createElement('span');
+        badge.className = 'inline-badge';
+        badge.textContent = '下一次';
+        nextDay.querySelector('.date').appendChild(badge);
+      }
+
+      setSummary(todaySummary, '今天要设置什么', todayDay, '今天没有要设置的活动');
+      setSummary(nextSummary, '下一次要设置什么', nextDay, '没有下一次提醒', '下一次');
+    }
+
+    function applyFilter() {
+      const query = search.value.trim().toLowerCase();
+      dayNodes.forEach((day) => {
+        if (day.classList.contains('hidden-by-date')) {
+          day.classList.add('hidden');
+          return;
+        }
+        const text = day.textContent.toLowerCase();
+        const matched = !query || text.includes(query);
+        day.classList.toggle('hidden', !matched);
+        if (query && matched) day.open = true;
+      });
+    }
+
+    search.addEventListener('input', applyFilter);
+    expandAll.addEventListener('click', () => dayNodes.forEach((day) => day.open = true));
+    collapseAll.addEventListener('click', () => dayNodes.forEach((day) => day.open = false));
+    syncDateState();
+    applyFilter();
+  </script>
+</body>
+</html>
