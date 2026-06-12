@@ -27,6 +27,16 @@ EVOLUTION_RECHARGE_ACTIVITY_LINES = [
 DISPLAY_NAME_OVERRIDES = {
     "进化连冲": "\n".join(EVOLUTION_RECHARGE_ACTIVITY_LINES),
 }
+MARMOT_SHIELD_MAIL_TITLE = "土拨鼠、罩子、邮件"
+MARMOT_PACKAGE_LINE = "29145: 火力全开：进攻土拨鼠128~648"
+MARMOT_MAIL_ITEMS = [
+    "204115：野任饲料*30000",
+    "202042: 2小时兵蚁解化加速*10",
+    "202044:2小时治 加速*10",
+    "204042：奇异密雯V*1",
+    "200077: 100钻石*4",
+    "203001：巢六保护8小时*1",
+]
 
 
 DURATIONS = [
@@ -168,6 +178,10 @@ def is_non_activity_note(activity: str) -> bool:
     }
 
 
+def is_marmot_shield_mail(raw: str) -> bool:
+    return "土拨鼠" in raw and "罩子" in raw and "邮件" in raw
+
+
 def activity_name(raw: str) -> str:
     if "功勋商店" in raw:
         return "延长功勋商店 / 功勋商店"
@@ -260,6 +274,8 @@ def regular_activity_id_map() -> dict[str, str]:
 
 
 def display_activity_name(raw: str) -> str:
+    if is_marmot_shield_mail(raw):
+        return MARMOT_SHIELD_MAIL_TITLE
     name = activity_name(raw)
     if name in DISPLAY_NAME_OVERRIDES:
         return DISPLAY_NAME_OVERRIDES[name]
@@ -437,6 +453,27 @@ def time_range(start_day: date, duration_label: str, days: int | None, name: str
     return f"{start:%Y-%m-%d %H:%M:%S} ~ {end:%Y-%m-%d %H:%M:%S}（{duration_label}） UTC+8"
 
 
+def compact_one_day_range(start_day: date) -> str:
+    start = datetime(start_day.year, start_day.month, start_day.day, 8, 0, 0)
+    end = start + timedelta(days=1) - timedelta(seconds=1)
+    return f"{start:%Y-%m-%d %H:%M:%S}~{end:%Y-%m-%d %H:%M:%S}"
+
+
+def marmot_shield_mail_text(start_day: date) -> str:
+    active_range = compact_one_day_range(start_day)
+    mail_time = datetime(start_day.year, start_day.month, start_day.day, 16, 0, 11) - timedelta(days=1)
+    lines = [
+        "土拨鼠服：",
+        MARMOT_PACKAGE_LINE,
+        f"时间：{active_range} UTC+8",
+        "新服不自动开启，每日刷新 pop2",
+        f"区域征战服：保护罩【{active_range} UTC+8】定时24h【赛季外，区域征战范围服 】",
+        f"邮件，赛季外，定时：{mail_time:%Y-%m-%d %H:%M:%S}",
+        *MARMOT_MAIL_ITEMS,
+    ]
+    return "\n".join(lines)
+
+
 def labeled_text(label: str, value: str) -> str:
     if "\n" in value:
         return f"{label}：\n{value}"
@@ -453,6 +490,10 @@ def render(reminders: list[Reminder], target: date) -> str:
 
     chunks = [header]
     for item in todays:
+        if is_marmot_shield_mail(item.raw):
+            chunks.append(marmot_shield_mail_text(item.start_day))
+            continue
+
         name = display_activity_name(item.raw)
         base_name = activity_name(item.raw)
         duration_label, days = duration_for(base_name, item.raw)

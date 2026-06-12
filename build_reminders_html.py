@@ -7,11 +7,16 @@ from pathlib import Path
 from zoneinfo import ZoneInfo
 
 from daily_reminder import (
+    MARMOT_MAIL_ITEMS,
+    MARMOT_PACKAGE_LINE,
     Reminder,
     activity_name,
+    compact_one_day_range,
     display_activity_name,
     duration_for,
+    is_marmot_shield_mail,
     load_reminders,
+    marmot_shield_mail_text,
     server_text,
     time_range,
 )
@@ -85,6 +90,29 @@ def render_server_meta(base_name: str, value: str) -> str:
     if base_name == "进化连冲":
         return f'<div class="meta meta-lines">{render_text_lines(value)}</div>'
     return render_labeled_meta("服务器", value)
+
+
+def marmot_shield_mail_details(item: Reminder) -> str:
+    active_range = compact_one_day_range(item.start_day)
+    mail_time_text = marmot_shield_mail_text(item.start_day).splitlines()[5].replace("邮件，赛季外，定时：", "")
+    mail_rows = "\n".join(f'<div>{escape(line)}</div>' for line in MARMOT_MAIL_ITEMS)
+    return f"""
+      <div class="package-block">
+        <div class="package-title">土拨鼠服</div>
+        <div class="package-lines"><div>{escape(MARMOT_PACKAGE_LINE)}</div></div>
+        <div class="meta">时间：{escape(active_range)} UTC+8</div>
+        <div class="meta">新服不自动开启，每日刷新 pop2</div>
+      </div>
+      <div class="package-block">
+        <div class="package-title">区域征战服</div>
+        <div class="meta">保护罩【{escape(active_range)} UTC+8】定时24h【赛季外，区域征战范围服 】</div>
+      </div>
+      <div class="package-block">
+        <div class="package-title">邮件，赛季外</div>
+        <div class="meta">定时：{escape(mail_time_text)}</div>
+        <div class="package-lines">{mail_rows}</div>
+      </div>
+    """
 
 
 def following_line_details(lines: list[str], prefixes: tuple[str, ...]) -> list[str]:
@@ -171,6 +199,16 @@ def package_details(item: Reminder) -> str:
 
 def render_card(item: Reminder) -> str:
     name = display_activity_name(item.raw)
+    if is_marmot_shield_mail(item.raw):
+        action = "" if item.action == "设置活动" else f'<div class="meta action">{escape(item.action)}</div>'
+        return f"""
+        <article class="card">
+          <h3 class="activity-name">{render_activity_name_lines(name)}</h3>
+          {action}
+          {marmot_shield_mail_details(item)}
+        </article>
+        """
+
     base_name = activity_name(item.raw)
     duration_label, days = duration_for(base_name, item.raw)
     action = "" if item.action == "设置活动" else f'<div class="meta action">{escape(item.action)}</div>'
