@@ -291,6 +291,14 @@ def display_activity_name(raw: str) -> str:
 def duration_for(name: str, raw: str) -> tuple[str, int | None]:
     if "功勋商店" in name:
         return "10年", None
+    for line in raw.splitlines():
+        line = line.strip()
+        if not line.startswith("时间："):
+            continue
+        explicit_duration = re.search(r"[（(]\s*(\d+)\s*天\s*[)）]", line)
+        if explicit_duration:
+            days = int(explicit_duration.group(1))
+            return f"{days}天", days
     for key, label, days in DURATIONS:
         if key in name or key in raw:
             return label, days
@@ -390,14 +398,21 @@ def computed_server_text(raw: str, start_day: date) -> str | None:
 
 
 def server_text(raw: str, start_day: date | None = None) -> str:
-    if start_day is not None:
-        computed = computed_server_text(raw, start_day)
-        if computed:
-            return computed
-
     raw_one_line = " ".join(raw.split())
     if re.search(r"服务器[:：]\s*全服", raw_one_line):
         return "全服"
+
+    explicit_servers = []
+    for line in raw.splitlines():
+        line = line.strip()
+        if not line.startswith("服务器"):
+            continue
+        server_value = re.sub(r"^服务器[:：]\s*", "", line)
+        server_value = re.sub(r"^服务器[:：]\s*", "", server_value)
+        for item in re.findall(r"S\s*\d+\s*[-~～—–]+\s*S?\s*(?:xxx|\d+)|S\s*\d+|S\s*xxx|(?<![\d.])1\s*[-~～—–]+\s*(?:xxx|XXX|\d+)", server_value, re.I):
+            explicit_servers.append(normalize_server(item))
+    if explicit_servers:
+        return "，".join(dict.fromkeys(explicit_servers))
 
     if "功勋商店" in raw:
         merit = re.search(r"功勋商店\s*(\d+|xxx)", raw_one_line, re.I)
@@ -415,7 +430,7 @@ def server_text(raw: str, start_day: date | None = None) -> str:
         if parts:
             return "；".join(parts)
 
-    server_matches = re.findall(r"S\s*\d+\s*[-~～—–]+\s*S?\s*(?:xxx|\d+)|S\s*\d+|S\s*xxx", raw_one_line, re.I)
+    server_matches = re.findall(r"S\s*\d+\s*[-~～—–]+\s*S?\s*(?:xxx|\d+)|S\s*xxx", raw_one_line, re.I)
     if server_matches:
         return "，".join(dict.fromkeys(normalize_server(item) for item in server_matches))
 
@@ -426,6 +441,11 @@ def server_text(raw: str, start_day: date | None = None) -> str:
     bracket = re.search(r"【([^】]*\d+\s*[-~～]\s*\d+[^】]*)】", raw_one_line)
     if bracket:
         return bracket.group(1).strip()
+
+    if start_day is not None:
+        computed = computed_server_text(raw, start_day)
+        if computed:
+            return computed
 
     return "排期表未标明"
 
