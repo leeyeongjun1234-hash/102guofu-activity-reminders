@@ -5,12 +5,14 @@
 ## 本地生成
 
 ```bash
+python3 generate_reminders.py
 python3 daily_reminder.py
 python3 build_reminders_html.py
 ```
 
 生成文件：
 
+- `活动设置提醒.tsv`
 - `每日活动提醒.txt`
 - `全部每日提醒.html`
 - `index.html`
@@ -32,6 +34,14 @@ python3 build_reminders_html.py
 - 提交本地修改
 - 拉取 GitHub 最新内容
 - 推送到 GitHub
+
+如果只想本地自动更新 HTML、不推送 GitHub，双击：
+
+```text
+自动更新HTML.command
+```
+
+打开后保持窗口不关；之后每次保存 `102国服活动排期表.xlsx` 或 `活动与礼包对应关系.xlsx`，都会自动重新生成 `活动设置提醒.tsv`、`每日活动提醒.txt`、`全部每日提醒.html`、`index.html` 和 `site/index.html`。
 
 ### Windows
 

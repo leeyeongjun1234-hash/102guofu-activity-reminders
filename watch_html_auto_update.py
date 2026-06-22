@@ -11,8 +11,11 @@ ROOT = Path(__file__).resolve().parent
 WATCHED_FILES = [
     ROOT / "102国服活动排期表.xlsx",
     ROOT / "活动与礼包对应关系.xlsx",
+    ROOT / "活动设置提醒.tsv",
+    ROOT / "generate_reminders.py",
     ROOT / "daily_reminder.py",
     ROOT / "build_reminders_html.py",
+    ROOT / "watch_html_auto_update.py",
 ]
 INTERVAL_SECONDS = 3
 
@@ -35,18 +38,21 @@ def log(message: str) -> None:
 
 
 def rebuild() -> bool:
-    log("开始更新 HTML...")
-    result = subprocess.run(
-        [sys.executable, str(ROOT / "build_reminders_html.py")],
-        cwd=ROOT,
-        text=True,
-    )
-    if result.returncode == 0:
-        log("HTML 已更新：全部每日提醒.html / site/index.html")
-        return True
+    steps = [
+        ("活动设置提醒 TSV", ROOT / "generate_reminders.py"),
+        ("每日活动提醒", ROOT / "daily_reminder.py"),
+        ("HTML", ROOT / "build_reminders_html.py"),
+    ]
 
-    log("HTML 更新失败，请查看上面的错误信息。")
-    return False
+    log("开始更新 TSV、提醒文本和 HTML...")
+    for label, script in steps:
+        result = subprocess.run([sys.executable, str(script)], cwd=ROOT, text=True)
+        if result.returncode != 0:
+            log(f"{label} 更新失败，请查看上面的错误信息。")
+            return False
+
+    log("已更新：活动设置提醒.tsv / 每日活动提醒.txt / 全部每日提醒.html / index.html / site/index.html")
+    return True
 
 
 def main() -> None:
@@ -54,7 +60,7 @@ def main() -> None:
     if missing:
         raise SystemExit("缺少文件：" + "、".join(missing))
 
-    log("自动更新 HTML 已启动。按 Ctrl+C 停止。")
+    log("自动更新已启动。按 Ctrl+C 停止。")
     rebuild()
     last_signature = watched_signature()
 
