@@ -155,13 +155,13 @@ def package_details(item: Reminder) -> str:
         ]
         return package_section("配套礼包", package_lines, details)
 
-    if name == "落潮海岸" and "32346" in item.raw:
+    if name == "落潮海岸" and any(package_id in item.raw for package_id in ("32346", "29681")):
         five_day_lines = [
             line
             for line in lines
-            if line.startswith(("32346", "32347", "32348", "31937", "31938", "32351"))
+            if line.startswith(("32346", "32347", "32348", "32351", "29681", "29682", "29683", "31937", "31938", "29686"))
         ]
-        six_day_lines = [line for line in lines if line.startswith("32345")]
+        six_day_lines = [line for line in lines if line.startswith(("32345", "29680"))]
         five_day_details = ["服务器：" + server_text(item.raw, item.start_day)]
         five_day_time = next((line for line in lines if line.startswith("开启时间：")), "")
         if five_day_time:
