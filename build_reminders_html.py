@@ -246,10 +246,8 @@ def render_summary(
     unique_names = list(dict.fromkeys(names))
     display_names = "\n".join(
         f'<div class="summary-name activity-name">{render_activity_name_lines(name)}</div>'
-        for name in unique_names[:3]
+        for name in unique_names
     )
-    if len(unique_names) > 3:
-        display_names += f"\n<div>等{len(unique_names)}个</div>"
 
     badge = f'<span class="next-badge">{escape(highlight)}</span>' if highlight else ""
     return f"""
@@ -794,12 +792,9 @@ def build_html(reminders: list[Reminder]) -> str:
       }});
     }}
 
-    function uniqueCardNames(day, limit = 3) {{
+    function uniqueCardNames(day) {{
       const names = [...day.querySelectorAll('.card h3')].map(activityNameText);
-      const unique = [...new Set(names)];
-      const shown = unique.slice(0, limit);
-      if (unique.length > limit) shown.push(`等${{unique.length}}个`);
-      return shown;
+      return [...new Set(names)];
     }}
 
     function setSummary(card, title, day, emptyText, badgeText = '') {{

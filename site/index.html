@@ -414,7 +414,12 @@
       <div class="summary-meta"><div class="summary-name activity-name"><span class="activity-name-line">1000301: 最强战区-功勋商店</span></div>
 <div class="summary-name activity-name"><span class="activity-name-line">1000118:战场-主题1</span></div>
 <div class="summary-name activity-name"><span class="activity-name-line">1000110:潮起潮落</span></div>
-<div>等9个</div></div>
+<div class="summary-name activity-name"><span class="activity-name-line">1000357:特化蚁的馈赠</span></div>
+<div class="summary-name activity-name"><span class="activity-name-line">1000151: 蚁巢装扮兑换商店</span></div>
+<div class="summary-name activity-name"><span class="activity-name-line">1000150:落潮海岸</span></div>
+<div class="summary-name activity-name"><span class="activity-name-line">1000906:国服-土拨鼠复仇</span></div>
+<div class="summary-name activity-name"><span class="activity-name-line">1000125:VIP商店</span></div>
+<div class="summary-name activity-name"><span class="activity-name-line">1000902:国服-拯救蚜虫-本服</span></div></div>
     </section>
     
       
@@ -1574,12 +1579,9 @@
       });
     }
 
-    function uniqueCardNames(day, limit = 3) {
+    function uniqueCardNames(day) {
       const names = [...day.querySelectorAll('.card h3')].map(activityNameText);
-      const unique = [...new Set(names)];
-      const shown = unique.slice(0, limit);
-      if (unique.length > limit) shown.push(`等${unique.length}个`);
-      return shown;
+      return [...new Set(names)];
     }
 
     function setSummary(card, title, day, emptyText, badgeText = '') {
