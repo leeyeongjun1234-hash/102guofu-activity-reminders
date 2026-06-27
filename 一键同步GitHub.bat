@@ -15,6 +15,8 @@ if %errorlevel%==0 (
 )
 
 echo 开始生成提醒文件...
+%PYTHON% generate_reminders.py
+if errorlevel 1 goto error
 %PYTHON% daily_reminder.py
 if errorlevel 1 goto error
 %PYTHON% build_reminders_html.py

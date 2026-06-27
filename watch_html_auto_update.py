@@ -11,10 +11,11 @@ ROOT = Path(__file__).resolve().parent
 WATCHED_FILES = [
     ROOT / "102国服活动排期表.xlsx",
     ROOT / "活动与礼包对应关系.xlsx",
-    ROOT / "活动设置提醒.tsv",
+    ROOT / "工作休日日历.xlsx",
     ROOT / "generate_reminders.py",
     ROOT / "daily_reminder.py",
     ROOT / "build_reminders_html.py",
+    ROOT / "workday_calendar.py",
     ROOT / "watch_html_auto_update.py",
 ]
 INTERVAL_SECONDS = 3

@@ -6,6 +6,8 @@ from collections import defaultdict
 from datetime import date, timedelta
 from pathlib import Path
 
+from workday_calendar import adjusted_setup_rules, has_fixed_sunday_setup
+
 
 SOURCE = Path("102国服活动排期表.xlsx")
 OUTPUT = Path("活动设置提醒.tsv")
@@ -30,26 +32,32 @@ def parse_month_day(value: str) -> date | None:
     return date(YEAR, int(match.group(1)), int(match.group(2)))
 
 
-def reminder_rules(activity: str, start_day: date) -> list[tuple[date, str]]:
-    if "区域迁徙" in activity:
+def reminder_rules(activity: str, start_day: date, row_context: str = "") -> list[tuple[date, str]]:
+    if has_fixed_sunday_setup(activity, row_context):
+        rules = [(week_monday(start_day) - timedelta(days=1), "设置活动")]
+    elif "区域迁徙" in activity:
         monday = week_monday(start_day) - timedelta(days=7)
-        return [
+        rules = [
             (monday, "区域迁徙：设置礼包+分组"),
             (monday + timedelta(days=2), "区域迁徙：设置活动+公布分组"),
         ]
-    if "本服联盟GVE" in activity:
-        return [(week_monday(start_day) - timedelta(days=7), "本服联盟GVE：设置活动")]
-    if "跨服联盟GVE" in activity:
-        return [(week_monday(start_day) - timedelta(days=2), "跨服联盟GVE：设置活动")]
-    if "VIP商店" in activity or "黑骑士" in activity:
-        return [(week_monday(start_day), "设置活动")]
-    if "联盟远征" in activity or "功勋商店" in activity:
-        return [(start_day, "设置活动")]
-    if "土拨鼠" in activity:
-        return [(start_day - timedelta(days=2), "设置活动")]
-    if "自选周卡" in activity or "进化连冲" in activity:
-        return [(start_day - timedelta(days=3), "设置活动")]
-    return [(start_day - timedelta(days=1), "设置活动")]
+    elif "本服联盟GVE" in activity:
+        rules = [(week_monday(start_day) - timedelta(days=7), "本服联盟GVE：设置活动")]
+    elif "跨服联盟GVE" in activity:
+        rules = [(week_monday(start_day) - timedelta(days=2), "跨服联盟GVE：设置活动")]
+    elif "VIP商店" in activity or "黑骑士" in activity:
+        rules = [(week_monday(start_day), "设置活动")]
+    elif "联盟远征" in activity or "功勋商店" in activity:
+        rules = [(start_day, "设置活动")]
+    elif "29145" in activity or "火力全开" in activity:
+        rules = [(start_day - timedelta(days=1), "设置活动")]
+    elif "土拨鼠" in activity:
+        rules = [(start_day - timedelta(days=2), "设置活动")]
+    elif "自选周卡" in activity or "进化连冲" in activity:
+        rules = [(start_day - timedelta(days=3), "设置活动")]
+    else:
+        rules = [(start_day - timedelta(days=1), "设置活动")]
+    return adjusted_setup_rules(rules, activity, row_context)
 
 
 def main() -> None:
@@ -67,13 +75,14 @@ def main() -> None:
 
     reminders: dict[date, list[tuple[date, str, str]]] = defaultdict(list)
     for row in rows[2:]:
+        row_context = clean_text("\n".join(value for value in row[:4] if value.strip()))
         for col, start_day in dates.items():
             if col >= len(row):
                 continue
             activity = clean_text(row[col])
             if not activity:
                 continue
-            for setup_day, action in reminder_rules(activity, start_day):
+            for setup_day, action in reminder_rules(activity, start_day, row_context):
                 reminders[setup_day].append((start_day, action, activity))
 
     with OUTPUT.open("w", encoding="utf-8-sig", newline="") as f:

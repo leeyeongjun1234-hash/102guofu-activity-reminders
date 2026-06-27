@@ -13,8 +13,10 @@ on:
     paths:
       - "102国服活动排期表.xlsx"
       - "活动与礼包对应关系.xlsx"
+      - "工作休日日历.xlsx"
       - "daily_reminder.py"
       - "build_reminders_html.py"
+      - "workday_calendar.py"
       - ".github/workflows/update-pages.yml"
 
 permissions:
@@ -36,6 +38,7 @@ jobs:
 
       - name: Generate reminder files
         run: |
+          python generate_reminders.py
           python daily_reminder.py
           python build_reminders_html.py
 
@@ -43,4 +46,4 @@ jobs:
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: "chore: update reminder page"
-          file_pattern: "index.html site/index.html 全部每日提醒.html 每日活动提醒.txt"
+          file_pattern: "index.html site/index.html 全部每日提醒.html 每日活动提醒.txt 活动设置提醒.tsv"

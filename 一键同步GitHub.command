@@ -14,6 +14,7 @@ else
 fi
 
 echo "开始生成提醒文件..."
+$PYTHON generate_reminders.py
 $PYTHON daily_reminder.py
 $PYTHON build_reminders_html.py
 

@@ -191,16 +191,19 @@
     }
 
     .cards {
-      column-count: 3;
-      column-gap: 12px;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      grid-auto-rows: 8px;
+      grid-auto-flow: dense;
+      align-items: start;
+      gap: 10px;
       padding: 16px;
     }
 
     .card {
+      align-self: start;
       display: grid;
       gap: 8px;
-      break-inside: avoid;
-      margin: 0 0 12px;
       padding: 14px;
       border: 1px solid var(--line);
       border-radius: 8px;
@@ -367,7 +370,7 @@
       }
 
       .cards {
-        column-count: 1;
+        grid-template-columns: 1fr;
       }
 
       .lock-row {
@@ -377,7 +380,7 @@
 
     @media (min-width: 721px) and (max-width: 980px) {
       .cards {
-        column-count: 2;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
       }
     }
   </style>
@@ -407,24 +410,21 @@
     </div>
 
     <section class="summary-grid">
-      
-    <section class="summary-card" id="todaySummary">
+      <section class="summary-card" id="todaySummary">
       <div class="summary-label">今天要设置什么</div>
       <div class="summary-date">2026-06-27</div>
-      <div class="summary-meta"><div class="summary-name activity-name"><span class="activity-name-line">1000179:蚁群嘉年华</span></div>
-<div class="summary-name activity-name"><span class="activity-name-line">1000905:国服-拯救蚜虫-跨服</span></div></div>
+      <div class="summary-meta"><div class="summary-name activity-name"><span class="activity-name-line"><span class="coded-line coded-line-package"><span class="item-code item-code-package" data-kind="礼包" title="礼包编号">29145</span><span class="item-separator">: </span>火力全开:进攻土拨鼠128~648</span></span></div>
+<div class="summary-name activity-name"><span class="activity-name-line"><span class="coded-line coded-line-activity"><span class="item-code item-code-activity" data-kind="活动" title="活动编号">1000179</span><span class="item-separator">:</span>蚁群嘉年华</span></span></div>
+<div class="summary-name activity-name"><span class="activity-name-line"><span class="coded-line coded-line-activity"><span class="item-code item-code-activity" data-kind="活动" title="活动编号">1000296</span><span class="item-separator">:</span>惊喜转盘（二代）</span></span></div>
+<div class="summary-name activity-name"><span class="activity-name-line"><span class="coded-line coded-line-activity"><span class="item-code item-code-activity" data-kind="活动" title="活动编号">1900132</span><span class="item-separator">: </span>连续充值（野怪开服30天以上）</span></span></div>
+<div class="summary-name activity-name"><span class="activity-name-line">蚁群狂欢</span></div>
+<div class="summary-name activity-name"><span class="activity-name-line"><span class="coded-line coded-line-activity"><span class="item-code item-code-activity" data-kind="活动" title="活动编号">1000905</span><span class="item-separator">:</span>国服-拯救蚜虫-跨服</span></span></div></div>
     </section>
-    
-      
-    <section class="summary-card" id="nextSummary">
-      <div class="summary-label">下一次要设置什么<span class="next-badge">下一次</span></div>
-      <div class="summary-date">2026-06-28</div>
-      <div class="summary-meta"><div class="summary-name activity-name"><span class="activity-name-line">1000927:飞蜥之战</span></div>
-<div class="summary-name activity-name"><span class="activity-name-line">1000296:惊喜转盘（二代）</span></div>
-<div class="summary-name activity-name"><span class="activity-name-line">1900132: 连续充值（野怪开服30天以上）</span></div>
-<div class="summary-name activity-name"><span class="activity-name-line">蚁群狂欢</span></div></div>
-    </section>
-    
+      <section class="summary-card" id="nextSummary">
+  <div class="summary-label">下一次要设置什么<span class="next-badge">下一次</span></div>
+  <div class="summary-date">2026-06-28</div>
+  <div class="summary-meta"><div class="summary-name activity-name"><span class="activity-name-line"><span class="coded-line coded-line-activity"><span class="item-code item-code-activity" data-kind="活动" title="活动编号">1000927</span><span class="item-separator">:</span>飞蜥之战</span></span></div></div>
+</section>
     </section>
 
     <main id="days">
@@ -432,12 +432,21 @@
             <details class="day" data-date="2026-06-27" open>
               <summary>
                 <span class="date"><span class="date-text">2026-06-27</span></span>
-                <span class="count">2 个提醒</span>
+                <span class="count">6 个提醒</span>
               </summary>
               <div class="cards">
                 
-    <article class="card">
-      <h3 class="activity-name"><span class="activity-name-line">1000179:蚁群嘉年华</span></h3>
+    <article class="card card-package-id">
+      <h3 class="activity-name"><span class="activity-name-line"><span class="coded-line coded-line-package"><span class="item-code item-code-package" data-kind="礼包" title="礼包编号">29145</span><span class="item-separator">: </span>火力全开:进攻土拨鼠128~648</span></span></h3>
+      
+      <div class="meta"><span>服务器：</span>S1-S856</div>
+      <div class="meta"><span>时间：</span>2026-06-28 08:00:00 ~ 2026-06-29 07:59:59（1天） UTC+8</div>
+      
+    </article>
+    
+
+    <article class="card card-activity-id">
+      <h3 class="activity-name"><span class="activity-name-line"><span class="coded-line coded-line-activity"><span class="item-code item-code-activity" data-kind="活动" title="活动编号">1000179</span><span class="item-separator">:</span>蚁群嘉年华</span></span></h3>
       
       <div class="meta"><span>服务器：</span>S1-S858</div>
       <div class="meta"><span>时间：</span>2026-06-28 08:00:00 ~ 2026-07-03 07:59:59（5天） UTC+8</div>
@@ -445,8 +454,70 @@
     </article>
     
 
+    <article class="card card-activity-id">
+      <h3 class="activity-name"><span class="activity-name-line"><span class="coded-line coded-line-activity"><span class="item-code item-code-activity" data-kind="活动" title="活动编号">1000296</span><span class="item-separator">:</span>惊喜转盘（二代）</span></span></h3>
+      
+      <div class="meta"><span>服务器：</span>S1-S858</div>
+      <div class="meta"><span>时间：</span>2026-06-29 08:00:00 ~ 2026-07-06 07:59:59（7天） UTC+8</div>
+      
+      <div class="package-block package-block-package">
+        <div class="package-title">配套礼包</div>
+        <div class="package-lines"><div><span class="coded-line coded-line-package"><span class="item-code item-code-package" data-kind="礼包" title="礼包编号">31444</span><span class="item-separator">: </span>惊喜叶片限定30</span></div>
+<div><span class="coded-line coded-line-package"><span class="item-code item-code-package" data-kind="礼包" title="礼包编号">31445</span><span class="item-separator">: </span>惊喜叶片限定68</span></div>
+<div><span class="coded-line coded-line-package"><span class="item-code item-code-package" data-kind="礼包" title="礼包编号">31446</span><span class="item-separator">: </span>惊喜叶片限定128</span></div>
+<div><span class="coded-line coded-line-package"><span class="item-code item-code-package" data-kind="礼包" title="礼包编号">31447</span><span class="item-separator">: </span>惊喜叶片限定328</span></div></div>
+        <div class="meta">服务器：S1-S858</div>
+<div class="meta">新服不自动开，每日不刷新</div>
+<div class="meta">2026-06-29 08:00:00 ~2026-07-06 07:59:59 UTC+8</div>
+      </div>
+    
+    </article>
+    
+
+    <article class="card card-activity-id">
+      <h3 class="activity-name"><span class="activity-name-line"><span class="coded-line coded-line-activity"><span class="item-code item-code-activity" data-kind="活动" title="活动编号">1900132</span><span class="item-separator">: </span>连续充值（野怪开服30天以上）</span></span></h3>
+      
+      <div class="meta"><span>服务器：</span>S1-S856</div>
+      <div class="meta"><span>时间：</span>2026-06-29 08:00:00 ~ 2026-07-06 07:59:59（7天） UTC+8</div>
+      
+    </article>
+    
+
     <article class="card">
-      <h3 class="activity-name"><span class="activity-name-line">1000905:国服-拯救蚜虫-跨服</span></h3>
+      <h3 class="activity-name"><span class="activity-name-line">蚁群狂欢</span></h3>
+      
+      <div class="meta"><span>服务器：</span>S1-S858</div>
+      <div class="meta"><span>时间：</span>2026-06-29 08:00:00 ~ 2026-07-02 07:59:59（3天） UTC+8</div>
+      
+      <div class="package-block package-block-package">
+        <div class="package-title">免费礼包</div>
+        <div class="package-lines"><div><span class="coded-line coded-line-package"><span class="item-code item-code-package" data-kind="礼包" title="礼包编号">31714</span><span class="item-separator">: </span>蚁群狂欢：免费礼物-08210</span></div>
+<div>2026-06-29 08:00:00~2026-06-30 07:59:59 UTC+8</div>
+<div><span class="coded-line coded-line-package"><span class="item-code item-code-package" data-kind="礼包" title="礼包编号">31715</span><span class="item-separator">: </span>蚁群狂欢：免费礼物-08220</span></div>
+<div>2026-06-30 08:00:00~2026-07-01 07:59:59 UTC+8</div>
+<div><span class="coded-line coded-line-package"><span class="item-code item-code-package" data-kind="礼包" title="礼包编号">31716</span><span class="item-separator">: </span>蚁群狂欢：免费礼物-08230</span></div>
+<div>2026-07-01 08:00:00~2026-07-02 07:59:59 UTC+8</div></div>
+        <div class="meta">服务器：S1-S858</div>
+      </div>
+    
+
+      <div class="package-block package-block-package">
+        <div class="package-title">付费礼包</div>
+        <div class="package-lines"><div><span class="coded-line coded-line-package"><span class="item-code item-code-package" data-kind="礼包" title="礼包编号">32295</span><span class="item-separator">: </span>蚁群狂欢：混合自选专供（四代宝箱）</span></div>
+<div><span class="coded-line coded-line-package"><span class="item-code item-code-package" data-kind="礼包" title="礼包编号">32163</span><span class="item-separator">: </span>蚁群狂欢：野怪养成专属68</span></div>
+<div><span class="coded-line coded-line-package"><span class="item-code item-code-package" data-kind="礼包" title="礼包编号">32164</span><span class="item-separator">: </span>蚁群狂欢：变异自选热卖68</span></div>
+<div><span class="coded-line coded-line-package"><span class="item-code item-code-package" data-kind="礼包" title="礼包编号">32165</span><span class="item-separator">: </span>蚁群狂欢：兵种改造特惠128</span></div>
+<div><span class="coded-line coded-line-package"><span class="item-code item-code-package" data-kind="礼包" title="礼包编号">32166</span><span class="item-separator">: </span>蚁群狂欢：特化蚁进化特供328</span></div></div>
+        <div class="meta">服务器：S1-S858</div>
+<div class="meta">2026-06-29 08:00:00 ~2026-07-02 07:59:59 UTC+8</div>
+<div class="meta">新服不自动开启，每日不刷新</div>
+      </div>
+    
+    </article>
+    
+
+    <article class="card card-activity-id">
+      <h3 class="activity-name"><span class="activity-name-line"><span class="coded-line coded-line-activity"><span class="item-code item-code-activity" data-kind="活动" title="活动编号">1000905</span><span class="item-separator">:</span>国服-拯救蚜虫-跨服</span></span></h3>
       
       <div class="meta"><span>服务器：</span>S857</div>
       <div class="meta"><span>时间：</span>2026-06-29 08:00:00 ~ 2026-07-04 07:59:59（5天） UTC+8</div>
@@ -459,78 +530,16 @@
             <details class="day" data-date="2026-06-28" open>
               <summary>
                 <span class="date"><span class="date-text">2026-06-28</span><span class="inline-badge">下一次</span></span>
-                <span class="count">4 个提醒</span>
+                <span class="count">1 个提醒</span>
               </summary>
               <div class="cards">
                 
-    <article class="card">
-      <h3 class="activity-name"><span class="activity-name-line">1000927:飞蜥之战</span></h3>
+    <article class="card card-activity-id">
+      <h3 class="activity-name"><span class="activity-name-line"><span class="coded-line coded-line-activity"><span class="item-code item-code-activity" data-kind="活动" title="活动编号">1000927</span><span class="item-separator">:</span>飞蜥之战</span></span></h3>
       
       <div class="meta"><span>服务器：</span>S1-S834</div>
       <div class="meta"><span>时间：</span>2026-06-29 08:00:00 ~ 2026-07-05 07:59:59（6天） UTC+8</div>
       
-    </article>
-    
-
-    <article class="card">
-      <h3 class="activity-name"><span class="activity-name-line">1000296:惊喜转盘（二代）</span></h3>
-      
-      <div class="meta"><span>服务器：</span>S1-S858</div>
-      <div class="meta"><span>时间：</span>2026-06-29 08:00:00 ~ 2026-07-06 07:59:59（7天） UTC+8</div>
-      
-      <div class="package-block">
-        <div class="package-title">配套礼包</div>
-        <div class="package-lines"><div>31444: 惊喜叶片限定30</div>
-<div>31445: 惊喜叶片限定68</div>
-<div>31446: 惊喜叶片限定128</div>
-<div>31447: 惊喜叶片限定328</div></div>
-        <div class="meta">服务器：S1-S858</div>
-<div class="meta">新服不自动开，每日不刷新</div>
-<div class="meta">2026-06-29 08:00:00 ~2026-07-06 07:59:59 UTC+8</div>
-      </div>
-    
-    </article>
-    
-
-    <article class="card">
-      <h3 class="activity-name"><span class="activity-name-line">1900132: 连续充值（野怪开服30天以上）</span></h3>
-      
-      <div class="meta"><span>服务器：</span>S1-SXXX</div>
-      <div class="meta"><span>时间：</span>2026-06-29 08:00:00 ~ 2026-07-06 07:59:59（7天） UTC+8</div>
-      
-    </article>
-    
-
-    <article class="card">
-      <h3 class="activity-name"><span class="activity-name-line">蚁群狂欢</span></h3>
-      
-      <div class="meta"><span>服务器：</span>S1-S858</div>
-      <div class="meta"><span>时间：</span>2026-06-29 08:00:00 ~ 2026-07-02 07:59:59（3天） UTC+8</div>
-      
-      <div class="package-block">
-        <div class="package-title">免费礼包</div>
-        <div class="package-lines"><div>31714: 蚁群狂欢：免费礼物-08210</div>
-<div>2026-06-29 08:00:00~2026-06-30 07:59:59 UTC+8</div>
-<div>31715: 蚁群狂欢：免费礼物-08220</div>
-<div>2026-06-30 08:00:00~2026-07-01 07:59:59 UTC+8</div>
-<div>31716: 蚁群狂欢：免费礼物-08230</div>
-<div>2026-07-01 08:00:00~2026-07-02 07:59:59 UTC+8</div></div>
-        <div class="meta">服务器：S1-S858</div>
-      </div>
-    
-
-      <div class="package-block">
-        <div class="package-title">付费礼包</div>
-        <div class="package-lines"><div>32295: 蚁群狂欢：混合自选专供（四代宝箱）</div>
-<div>32163: 蚁群狂欢：野怪养成专属68</div>
-<div>32164: 蚁群狂欢：变异自选热卖68</div>
-<div>32165: 蚁群狂欢：兵种改造特惠128</div>
-<div>32166: 蚁群狂欢：特化蚁进化特供328</div></div>
-        <div class="meta">服务器：S1-S858</div>
-<div class="meta">2026-06-29 08:00:00 ~2026-07-02 07:59:59 UTC+8</div>
-<div class="meta">新服不自动开启，每日不刷新</div>
-      </div>
-    
     </article>
     
               </div>
@@ -543,8 +552,8 @@
               </summary>
               <div class="cards">
                 
-    <article class="card">
-      <h3 class="activity-name"><span class="activity-name-line">1000301: 最强战区-功勋商店</span></h3>
+    <article class="card card-activity-id">
+      <h3 class="activity-name"><span class="activity-name-line"><span class="coded-line coded-line-activity"><span class="item-code item-code-activity" data-kind="活动" title="活动编号">1000301</span><span class="item-separator">: </span>最强战区-功勋商店</span></span></h3>
       
       <div class="meta"><span>服务器：</span>S856</div>
       <div class="meta"><span>时间：</span>2026-06-29 08:00:00 ~ 2036-06-30 07:59:59（10年） UTC+8</div>
@@ -552,8 +561,8 @@
     </article>
     
 
-    <article class="card">
-      <h3 class="activity-name"><span class="activity-name-line">1000118:战场-主题1</span></h3>
+    <article class="card card-activity-id">
+      <h3 class="activity-name"><span class="activity-name-line"><span class="coded-line coded-line-activity"><span class="item-code item-code-activity" data-kind="活动" title="活动编号">1000118</span><span class="item-separator">:</span>战场-主题1</span></span></h3>
       
       <div class="meta"><span>服务器：</span>S1-S856</div>
       <div class="meta"><span>时间：</span>2026-06-29 08:00:00 ~ 2026-07-06 07:59:59（7天） UTC+8</div>
@@ -561,15 +570,15 @@
     </article>
     
 
-    <article class="card">
-      <h3 class="activity-name"><span class="activity-name-line">1000111:旱季来临</span></h3>
+    <article class="card card-activity-id">
+      <h3 class="activity-name"><span class="activity-name-line"><span class="coded-line coded-line-activity"><span class="item-code item-code-activity" data-kind="活动" title="活动编号">1000111</span><span class="item-separator">:</span>旱季来临</span></span></h3>
       
       <div class="meta"><span>服务器：</span>S1-S858</div>
       <div class="meta"><span>时间：</span>2026-06-30 08:00:00 ~ 2026-07-07 07:59:59（7天） UTC+8</div>
       
-      <div class="package-block">
+      <div class="package-block package-block-package">
         <div class="package-title">配套礼包</div>
-        <div class="package-lines"><div>29120: 旱季来临神秘特供</div></div>
+        <div class="package-lines"><div><span class="coded-line coded-line-package"><span class="item-code item-code-package" data-kind="礼包" title="礼包编号">29120</span><span class="item-separator">: </span>旱季来临神秘特供</span></div></div>
         <div class="meta">服务器：S1-S858</div>
 <div class="meta">时间：2026-06-30 08:00:00 ~ 2026-07-07 07:59:59（7天） UTC+8</div>
 <div class="meta">每日刷新：是</div>
@@ -579,8 +588,8 @@
     </article>
     
 
-    <article class="card">
-      <h3 class="activity-name"><span class="activity-name-line">1000125:VIP商店</span></h3>
+    <article class="card card-activity-id">
+      <h3 class="activity-name"><span class="activity-name-line"><span class="coded-line coded-line-activity"><span class="item-code item-code-activity" data-kind="活动" title="活动编号">1000125</span><span class="item-separator">:</span>VIP商店</span></span></h3>
       
       <div class="meta"><span>服务器：</span>S1-S857</div>
       <div class="meta"><span>时间：</span>2026-07-04 08:00:00 ~ 2026-07-06 07:59:59（2天） UTC+8</div>
@@ -588,8 +597,8 @@
     </article>
     
 
-    <article class="card">
-      <h3 class="activity-name"><span class="activity-name-line">1000902:国服-拯救蚜虫-本服</span></h3>
+    <article class="card card-activity-id">
+      <h3 class="activity-name"><span class="activity-name-line"><span class="coded-line coded-line-activity"><span class="item-code item-code-activity" data-kind="活动" title="活动编号">1000902</span><span class="item-separator">:</span>国服-拯救蚜虫-本服</span></span></h3>
       
       <div class="meta"><span>服务器：</span>S859</div>
       <div class="meta"><span>时间：</span>2026-07-06 08:00:00 ~ 2026-07-11 07:59:59（5天） UTC+8</div>
@@ -606,8 +615,8 @@
               </summary>
               <div class="cards">
                 
-    <article class="card">
-      <h3 class="activity-name"><span class="activity-name-line">1000143:特化蚁对决</span></h3>
+    <article class="card card-activity-id">
+      <h3 class="activity-name"><span class="activity-name-line"><span class="coded-line coded-line-activity"><span class="item-code item-code-activity" data-kind="活动" title="活动编号">1000143</span><span class="item-separator">:</span>特化蚁对决</span></span></h3>
       
       <div class="meta"><span>服务器：</span>排期表未标明</div>
       <div class="meta"><span>时间：</span>2026-07-02 08:15:00 ~ 2026-07-16 08:14:59（14天） UTC+8</div>
@@ -638,12 +647,12 @@
             <details class="day" data-date="2026-07-03" open>
               <summary>
                 <span class="date"><span class="date-text">2026-07-03</span></span>
-                <span class="count">2 个提醒</span>
+                <span class="count">3 个提醒</span>
               </summary>
               <div class="cards">
                 
-    <article class="card">
-      <h3 class="activity-name"><span class="activity-name-line">31328:最强限定:战斗特供</span></h3>
+    <article class="card card-package-id">
+      <h3 class="activity-name"><span class="activity-name-line"><span class="coded-line coded-line-package"><span class="item-code item-code-package" data-kind="礼包" title="礼包编号">31328</span><span class="item-separator">:</span>最强限定:战斗特供</span></span></h3>
       
       <div class="meta"><span>服务器：</span>全服</div>
       <div class="meta"><span>时间：</span>2026-07-04 08:00:00 ~ 2026-07-05 07:59:59（1天） UTC+8</div>
@@ -655,9 +664,9 @@
           <h3 class="activity-name"><span class="activity-name-line">土拨鼠、罩子、邮件</span></h3>
           
           
-      <div class="package-block">
+      <div class="package-block package-block-package">
         <div class="package-title">土拨鼠服</div>
-        <div class="package-lines"><div>29145: 火力全开：进攻土拨鼠128~648</div></div>
+        <div class="package-lines"><div><span class="coded-line coded-line-package"><span class="item-code item-code-package" data-kind="礼包" title="礼包编号">29145</span><span class="item-separator">: </span>火力全开：进攻土拨鼠128~648</span></div></div>
         <div class="meta">时间：2026-07-05 08:00:00~2026-07-06 07:59:59 UTC+8</div>
         <div class="meta">新服不自动开启，每日刷新 pop2</div>
       </div>
@@ -678,6 +687,15 @@
     
         </article>
         
+
+    <article class="card card-activity-id">
+      <h3 class="activity-name"><span class="activity-name-line"><span class="coded-line coded-line-activity"><span class="item-code item-code-activity" data-kind="活动" title="活动编号">1900128</span><span class="item-separator">: </span>野怪孵化周活动</span></span></h3>
+      
+      <div class="meta"><span>服务器：</span>S1-Sxxx</div>
+      <div class="meta"><span>时间：</span>2026-07-06 08:00:00 ~ 2026-07-13 07:59:59（7天） UTC+8</div>
+      
+    </article>
+    
               </div>
             </details>
             
@@ -688,8 +706,8 @@
               </summary>
               <div class="cards">
                 
-    <article class="card">
-      <h3 class="activity-name"><span class="activity-name-line">1000905:国服-拯救蚜虫-跨服</span></h3>
+    <article class="card card-activity-id">
+      <h3 class="activity-name"><span class="activity-name-line"><span class="coded-line coded-line-activity"><span class="item-code item-code-activity" data-kind="活动" title="活动编号">1000905</span><span class="item-separator">:</span>国服-拯救蚜虫-跨服</span></span></h3>
       
       <div class="meta"><span>服务器：</span>S858</div>
       <div class="meta"><span>时间：</span>2026-07-06 08:00:00 ~ 2026-07-11 07:59:59（5天） UTC+8</div>
@@ -702,24 +720,15 @@
             <details class="day" data-date="2026-07-05" open>
               <summary>
                 <span class="date"><span class="date-text">2026-07-05</span></span>
-                <span class="count">2 个提醒</span>
+                <span class="count">1 个提醒</span>
               </summary>
               <div class="cards">
                 
-    <article class="card">
-      <h3 class="activity-name"><span class="activity-name-line">1000927:飞蜥之战</span></h3>
+    <article class="card card-activity-id">
+      <h3 class="activity-name"><span class="activity-name-line"><span class="coded-line coded-line-activity"><span class="item-code item-code-activity" data-kind="活动" title="活动编号">1000927</span><span class="item-separator">:</span>飞蜥之战</span></span></h3>
       
       <div class="meta"><span>服务器：</span>S1-S834</div>
       <div class="meta"><span>时间：</span>2026-07-06 08:00:00 ~ 2026-07-12 07:59:59（6天） UTC+8</div>
-      
-    </article>
-    
-
-    <article class="card">
-      <h3 class="activity-name"><span class="activity-name-line">1900128: 野怪孵化周活动</span></h3>
-      
-      <div class="meta"><span>服务器：</span>S1-Sxxx</div>
-      <div class="meta"><span>时间：</span>2026-07-06 08:00:00 ~ 2026-07-13 07:59:59（7天） UTC+8</div>
       
     </article>
     
@@ -733,8 +742,8 @@
               </summary>
               <div class="cards">
                 
-    <article class="card">
-      <h3 class="activity-name"><span class="activity-name-line">1000301: 最强战区-功勋商店</span></h3>
+    <article class="card card-activity-id">
+      <h3 class="activity-name"><span class="activity-name-line"><span class="coded-line coded-line-activity"><span class="item-code item-code-activity" data-kind="活动" title="活动编号">1000301</span><span class="item-separator">: </span>最强战区-功勋商店</span></span></h3>
       
       <div class="meta"><span>服务器：</span>S857</div>
       <div class="meta"><span>时间：</span>2026-07-06 08:00:00 ~ 2036-07-07 07:59:59（10年） UTC+8</div>
@@ -742,8 +751,8 @@
     </article>
     
 
-    <article class="card">
-      <h3 class="activity-name"><span class="activity-name-line">1000118:战场-主题1</span></h3>
+    <article class="card card-activity-id">
+      <h3 class="activity-name"><span class="activity-name-line"><span class="coded-line coded-line-activity"><span class="item-code item-code-activity" data-kind="活动" title="活动编号">1000118</span><span class="item-separator">:</span>战场-主题1</span></span></h3>
       
       <div class="meta"><span>服务器：</span>S1-S857</div>
       <div class="meta"><span>时间：</span>2026-07-06 08:00:00 ~ 2026-07-13 07:59:59（7天） UTC+8</div>
@@ -751,15 +760,15 @@
     </article>
     
 
-    <article class="card">
-      <h3 class="activity-name"><span class="activity-name-line">1000112:回归自然</span></h3>
+    <article class="card card-activity-id">
+      <h3 class="activity-name"><span class="activity-name-line"><span class="coded-line coded-line-activity"><span class="item-code item-code-activity" data-kind="活动" title="活动编号">1000112</span><span class="item-separator">:</span>回归自然</span></span></h3>
       
       <div class="meta"><span>服务器：</span>S1-S859</div>
       <div class="meta"><span>时间：</span>2026-07-07 08:00:00 ~ 2026-07-14 07:59:59（7天） UTC+8</div>
       
-      <div class="package-block">
+      <div class="package-block package-block-package">
         <div class="package-title">配套礼包</div>
-        <div class="package-lines"><div>29121: 回归自然神秘特供</div></div>
+        <div class="package-lines"><div><span class="coded-line coded-line-package"><span class="item-code item-code-package" data-kind="礼包" title="礼包编号">29121</span><span class="item-separator">: </span>回归自然神秘特供</span></div></div>
         <div class="meta">服务器：S1-S859</div>
 <div class="meta">时间：2026-07-07 08:00:00 ~ 2026-07-14 07:59:59（7天） UTC+8</div>
 <div class="meta">每日刷新：是</div>
@@ -778,8 +787,8 @@
     </article>
     
 
-    <article class="card">
-      <h3 class="activity-name"><span class="activity-name-line">1000151: 蚁巢装扮兑换商店</span></h3>
+    <article class="card card-activity-id">
+      <h3 class="activity-name"><span class="activity-name-line"><span class="coded-line coded-line-activity"><span class="item-code item-code-activity" data-kind="活动" title="活动编号">1000151</span><span class="item-separator">: </span>蚁巢装扮兑换商店</span></span></h3>
       
       <div class="meta"><span>服务器：</span>排期表未标明</div>
       <div class="meta"><span>时间：</span>2026-07-07 08:00:00 ~ 2026-07-13 07:59:59（6天） UTC+8</div>
@@ -796,8 +805,8 @@
     </article>
     
 
-    <article class="card">
-      <h3 class="activity-name"><span class="activity-name-line">1000906:国服-土拨鼠复仇</span></h3>
+    <article class="card card-activity-id">
+      <h3 class="activity-name"><span class="activity-name-line"><span class="coded-line coded-line-activity"><span class="item-code item-code-activity" data-kind="活动" title="活动编号">1000906</span><span class="item-separator">:</span>国服-土拨鼠复仇</span></span></h3>
       
       <div class="meta"><span>服务器：</span>客户端 S1-S853；小程序 S205-S751</div>
       <div class="meta"><span>时间：</span>2026-07-08 08:00:00 ~ 2026-07-09 07:59:59（1天） UTC+8</div>
@@ -805,8 +814,8 @@
     </article>
     
 
-    <article class="card">
-      <h3 class="activity-name"><span class="activity-name-line">1000125:VIP商店</span></h3>
+    <article class="card card-activity-id">
+      <h3 class="activity-name"><span class="activity-name-line"><span class="coded-line coded-line-activity"><span class="item-code item-code-activity" data-kind="活动" title="活动编号">1000125</span><span class="item-separator">:</span>VIP商店</span></span></h3>
       
       <div class="meta"><span>服务器：</span>S1-S858</div>
       <div class="meta"><span>时间：</span>2026-07-11 08:00:00 ~ 2026-07-13 07:59:59（2天） UTC+8</div>
@@ -814,8 +823,8 @@
     </article>
     
 
-    <article class="card">
-      <h3 class="activity-name"><span class="activity-name-line">1000902:国服-拯救蚜虫-本服</span></h3>
+    <article class="card card-activity-id">
+      <h3 class="activity-name"><span class="activity-name-line"><span class="coded-line coded-line-activity"><span class="item-code item-code-activity" data-kind="活动" title="活动编号">1000902</span><span class="item-separator">:</span>国服-拯救蚜虫-本服</span></span></h3>
       
       <div class="meta"><span>服务器：</span>S860</div>
       <div class="meta"><span>时间：</span>2026-07-13 08:00:00 ~ 2026-07-18 07:59:59（5天） UTC+8</div>
@@ -825,33 +834,43 @@
               </div>
             </details>
             
-            <details class="day" data-date="2026-07-10" open>
+            <details class="day" data-date="2026-07-11" open>
               <summary>
-                <span class="date"><span class="date-text">2026-07-10</span></span>
-                <span class="count">1 个提醒</span>
+                <span class="date"><span class="date-text">2026-07-11</span></span>
+                <span class="count">4 个提醒</span>
               </summary>
               <div class="cards">
                 
-    <article class="card">
-      <h3 class="activity-name"><span class="activity-name-line">29145: 火力全开:进攻土拨鼠128~648</span></h3>
+    <article class="card card-package-id">
+      <h3 class="activity-name"><span class="activity-name-line"><span class="coded-line coded-line-package"><span class="item-code item-code-package" data-kind="礼包" title="礼包编号">29145</span><span class="item-separator">: </span>火力全开:进攻土拨鼠128~648</span></span></h3>
       
       <div class="meta"><span>服务器：</span>S1-Sxxx</div>
       <div class="meta"><span>时间：</span>2026-07-12 08:00:00 ~ 2026-07-13 07:59:59（1天） UTC+8</div>
       
     </article>
     
-              </div>
-            </details>
-            
-            <details class="day" data-date="2026-07-11" open>
-              <summary>
-                <span class="date"><span class="date-text">2026-07-11</span></span>
-                <span class="count">1 个提醒</span>
-              </summary>
-              <div class="cards">
-                
-    <article class="card">
-      <h3 class="activity-name"><span class="activity-name-line">1000905:国服-拯救蚜虫-跨服</span></h3>
+
+    <article class="card card-activity-id">
+      <h3 class="activity-name"><span class="activity-name-line"><span class="coded-line coded-line-activity"><span class="item-code item-code-activity" data-kind="活动" title="活动编号">1900131</span><span class="item-separator">: </span>连续充值（变异（全服））</span></span>
+<span class="activity-name-line"><span class="coded-line coded-line-activity"><span class="item-code item-code-activity" data-kind="活动" title="活动编号">1900084</span><span class="item-separator">:</span>【国服】五日随心储</span></span></h3>
+      
+      <div class="meta"><span>服务器：</span>S1-S858</div>
+      <div class="meta"><span>时间：</span>2026-07-13 08:00:00 ~ 2026-07-20 07:59:59（7天） UTC+8</div>
+      
+    </article>
+    
+
+    <article class="card card-activity-id">
+      <h3 class="activity-name"><span class="activity-name-line"><span class="coded-line coded-line-activity"><span class="item-code item-code-activity" data-kind="活动" title="活动编号">1000252</span><span class="item-separator">: </span>无限寻宝</span></span></h3>
+      
+      <div class="meta"><span>服务器：</span>S1-Sxxx</div>
+      <div class="meta"><span>时间：</span>2026-07-13 08:00:00 ~ 2026-07-15 07:59:59（2天） UTC+8</div>
+      
+    </article>
+    
+
+    <article class="card card-activity-id">
+      <h3 class="activity-name"><span class="activity-name-line"><span class="coded-line coded-line-activity"><span class="item-code item-code-activity" data-kind="活动" title="活动编号">1000905</span><span class="item-separator">:</span>国服-拯救蚜虫-跨服</span></span></h3>
       
       <div class="meta"><span>服务器：</span>S1-S857</div>
       <div class="meta"><span>时间：</span>2026-07-13 08:00:00 ~ 2026-07-18 07:59:59（5天） UTC+8</div>
@@ -864,34 +883,15 @@
             <details class="day" data-date="2026-07-12" open>
               <summary>
                 <span class="date"><span class="date-text">2026-07-12</span></span>
-                <span class="count">3 个提醒</span>
+                <span class="count">1 个提醒</span>
               </summary>
               <div class="cards">
                 
-    <article class="card">
-      <h3 class="activity-name"><span class="activity-name-line">1000927:飞蜥之战</span></h3>
+    <article class="card card-activity-id">
+      <h3 class="activity-name"><span class="activity-name-line"><span class="coded-line coded-line-activity"><span class="item-code item-code-activity" data-kind="活动" title="活动编号">1000927</span><span class="item-separator">:</span>飞蜥之战</span></span></h3>
       
       <div class="meta"><span>服务器：</span>S1-S834</div>
       <div class="meta"><span>时间：</span>2026-07-13 08:00:00 ~ 2026-07-19 07:59:59（6天） UTC+8</div>
-      
-    </article>
-    
-
-    <article class="card">
-      <h3 class="activity-name"><span class="activity-name-line">1900131: 连续充值（变异（全服））</span>
-<span class="activity-name-line">1900084:【国服】五日随心储</span></h3>
-      
-      <div class="meta"><span>服务器：</span>S1-S858</div>
-      <div class="meta"><span>时间：</span>2026-07-13 08:00:00 ~ 2026-07-20 07:59:59（7天） UTC+8</div>
-      
-    </article>
-    
-
-    <article class="card">
-      <h3 class="activity-name"><span class="activity-name-line">1000252: 无限寻宝</span></h3>
-      
-      <div class="meta"><span>服务器：</span>S1-Sxxx</div>
-      <div class="meta"><span>时间：</span>2026-07-13 08:00:00 ~ 2026-07-15 07:59:59（2天） UTC+8</div>
       
     </article>
     
@@ -905,8 +905,8 @@
               </summary>
               <div class="cards">
                 
-    <article class="card">
-      <h3 class="activity-name"><span class="activity-name-line">1000301: 最强战区-功勋商店</span></h3>
+    <article class="card card-activity-id">
+      <h3 class="activity-name"><span class="activity-name-line"><span class="coded-line coded-line-activity"><span class="item-code item-code-activity" data-kind="活动" title="活动编号">1000301</span><span class="item-separator">: </span>最强战区-功勋商店</span></span></h3>
       
       <div class="meta"><span>服务器：</span>S858</div>
       <div class="meta"><span>时间：</span>2026-07-13 08:00:00 ~ 2036-07-14 07:59:59（10年） UTC+8</div>
@@ -914,8 +914,8 @@
     </article>
     
 
-    <article class="card">
-      <h3 class="activity-name"><span class="activity-name-line">1000118:战场-主题1</span></h3>
+    <article class="card card-activity-id">
+      <h3 class="activity-name"><span class="activity-name-line"><span class="coded-line coded-line-activity"><span class="item-code item-code-activity" data-kind="活动" title="活动编号">1000118</span><span class="item-separator">:</span>战场-主题1</span></span></h3>
       
       <div class="meta"><span>服务器：</span>S1-S858</div>
       <div class="meta"><span>时间：</span>2026-07-13 08:00:00 ~ 2026-07-20 07:59:59（7天） UTC+8</div>
@@ -923,15 +923,15 @@
     </article>
     
 
-    <article class="card">
-      <h3 class="activity-name"><span class="activity-name-line">1000109:万物新生</span></h3>
+    <article class="card card-activity-id">
+      <h3 class="activity-name"><span class="activity-name-line"><span class="coded-line coded-line-activity"><span class="item-code item-code-activity" data-kind="活动" title="活动编号">1000109</span><span class="item-separator">:</span>万物新生</span></span></h3>
       
       <div class="meta"><span>服务器：</span>S1-S860</div>
       <div class="meta"><span>时间：</span>2026-07-14 08:00:00 ~ 2026-07-21 07:59:59（7天） UTC+8</div>
       
-      <div class="package-block">
+      <div class="package-block package-block-package">
         <div class="package-title">配套礼包</div>
-        <div class="package-lines"><div>29118: 万物新生神秘特供</div></div>
+        <div class="package-lines"><div><span class="coded-line coded-line-package"><span class="item-code item-code-package" data-kind="礼包" title="礼包编号">29118</span><span class="item-separator">: </span>万物新生神秘特供</span></div></div>
         <div class="meta">服务器：S1-S860</div>
 <div class="meta">时间：2026-07-14 08:00:00 ~ 2026-07-21 07:59:59（7天） UTC+8</div>
 <div class="meta">每日刷新：是</div>
@@ -941,8 +941,8 @@
     </article>
     
 
-    <article class="card">
-      <h3 class="activity-name"><span class="activity-name-line">1000125:VIP商店</span></h3>
+    <article class="card card-activity-id">
+      <h3 class="activity-name"><span class="activity-name-line"><span class="coded-line coded-line-activity"><span class="item-code item-code-activity" data-kind="活动" title="活动编号">1000125</span><span class="item-separator">:</span>VIP商店</span></span></h3>
       
       <div class="meta"><span>服务器：</span>S1-S859</div>
       <div class="meta"><span>时间：</span>2026-07-18 08:00:00 ~ 2026-07-20 07:59:59（2天） UTC+8</div>
@@ -950,8 +950,8 @@
     </article>
     
 
-    <article class="card">
-      <h3 class="activity-name"><span class="activity-name-line">1000902:国服-拯救蚜虫-本服</span></h3>
+    <article class="card card-activity-id">
+      <h3 class="activity-name"><span class="activity-name-line"><span class="coded-line coded-line-activity"><span class="item-code item-code-activity" data-kind="活动" title="活动编号">1000902</span><span class="item-separator">:</span>国服-拯救蚜虫-本服</span></span></h3>
       
       <div class="meta"><span>服务器：</span>S861</div>
       <div class="meta"><span>时间：</span>2026-07-20 08:00:00 ~ 2026-07-25 07:59:59（5天） UTC+8</div>
@@ -986,8 +986,8 @@
               </summary>
               <div class="cards">
                 
-    <article class="card">
-      <h3 class="activity-name"><span class="activity-name-line">1000143:特化蚁对决</span></h3>
+    <article class="card card-activity-id">
+      <h3 class="activity-name"><span class="activity-name-line"><span class="coded-line coded-line-activity"><span class="item-code item-code-activity" data-kind="活动" title="活动编号">1000143</span><span class="item-separator">:</span>特化蚁对决</span></span></h3>
       
       <div class="meta"><span>服务器：</span>排期表未标明</div>
       <div class="meta"><span>时间：</span>2026-07-17 08:15:00 ~ 2026-07-31 08:14:59（14天） UTC+8</div>
@@ -1000,12 +1000,12 @@
             <details class="day" data-date="2026-07-17" open>
               <summary>
                 <span class="date"><span class="date-text">2026-07-17</span></span>
-                <span class="count">2 个提醒</span>
+                <span class="count">3 个提醒</span>
               </summary>
               <div class="cards">
                 
-    <article class="card">
-      <h3 class="activity-name"><span class="activity-name-line">31328:最强限定:战斗特供</span></h3>
+    <article class="card card-package-id">
+      <h3 class="activity-name"><span class="activity-name-line"><span class="coded-line coded-line-package"><span class="item-code item-code-package" data-kind="礼包" title="礼包编号">31328</span><span class="item-separator">:</span>最强限定:战斗特供</span></span></h3>
       
       <div class="meta"><span>服务器：</span>全服</div>
       <div class="meta"><span>时间：</span>2026-07-18 08:00:00 ~ 2026-07-19 07:59:59（1天） UTC+8</div>
@@ -1017,9 +1017,9 @@
           <h3 class="activity-name"><span class="activity-name-line">土拨鼠、罩子、邮件</span></h3>
           
           
-      <div class="package-block">
+      <div class="package-block package-block-package">
         <div class="package-title">土拨鼠服</div>
-        <div class="package-lines"><div>29145: 火力全开：进攻土拨鼠128~648</div></div>
+        <div class="package-lines"><div><span class="coded-line coded-line-package"><span class="item-code item-code-package" data-kind="礼包" title="礼包编号">29145</span><span class="item-separator">: </span>火力全开：进攻土拨鼠128~648</span></div></div>
         <div class="meta">时间：2026-07-19 08:00:00~2026-07-20 07:59:59 UTC+8</div>
         <div class="meta">新服不自动开启，每日刷新 pop2</div>
       </div>
@@ -1040,6 +1040,15 @@
     
         </article>
         
+
+    <article class="card card-activity-id">
+      <h3 class="activity-name"><span class="activity-name-line"><span class="coded-line coded-line-activity"><span class="item-code item-code-activity" data-kind="活动" title="活动编号">1000135</span><span class="item-separator">:</span>蚁后对决</span></span></h3>
+      
+      <div class="meta"><span>服务器：</span>S1-Sxxx</div>
+      <div class="meta"><span>时间：</span>2026-07-20 08:15:00 ~ 2026-09-03 08:14:59（45天） UTC+8</div>
+      
+    </article>
+    
               </div>
             </details>
             
@@ -1050,29 +1059,11 @@
               </summary>
               <div class="cards">
                 
-    <article class="card">
-      <h3 class="activity-name"><span class="activity-name-line">1000905:国服-拯救蚜虫-跨服</span></h3>
+    <article class="card card-activity-id">
+      <h3 class="activity-name"><span class="activity-name-line"><span class="coded-line coded-line-activity"><span class="item-code item-code-activity" data-kind="活动" title="活动编号">1000905</span><span class="item-separator">:</span>国服-拯救蚜虫-跨服</span></span></h3>
       
       <div class="meta"><span>服务器：</span>S860</div>
       <div class="meta"><span>时间：</span>2026-07-20 08:00:00 ~ 2026-07-25 07:59:59（5天） UTC+8</div>
-      
-    </article>
-    
-              </div>
-            </details>
-            
-            <details class="day" data-date="2026-07-19" open>
-              <summary>
-                <span class="date"><span class="date-text">2026-07-19</span></span>
-                <span class="count">1 个提醒</span>
-              </summary>
-              <div class="cards">
-                
-    <article class="card">
-      <h3 class="activity-name"><span class="activity-name-line">1000135:蚁后对决</span></h3>
-      
-      <div class="meta"><span>服务器：</span>S1-Sxxx</div>
-      <div class="meta"><span>时间：</span>2026-07-20 08:15:00 ~ 2026-09-03 08:14:59（45天） UTC+8</div>
       
     </article>
     
@@ -1086,8 +1077,8 @@
               </summary>
               <div class="cards">
                 
-    <article class="card">
-      <h3 class="activity-name"><span class="activity-name-line">1000301: 最强战区-功勋商店</span></h3>
+    <article class="card card-activity-id">
+      <h3 class="activity-name"><span class="activity-name-line"><span class="coded-line coded-line-activity"><span class="item-code item-code-activity" data-kind="活动" title="活动编号">1000301</span><span class="item-separator">: </span>最强战区-功勋商店</span></span></h3>
       
       <div class="meta"><span>服务器：</span>S859</div>
       <div class="meta"><span>时间：</span>2026-07-20 08:00:00 ~ 2036-07-21 07:59:59（10年） UTC+8</div>
@@ -1095,8 +1086,8 @@
     </article>
     
 
-    <article class="card">
-      <h3 class="activity-name"><span class="activity-name-line">1000118:战场-主题1</span></h3>
+    <article class="card card-activity-id">
+      <h3 class="activity-name"><span class="activity-name-line"><span class="coded-line coded-line-activity"><span class="item-code item-code-activity" data-kind="活动" title="活动编号">1000118</span><span class="item-separator">:</span>战场-主题1</span></span></h3>
       
       <div class="meta"><span>服务器：</span>S1-S859</div>
       <div class="meta"><span>时间：</span>2026-07-20 08:00:00 ~ 2026-07-27 07:59:59（7天） UTC+8</div>
@@ -1122,15 +1113,15 @@
     </article>
     
 
-    <article class="card">
-      <h3 class="activity-name"><span class="activity-name-line">1000110:潮起潮落</span></h3>
+    <article class="card card-activity-id">
+      <h3 class="activity-name"><span class="activity-name-line"><span class="coded-line coded-line-activity"><span class="item-code item-code-activity" data-kind="活动" title="活动编号">1000110</span><span class="item-separator">:</span>潮起潮落</span></span></h3>
       
       <div class="meta"><span>服务器：</span>S1-S861</div>
       <div class="meta"><span>时间：</span>2026-07-21 08:00:00 ~ 2026-07-28 07:59:59（7天） UTC+8</div>
       
-      <div class="package-block">
+      <div class="package-block package-block-package">
         <div class="package-title">配套礼包</div>
-        <div class="package-lines"><div>29119: 潮起潮落神秘特供</div></div>
+        <div class="package-lines"><div><span class="coded-line coded-line-package"><span class="item-code item-code-package" data-kind="礼包" title="礼包编号">29119</span><span class="item-separator">: </span>潮起潮落神秘特供</span></div></div>
         <div class="meta">服务器：S1-S861</div>
 <div class="meta">时间：2026-07-21 08:00:00 ~ 2026-07-28 07:59:59（7天） UTC+8</div>
 <div class="meta">每日刷新：是</div>
@@ -1140,8 +1131,8 @@
     </article>
     
 
-    <article class="card">
-      <h3 class="activity-name"><span class="activity-name-line">1000151: 蚁巢装扮兑换商店</span></h3>
+    <article class="card card-activity-id">
+      <h3 class="activity-name"><span class="activity-name-line"><span class="coded-line coded-line-activity"><span class="item-code item-code-activity" data-kind="活动" title="活动编号">1000151</span><span class="item-separator">: </span>蚁巢装扮兑换商店</span></span></h3>
       
       <div class="meta"><span>服务器：</span>排期表未标明</div>
       <div class="meta"><span>时间：</span>2026-07-21 08:00:00 ~ 2026-07-27 07:59:59（6天） UTC+8</div>
@@ -1149,8 +1140,8 @@
     </article>
     
 
-    <article class="card">
-      <h3 class="activity-name"><span class="activity-name-line">1000906:国服-土拨鼠复仇</span></h3>
+    <article class="card card-activity-id">
+      <h3 class="activity-name"><span class="activity-name-line"><span class="coded-line coded-line-activity"><span class="item-code item-code-activity" data-kind="活动" title="活动编号">1000906</span><span class="item-separator">:</span>国服-土拨鼠复仇</span></span></h3>
       
       <div class="meta"><span>服务器：</span>客户端 S1-S853；小程序 S205-S751</div>
       <div class="meta"><span>时间：</span>2026-07-22 08:00:00 ~ 2026-07-23 07:59:59（1天） UTC+8</div>
@@ -1158,8 +1149,8 @@
     </article>
     
 
-    <article class="card">
-      <h3 class="activity-name"><span class="activity-name-line">1000125:VIP商店</span></h3>
+    <article class="card card-activity-id">
+      <h3 class="activity-name"><span class="activity-name-line"><span class="coded-line coded-line-activity"><span class="item-code item-code-activity" data-kind="活动" title="活动编号">1000125</span><span class="item-separator">:</span>VIP商店</span></span></h3>
       
       <div class="meta"><span>服务器：</span>S1-S860</div>
       <div class="meta"><span>时间：</span>2026-07-25 08:00:00 ~ 2026-07-27 07:59:59（2天） UTC+8</div>
@@ -1167,8 +1158,8 @@
     </article>
     
 
-    <article class="card">
-      <h3 class="activity-name"><span class="activity-name-line">1000902:国服-拯救蚜虫-本服</span></h3>
+    <article class="card card-activity-id">
+      <h3 class="activity-name"><span class="activity-name-line"><span class="coded-line coded-line-activity"><span class="item-code item-code-activity" data-kind="活动" title="活动编号">1000902</span><span class="item-separator">:</span>国服-拯救蚜虫-本服</span></span></h3>
       
       <div class="meta"><span>服务器：</span>S862</div>
       <div class="meta"><span>时间：</span>2026-07-27 08:00:00 ~ 2026-08-01 07:59:59（5天） UTC+8</div>
@@ -1181,24 +1172,15 @@
             <details class="day" data-date="2026-07-24" open>
               <summary>
                 <span class="date"><span class="date-text">2026-07-24</span></span>
-                <span class="count">2 个提醒</span>
+                <span class="count">1 个提醒</span>
               </summary>
               <div class="cards">
                 
-    <article class="card">
-      <h3 class="activity-name"><span class="activity-name-line">29145: 火力全开:进攻土拨鼠128~648</span></h3>
-      
-      <div class="meta"><span>服务器：</span>S1-Sxxx</div>
-      <div class="meta"><span>时间：</span>2026-07-26 08:00:00 ~ 2026-07-27 07:59:59（1天） UTC+8</div>
-      
-    </article>
-    
-
-    <article class="card">
-      <h3 class="activity-name"><span class="activity-name-line">1900133: 连续充值（进化开启第二套）</span>
-<span class="activity-name-line">1900162: 连续充值（进化开启第三套）</span>
-<span class="activity-name-line">1900163: 连续充值（改造，开启进化第2/3套以外的服务器）</span>
-<span class="activity-name-line">1900084:【国服】五日随心储</span></h3>
+    <article class="card card-activity-id">
+      <h3 class="activity-name"><span class="activity-name-line"><span class="coded-line coded-line-activity"><span class="item-code item-code-activity" data-kind="活动" title="活动编号">1900133</span><span class="item-separator">: </span>连续充值（进化开启第二套）</span></span>
+<span class="activity-name-line"><span class="coded-line coded-line-activity"><span class="item-code item-code-activity" data-kind="活动" title="活动编号">1900162</span><span class="item-separator">: </span>连续充值（进化开启第三套）</span></span>
+<span class="activity-name-line"><span class="coded-line coded-line-activity"><span class="item-code item-code-activity" data-kind="活动" title="活动编号">1900163</span><span class="item-separator">: </span>连续充值（改造，开启进化第2/3套以外的服务器）</span></span>
+<span class="activity-name-line"><span class="coded-line coded-line-activity"><span class="item-code item-code-activity" data-kind="活动" title="活动编号">1900084</span><span class="item-separator">:</span>【国服】五日随心储</span></span></h3>
       
       <div class="meta meta-lines"><span class="text-line">S1-SXXX</span></div>
       <div class="meta"><span>时间：</span>2026-07-27 08:00:00 ~ 2026-08-03 07:59:59（7天） UTC+8</div>
@@ -1211,33 +1193,33 @@
             <details class="day" data-date="2026-07-25" open>
               <summary>
                 <span class="date"><span class="date-text">2026-07-25</span></span>
-                <span class="count">1 个提醒</span>
+                <span class="count">3 个提醒</span>
               </summary>
               <div class="cards">
                 
-    <article class="card">
-      <h3 class="activity-name"><span class="activity-name-line">1000905:国服-拯救蚜虫-跨服</span></h3>
+    <article class="card card-package-id">
+      <h3 class="activity-name"><span class="activity-name-line"><span class="coded-line coded-line-package"><span class="item-code item-code-package" data-kind="礼包" title="礼包编号">29145</span><span class="item-separator">: </span>火力全开:进攻土拨鼠128~648</span></span></h3>
       
-      <div class="meta"><span>服务器：</span>S861</div>
-      <div class="meta"><span>时间：</span>2026-07-27 08:00:00 ~ 2026-08-01 07:59:59（5天） UTC+8</div>
+      <div class="meta"><span>服务器：</span>S1-Sxxx</div>
+      <div class="meta"><span>时间：</span>2026-07-26 08:00:00 ~ 2026-07-27 07:59:59（1天） UTC+8</div>
       
     </article>
     
-              </div>
-            </details>
-            
-            <details class="day" data-date="2026-07-26" open>
-              <summary>
-                <span class="date"><span class="date-text">2026-07-26</span></span>
-                <span class="count">1 个提醒</span>
-              </summary>
-              <div class="cards">
-                
+
     <article class="card">
       <h3 class="activity-name"><span class="activity-name-line">惊喜转盘</span></h3>
       
       <div class="meta"><span>服务器：</span>S1-Sxxx</div>
       <div class="meta"><span>时间：</span>2026-07-27 08:00:00 ~ 2026-08-03 07:59:59（7天） UTC+8</div>
+      
+    </article>
+    
+
+    <article class="card card-activity-id">
+      <h3 class="activity-name"><span class="activity-name-line"><span class="coded-line coded-line-activity"><span class="item-code item-code-activity" data-kind="活动" title="活动编号">1000905</span><span class="item-separator">:</span>国服-拯救蚜虫-跨服</span></span></h3>
+      
+      <div class="meta"><span>服务器：</span>S861</div>
+      <div class="meta"><span>时间：</span>2026-07-27 08:00:00 ~ 2026-08-01 07:59:59（5天） UTC+8</div>
       
     </article>
     
@@ -1251,8 +1233,8 @@
               </summary>
               <div class="cards">
                 
-    <article class="card">
-      <h3 class="activity-name"><span class="activity-name-line">1000301: 最强战区-功勋商店</span></h3>
+    <article class="card card-activity-id">
+      <h3 class="activity-name"><span class="activity-name-line"><span class="coded-line coded-line-activity"><span class="item-code item-code-activity" data-kind="活动" title="活动编号">1000301</span><span class="item-separator">: </span>最强战区-功勋商店</span></span></h3>
       
       <div class="meta"><span>服务器：</span>S860</div>
       <div class="meta"><span>时间：</span>2026-07-27 08:00:00 ~ 2036-07-28 07:59:59（10年） UTC+8</div>
@@ -1260,8 +1242,8 @@
     </article>
     
 
-    <article class="card">
-      <h3 class="activity-name"><span class="activity-name-line">1000118:战场-主题1</span></h3>
+    <article class="card card-activity-id">
+      <h3 class="activity-name"><span class="activity-name-line"><span class="coded-line coded-line-activity"><span class="item-code item-code-activity" data-kind="活动" title="活动编号">1000118</span><span class="item-separator">:</span>战场-主题1</span></span></h3>
       
       <div class="meta"><span>服务器：</span>S1-S860</div>
       <div class="meta"><span>时间：</span>2026-07-27 08:00:00 ~ 2026-08-03 07:59:59（7天） UTC+8</div>
@@ -1269,15 +1251,15 @@
     </article>
     
 
-    <article class="card">
-      <h3 class="activity-name"><span class="activity-name-line">1000111:旱季来临</span></h3>
+    <article class="card card-activity-id">
+      <h3 class="activity-name"><span class="activity-name-line"><span class="coded-line coded-line-activity"><span class="item-code item-code-activity" data-kind="活动" title="活动编号">1000111</span><span class="item-separator">:</span>旱季来临</span></span></h3>
       
       <div class="meta"><span>服务器：</span>S1-S862</div>
       <div class="meta"><span>时间：</span>2026-07-28 08:00:00 ~ 2026-08-04 07:59:59（7天） UTC+8</div>
       
-      <div class="package-block">
+      <div class="package-block package-block-package">
         <div class="package-title">配套礼包</div>
-        <div class="package-lines"><div>29120: 旱季来临神秘特供</div></div>
+        <div class="package-lines"><div><span class="coded-line coded-line-package"><span class="item-code item-code-package" data-kind="礼包" title="礼包编号">29120</span><span class="item-separator">: </span>旱季来临神秘特供</span></div></div>
         <div class="meta">服务器：S1-S862</div>
 <div class="meta">时间：2026-07-28 08:00:00 ~ 2026-08-04 07:59:59（7天） UTC+8</div>
 <div class="meta">每日刷新：是</div>
@@ -1287,8 +1269,8 @@
     </article>
     
 
-    <article class="card">
-      <h3 class="activity-name"><span class="activity-name-line">1000125:VIP商店</span></h3>
+    <article class="card card-activity-id">
+      <h3 class="activity-name"><span class="activity-name-line"><span class="coded-line coded-line-activity"><span class="item-code item-code-activity" data-kind="活动" title="活动编号">1000125</span><span class="item-separator">:</span>VIP商店</span></span></h3>
       
       <div class="meta"><span>服务器：</span>S1-S861</div>
       <div class="meta"><span>时间：</span>2026-08-01 08:00:00 ~ 2026-08-03 07:59:59（2天） UTC+8</div>
@@ -1332,8 +1314,8 @@
               </summary>
               <div class="cards">
                 
-    <article class="card">
-      <h3 class="activity-name"><span class="activity-name-line">31328:最强限定:战斗特供</span></h3>
+    <article class="card card-package-id">
+      <h3 class="activity-name"><span class="activity-name-line"><span class="coded-line coded-line-package"><span class="item-code item-code-package" data-kind="礼包" title="礼包编号">31328</span><span class="item-separator">:</span>最强限定:战斗特供</span></span></h3>
       
       <div class="meta"><span>服务器：</span>全服</div>
       <div class="meta"><span>时间：</span>2026-08-01 08:00:00 ~ 2026-08-02 07:59:59（1天） UTC+8</div>
@@ -1345,9 +1327,9 @@
           <h3 class="activity-name"><span class="activity-name-line">土拨鼠、罩子、邮件</span></h3>
           
           
-      <div class="package-block">
+      <div class="package-block package-block-package">
         <div class="package-title">土拨鼠服</div>
-        <div class="package-lines"><div>29145: 火力全开：进攻土拨鼠128~648</div></div>
+        <div class="package-lines"><div><span class="coded-line coded-line-package"><span class="item-code item-code-package" data-kind="礼包" title="礼包编号">29145</span><span class="item-separator">: </span>火力全开：进攻土拨鼠128~648</span></div></div>
         <div class="meta">时间：2026-08-02 08:00:00~2026-08-03 07:59:59 UTC+8</div>
         <div class="meta">新服不自动开启，每日刷新 pop2</div>
       </div>
@@ -1420,6 +1402,8 @@
     const collapseAll = document.getElementById('collapseAll');
     const todaySummary = document.getElementById('todaySummary');
     const nextSummary = document.getElementById('nextSummary');
+    const cardContainers = [...document.querySelectorAll('.cards')];
+    let layoutQueued = false;
 
     function todayString() {
       const formatter = new Intl.DateTimeFormat('en-CA', {
@@ -1453,9 +1437,41 @@
       name.split('\n').map((line) => line.trim()).filter(Boolean).forEach((line) => {
         const lineNode = document.createElement('span');
         lineNode.className = 'activity-name-line';
-        lineNode.textContent = line;
+        appendCodedLine(lineNode, line);
         container.appendChild(lineNode);
       });
+    }
+
+    function appendCodedLine(container, line) {
+      const match = line.trim().match(/^(\d{5,7})(\s*[:：]\s*)(.*)$/);
+      if (!match) {
+        container.textContent = line;
+        return;
+      }
+
+      const [, code, separator, rest] = match;
+      const kind = code.length === 7 ? 'activity' : code.length === 5 ? 'package' : '';
+      if (!kind) {
+        container.textContent = line;
+        return;
+      }
+
+      const label = kind === 'activity' ? '活动' : '礼包';
+      const wrapper = document.createElement('span');
+      wrapper.className = `coded-line coded-line-${kind}`;
+
+      const codeNode = document.createElement('span');
+      codeNode.className = `item-code item-code-${kind}`;
+      codeNode.dataset.kind = label;
+      codeNode.title = `${label}编号`;
+      codeNode.textContent = code;
+
+      const separatorNode = document.createElement('span');
+      separatorNode.className = 'item-separator';
+      separatorNode.textContent = separator;
+
+      wrapper.append(codeNode, separatorNode, document.createTextNode(rest));
+      container.appendChild(wrapper);
     }
 
     function uniqueCardNames(day) {
@@ -1490,6 +1506,34 @@
         row.className = 'summary-name activity-name';
         appendActivityNameLines(row, name);
         meta.appendChild(row);
+      });
+    }
+
+    function layoutCards(container) {
+      const styles = getComputedStyle(container);
+      const rowHeight = parseFloat(styles.gridAutoRows) || 8;
+      const rowGap = parseFloat(styles.rowGap) || 0;
+      container.querySelectorAll('.card').forEach((card) => {
+        card.style.gridRowEnd = 'auto';
+      });
+
+      container.querySelectorAll('.card').forEach((card) => {
+        const height = card.getBoundingClientRect().height;
+        const span = Math.max(1, Math.ceil((height + rowGap) / (rowHeight + rowGap)));
+        card.style.gridRowEnd = `span ${span}`;
+      });
+    }
+
+    function layoutAllCards() {
+      cardContainers.forEach(layoutCards);
+    }
+
+    function scheduleCardLayout() {
+      if (layoutQueued) return;
+      layoutQueued = true;
+      requestAnimationFrame(() => {
+        layoutQueued = false;
+        layoutAllCards();
       });
     }
 
@@ -1531,8 +1575,18 @@
     }
 
     search.addEventListener('input', applyFilter);
-    expandAll.addEventListener('click', () => dayNodes.forEach((day) => day.open = true));
-    collapseAll.addEventListener('click', () => dayNodes.forEach((day) => day.open = false));
+    search.addEventListener('input', scheduleCardLayout);
+    expandAll.addEventListener('click', () => {
+      dayNodes.forEach((day) => day.open = true);
+      scheduleCardLayout();
+    });
+    collapseAll.addEventListener('click', () => {
+      dayNodes.forEach((day) => day.open = false);
+      scheduleCardLayout();
+    });
+    window.addEventListener('resize', scheduleCardLayout);
+    window.addEventListener('load', scheduleCardLayout);
+    scheduleCardLayout();
     syncDateState();
     applyFilter();
   </script>

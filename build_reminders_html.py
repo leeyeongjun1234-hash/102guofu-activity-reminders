@@ -4,6 +4,8 @@ from collections import defaultdict
 from datetime import date, datetime
 from html import escape
 from pathlib import Path
+import re
+from textwrap import dedent
 from zoneinfo import ZoneInfo
 
 from daily_reminder import (
@@ -33,6 +35,11 @@ THEME_PACKAGES = {
     "旱季来临": "29120: 旱季来临神秘特供",
     "回归自然": "29121: 回归自然神秘特供",
 }
+CODED_LINE_RE = re.compile(r"^\s*(\d{5,7})(\s*[:：]\s*)(.*)$")
+CODE_KIND_LABELS = {
+    "activity": "活动",
+    "package": "礼包",
+}
 
 
 def sort_key(item: Reminder) -> tuple[date, str, str]:
@@ -52,11 +59,60 @@ def raw_server_text(line: str) -> str:
     return line
 
 
+def leading_code_kind(value: str) -> str:
+    match = CODED_LINE_RE.match(value.strip())
+    if not match:
+        return ""
+
+    length = len(match.group(1))
+    if length == 7:
+        return "activity"
+    if length == 5:
+        return "package"
+    return ""
+
+
+def render_coded_line(value: str) -> str:
+    line = value.strip()
+    match = CODED_LINE_RE.match(line)
+    if not match:
+        return escape(line)
+
+    code, separator, rest = match.groups()
+    kind = leading_code_kind(line)
+    if not kind:
+        return escape(line)
+
+    label = CODE_KIND_LABELS[kind]
+    return (
+        f'<span class="coded-line coded-line-{kind}">'
+        f'<span class="item-code item-code-{kind}" data-kind="{escape(label, quote=True)}" '
+        f'title="{escape(label, quote=True)}编号">{escape(code)}</span>'
+        f'<span class="item-separator">{escape(separator)}</span>'
+        f"{escape(rest)}"
+        f"</span>"
+    )
+
+
+def block_code_classes(lines: list[str]) -> str:
+    kinds = sorted({leading_code_kind(line) for line in lines if leading_code_kind(line)})
+    return "".join(f" package-block-{kind}" for kind in kinds)
+
+
+def card_code_class(value: str) -> str:
+    for line in text_lines(value):
+        kind = leading_code_kind(line)
+        if kind:
+            return f" card-{kind}-id"
+    return ""
+
+
 def package_section(title: str, lines: list[str], details: list[str]) -> str:
-    package_rows = "\n".join(f"<div>{escape(line)}</div>" for line in lines)
+    package_rows = "\n".join(f"<div>{render_coded_line(line)}</div>" for line in lines)
     detail_rows = "\n".join(f'<div class="meta">{escape(line)}</div>' for line in details)
+    classes = "package-block" + block_code_classes(lines)
     return f"""
-      <div class="package-block">
+      <div class="{classes}">
         <div class="package-title">{escape(title)}</div>
         <div class="package-lines">{package_rows}</div>
         {detail_rows}
@@ -69,13 +125,13 @@ def text_lines(value: str) -> list[str]:
 
 
 def render_activity_name_lines(value: str) -> str:
-    return "\n".join(f'<span class="activity-name-line">{escape(line)}</span>' for line in text_lines(value))
+    return "\n".join(f'<span class="activity-name-line">{render_coded_line(line)}</span>' for line in text_lines(value))
 
 
 def render_text_lines(value: str) -> str:
     return "\n".join(
         '<span class="text-line text-line-empty"></span>' if not line.strip()
-        else f'<span class="text-line">{escape(line.strip())}</span>'
+        else f'<span class="text-line">{render_coded_line(line)}</span>'
         for line in value.splitlines()
     )
 
@@ -95,11 +151,11 @@ def render_server_meta(base_name: str, value: str) -> str:
 def marmot_shield_mail_details(item: Reminder) -> str:
     active_range = compact_one_day_range(item.start_day)
     mail_time_text = marmot_shield_mail_text(item.start_day).splitlines()[5].replace("邮件，赛季外，定时：", "")
-    mail_rows = "\n".join(f'<div>{escape(line)}</div>' for line in MARMOT_MAIL_ITEMS)
+    mail_rows = "\n".join(f'<div>{render_coded_line(line)}</div>' for line in MARMOT_MAIL_ITEMS)
     return f"""
-      <div class="package-block">
+      <div class="package-block package-block-package">
         <div class="package-title">土拨鼠服</div>
-        <div class="package-lines"><div>{escape(MARMOT_PACKAGE_LINE)}</div></div>
+        <div class="package-lines"><div>{render_coded_line(MARMOT_PACKAGE_LINE)}</div></div>
         <div class="meta">时间：{escape(active_range)} UTC+8</div>
         <div class="meta">新服不自动开启，每日刷新 pop2</div>
       </div>
@@ -202,7 +258,7 @@ def render_card(item: Reminder) -> str:
     if is_marmot_shield_mail(item.raw):
         action = "" if item.action == "设置活动" else f'<div class="meta action">{escape(item.action)}</div>'
         return f"""
-        <article class="card">
+        <article class="card{card_code_class(name)}">
           <h3 class="activity-name">{render_activity_name_lines(name)}</h3>
           {action}
           {marmot_shield_mail_details(item)}
@@ -214,7 +270,7 @@ def render_card(item: Reminder) -> str:
     action = "" if item.action == "设置活动" else f'<div class="meta action">{escape(item.action)}</div>'
     packages = package_details(item)
     return f"""
-    <article class="card">
+    <article class="card{card_code_class(name)}">
       <h3 class="activity-name">{render_activity_name_lines(name)}</h3>
       {action}
       {render_server_meta(base_name, server_text(item.raw, item.start_day))}
@@ -234,13 +290,13 @@ def render_summary(
 ) -> str:
     id_attr = f' id="{escape(summary_id, quote=True)}"' if summary_id else ""
     if target_day is None or not items:
-        return f"""
+        return dedent(f"""
         <section class="summary-card"{id_attr}>
           <div class="summary-label">{escape(title)}</div>
           <div class="summary-date">{escape(empty_text)}</div>
           <div class="summary-meta">当前没有可展示的提醒</div>
         </section>
-        """
+        """).strip()
 
     names = [display_activity_name(item.raw) for item in sorted(items, key=sort_key)]
     unique_names = list(dict.fromkeys(names))
@@ -250,13 +306,13 @@ def render_summary(
     )
 
     badge = f'<span class="next-badge">{escape(highlight)}</span>' if highlight else ""
-    return f"""
+    return dedent(f"""
     <section class="summary-card"{id_attr}>
       <div class="summary-label">{escape(title)}{badge}</div>
       <div class="summary-date">{target_day:%Y-%m-%d}</div>
       <div class="summary-meta">{display_names}</div>
     </section>
-    """
+    """).strip()
 
 
 def build_html(reminders: list[Reminder]) -> str:
@@ -483,16 +539,19 @@ def build_html(reminders: list[Reminder]) -> str:
     }}
 
     .cards {{
-      column-count: 3;
-      column-gap: 12px;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      grid-auto-rows: 8px;
+      grid-auto-flow: dense;
+      align-items: start;
+      gap: 10px;
       padding: 16px;
     }}
 
     .card {{
+      align-self: start;
       display: grid;
       gap: 8px;
-      break-inside: avoid;
-      margin: 0 0 12px;
       padding: 14px;
       border: 1px solid var(--line);
       border-radius: 8px;
@@ -659,7 +718,7 @@ def build_html(reminders: list[Reminder]) -> str:
       }}
 
       .cards {{
-        column-count: 1;
+        grid-template-columns: 1fr;
       }}
 
       .lock-row {{
@@ -669,7 +728,7 @@ def build_html(reminders: list[Reminder]) -> str:
 
     @media (min-width: 721px) and (max-width: 980px) {{
       .cards {{
-        column-count: 2;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
       }}
     }}
   </style>
@@ -754,6 +813,8 @@ def build_html(reminders: list[Reminder]) -> str:
     const collapseAll = document.getElementById('collapseAll');
     const todaySummary = document.getElementById('todaySummary');
     const nextSummary = document.getElementById('nextSummary');
+    const cardContainers = [...document.querySelectorAll('.cards')];
+    let layoutQueued = false;
 
     function todayString() {{
       const formatter = new Intl.DateTimeFormat('en-CA', {{
@@ -787,9 +848,41 @@ def build_html(reminders: list[Reminder]) -> str:
       name.split('\\n').map((line) => line.trim()).filter(Boolean).forEach((line) => {{
         const lineNode = document.createElement('span');
         lineNode.className = 'activity-name-line';
-        lineNode.textContent = line;
+        appendCodedLine(lineNode, line);
         container.appendChild(lineNode);
       }});
+    }}
+
+    function appendCodedLine(container, line) {{
+      const match = line.trim().match(/^(\\d{{5,7}})(\\s*[:：]\\s*)(.*)$/);
+      if (!match) {{
+        container.textContent = line;
+        return;
+      }}
+
+      const [, code, separator, rest] = match;
+      const kind = code.length === 7 ? 'activity' : code.length === 5 ? 'package' : '';
+      if (!kind) {{
+        container.textContent = line;
+        return;
+      }}
+
+      const label = kind === 'activity' ? '活动' : '礼包';
+      const wrapper = document.createElement('span');
+      wrapper.className = `coded-line coded-line-${{kind}}`;
+
+      const codeNode = document.createElement('span');
+      codeNode.className = `item-code item-code-${{kind}}`;
+      codeNode.dataset.kind = label;
+      codeNode.title = `${{label}}编号`;
+      codeNode.textContent = code;
+
+      const separatorNode = document.createElement('span');
+      separatorNode.className = 'item-separator';
+      separatorNode.textContent = separator;
+
+      wrapper.append(codeNode, separatorNode, document.createTextNode(rest));
+      container.appendChild(wrapper);
     }}
 
     function uniqueCardNames(day) {{
@@ -824,6 +917,34 @@ def build_html(reminders: list[Reminder]) -> str:
         row.className = 'summary-name activity-name';
         appendActivityNameLines(row, name);
         meta.appendChild(row);
+      }});
+    }}
+
+    function layoutCards(container) {{
+      const styles = getComputedStyle(container);
+      const rowHeight = parseFloat(styles.gridAutoRows) || 8;
+      const rowGap = parseFloat(styles.rowGap) || 0;
+      container.querySelectorAll('.card').forEach((card) => {{
+        card.style.gridRowEnd = 'auto';
+      }});
+
+      container.querySelectorAll('.card').forEach((card) => {{
+        const height = card.getBoundingClientRect().height;
+        const span = Math.max(1, Math.ceil((height + rowGap) / (rowHeight + rowGap)));
+        card.style.gridRowEnd = `span ${{span}}`;
+      }});
+    }}
+
+    function layoutAllCards() {{
+      cardContainers.forEach(layoutCards);
+    }}
+
+    function scheduleCardLayout() {{
+      if (layoutQueued) return;
+      layoutQueued = true;
+      requestAnimationFrame(() => {{
+        layoutQueued = false;
+        layoutAllCards();
       }});
     }}
 
@@ -865,8 +986,18 @@ def build_html(reminders: list[Reminder]) -> str:
     }}
 
     search.addEventListener('input', applyFilter);
-    expandAll.addEventListener('click', () => dayNodes.forEach((day) => day.open = true));
-    collapseAll.addEventListener('click', () => dayNodes.forEach((day) => day.open = false));
+    search.addEventListener('input', scheduleCardLayout);
+    expandAll.addEventListener('click', () => {{
+      dayNodes.forEach((day) => day.open = true);
+      scheduleCardLayout();
+    }});
+    collapseAll.addEventListener('click', () => {{
+      dayNodes.forEach((day) => day.open = false);
+      scheduleCardLayout();
+    }});
+    window.addEventListener('resize', scheduleCardLayout);
+    window.addEventListener('load', scheduleCardLayout);
+    scheduleCardLayout();
     syncDateState();
     applyFilter();
   </script>
