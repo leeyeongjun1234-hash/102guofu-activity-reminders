@@ -193,11 +193,15 @@
     .cards {
       display: grid;
       grid-template-columns: repeat(3, minmax(0, 1fr));
-      grid-auto-rows: 8px;
+      grid-auto-rows: auto;
       grid-auto-flow: dense;
       align-items: start;
       gap: 10px;
       padding: 16px;
+    }
+
+    body.layout-ready .cards {
+      grid-auto-rows: 8px;
     }
 
     .card {
@@ -1194,6 +1198,7 @@
 
     function unlockPage() {
       document.body.classList.remove('locked');
+      window.dispatchEvent(new Event('activity-reminders-unlocked'));
     }
 
     async function sha256(value) {
@@ -1338,6 +1343,7 @@
     }
 
     function layoutCards(container) {
+      if (!container.getClientRects().length) return;
       const styles = getComputedStyle(container);
       const rowHeight = parseFloat(styles.gridAutoRows) || 8;
       const rowGap = parseFloat(styles.rowGap) || 0;
@@ -1357,11 +1363,23 @@
     }
 
     function scheduleCardLayout() {
+      if (document.body.classList.contains('locked')) return;
       if (layoutQueued) return;
       layoutQueued = true;
       requestAnimationFrame(() => {
         layoutQueued = false;
+        document.body.classList.add('layout-ready');
         layoutAllCards();
+      });
+    }
+
+    function scheduleVisibleCardLayout() {
+      if (document.body.classList.contains('locked')) return;
+      scheduleCardLayout();
+      requestAnimationFrame(() => {
+        document.body.classList.add('layout-ready');
+        layoutAllCards();
+        requestAnimationFrame(layoutAllCards);
       });
     }
 
@@ -1412,11 +1430,17 @@
       dayNodes.forEach((day) => day.open = false);
       scheduleCardLayout();
     });
-    window.addEventListener('resize', scheduleCardLayout);
-    window.addEventListener('load', scheduleCardLayout);
-    scheduleCardLayout();
+    dayNodes.forEach((day) => {
+      day.addEventListener('toggle', () => {
+        if (day.open) scheduleVisibleCardLayout();
+      });
+    });
+    window.addEventListener('resize', scheduleVisibleCardLayout);
+    window.addEventListener('load', scheduleVisibleCardLayout);
+    window.addEventListener('activity-reminders-unlocked', scheduleVisibleCardLayout);
     syncDateState();
     applyFilter();
+    scheduleVisibleCardLayout();
   </script>
 </body>
 </html>
