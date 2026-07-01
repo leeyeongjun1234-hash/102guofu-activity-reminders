@@ -14,6 +14,31 @@ if %errorlevel%==0 (
     )
 )
 
+if exist ".git\rebase-merge" (
+    echo 检测到上一次 Git 同步未完成。
+    echo 请先处理完成后再运行一键同步。当前状态：
+    git status
+    goto error
+)
+
+if exist ".git\rebase-apply" (
+    echo 检测到上一次 Git 同步未完成。
+    echo 请先处理完成后再运行一键同步。当前状态：
+    git status
+    goto error
+)
+
+for /f "delims=" %%i in ('git branch --show-current') do set "CURRENT_BRANCH=%%i"
+if not "%CURRENT_BRANCH%"=="main" (
+    echo 当前不在 main 分支，正在切换到 main...
+    git switch main
+    if errorlevel 1 goto error
+)
+
+echo 先同步 GitHub 最新内容...
+git pull --rebase --autostash origin main
+if errorlevel 1 goto error
+
 echo 开始生成提醒文件...
 %PYTHON% generate_reminders.py
 if errorlevel 1 goto error
@@ -36,8 +61,8 @@ if errorlevel 1 (
 )
 
 echo.
-echo 同步 GitHub...
-git pull --rebase origin main
+echo 推送前再次同步 GitHub...
+git pull --rebase --autostash origin main
 if errorlevel 1 goto error
 git push origin main
 if errorlevel 1 goto error
