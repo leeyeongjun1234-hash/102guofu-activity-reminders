@@ -14,6 +14,7 @@ from daily_reminder import (
     Reminder,
     activity_name,
     compact_one_day_range,
+    custom_reminder_lines,
     display_activity_name,
     duration_for,
     is_marmot_shield_mail,
@@ -254,6 +255,18 @@ def package_details(item: Reminder) -> str:
 
 
 def render_card(item: Reminder) -> str:
+    custom_lines = custom_reminder_lines(item)
+    if custom_lines:
+        name = custom_lines[1] if len(custom_lines) > 1 and custom_lines[1].startswith(("100", "190", "291")) else custom_lines[0]
+        details = custom_lines[1:] if name == custom_lines[0] else [custom_lines[0], *custom_lines[2:]]
+        detail_rows = "\n".join(f'<div class="meta">{render_coded_line(line)}</div>' for line in details)
+        return f"""
+        <article class="card{card_code_class(name)}">
+          <h3 class="activity-name">{render_activity_name_lines(name)}</h3>
+          {detail_rows}
+        </article>
+        """
+
     name = display_activity_name(item.raw)
     if is_marmot_shield_mail(item.raw):
         action = "" if item.action == "设置活动" else f'<div class="meta action">{escape(item.action)}</div>'
@@ -280,6 +293,15 @@ def render_card(item: Reminder) -> str:
     """
 
 
+def summary_display_name(item: Reminder) -> str:
+    custom_lines = custom_reminder_lines(item)
+    if custom_lines:
+        if len(custom_lines) > 1 and custom_lines[1].startswith(("100", "190", "291")):
+            return custom_lines[1]
+        return custom_lines[0]
+    return display_activity_name(item.raw)
+
+
 def render_summary(
     title: str,
     target_day: date | None,
@@ -298,7 +320,7 @@ def render_summary(
         </section>
         """).strip()
 
-    names = [display_activity_name(item.raw) for item in sorted(items, key=sort_key)]
+    names = [summary_display_name(item) for item in sorted(items, key=sort_key)]
     unique_names = list(dict.fromkeys(names))
     display_names = "\n".join(
         f'<div class="summary-name activity-name">{render_activity_name_lines(name)}</div>'

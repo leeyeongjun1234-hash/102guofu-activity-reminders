@@ -39,6 +39,8 @@ MARMOT_MAIL_ITEMS = [
     "200077: 100钻石*4",
     "203001：巢六保护8小时*1",
 ]
+CODED_TITLE_RE = re.compile(r"^\s*(\d{5,7})\s*[:：]\s*(.+)$")
+DIRECT_ACTION_NAMES = {"礼包+分组预设+活动确认", "活动预设+公布分组"}
 
 
 DURATIONS = [
@@ -96,6 +98,7 @@ class Reminder:
     start_day: date
     action: str
     raw: str
+    detail_raw: str = ""
 
 
 def week_monday(day: date) -> date:
@@ -107,6 +110,28 @@ def clean_text(value: str) -> str:
     value = re.sub(r"[ \t]+", " ", value)
     value = re.sub(r"\n{3,}", "\n\n", value)
     return value
+
+
+def nonempty_lines(value: str) -> list[str]:
+    return [line.strip() for line in value.splitlines() if line.strip()]
+
+
+def normalized_direct_action(value: str) -> str:
+    value = re.sub(r"【.*?】", "", value)
+    value = re.sub(r"\s+", "", value)
+    return value
+
+
+def is_direct_action_line(value: str) -> bool:
+    return normalized_direct_action(value) in DIRECT_ACTION_NAMES
+
+
+def direct_action_name(value: str) -> str:
+    lines = nonempty_lines(value)
+    if not lines:
+        return ""
+    normalized = normalized_direct_action(lines[0])
+    return normalized if normalized in DIRECT_ACTION_NAMES else ""
 
 
 def parse_month_day(value: str) -> date | None:
@@ -163,6 +188,7 @@ def load_reminders() -> list[Reminder]:
     reminders: list[Reminder] = []
     for row in rows[2:]:
         row_context = clean_text("\n".join(value for value in row[:4] if value.strip()))
+        direct_details = direct_details_by_day(row, dates)
         for col, start_day in dates.items():
             if col >= len(row):
                 continue
@@ -172,19 +198,42 @@ def load_reminders() -> list[Reminder]:
             if is_non_activity_note(activity):
                 continue
             for setup_day, action in reminder_rules(activity, start_day, row_context):
-                reminders.append(Reminder(setup_day, start_day, action, activity))
+                detail_raw = direct_detail_for_action(direct_details, setup_day, action)
+                reminders.append(Reminder(setup_day, start_day, action, activity, detail_raw))
     return reminders
 
 
+def direct_details_by_day(row: list[str], dates: dict[int, date]) -> dict[date, str]:
+    details: dict[date, str] = {}
+    for col, day in dates.items():
+        if col >= len(row):
+            continue
+        value = clean_text(row[col])
+        if direct_action_name(value):
+            details[day] = value
+    return details
+
+
+def direct_detail_for_action(direct_details: dict[date, str], setup_day: date, action: str) -> str:
+    detail = direct_details.get(setup_day, "")
+    detail_action = direct_action_name(detail)
+    if action == "设置礼包+分组" and detail_action == "礼包+分组预设+活动确认":
+        return detail
+    if action == "设置活动+公布分组" and detail_action == "活动预设+公布分组":
+        return detail
+    return ""
+
+
 def is_non_activity_note(activity: str) -> bool:
+    lines = nonempty_lines(activity)
     normalized = activity.replace(" ", "")
-    return normalized in {
+    if normalized in {
         "兑换",
         "兑换多一天",
-        "礼包【✔】+分组预设【✔】+活动确认【✔】",
-        "活动预设【✔】+公布分组【✔】",
         "这轮不开，等0602版本改竞技场规则",
-    }
+    }:
+        return True
+    return bool(lines and is_direct_action_line(lines[0]))
 
 
 def is_marmot_shield_mail(raw: str) -> bool:
@@ -216,6 +265,17 @@ def activity_name(raw: str) -> str:
     first_line = re.sub(r"[;；（(].*$", "", first_line)
     first_line = re.sub(r"\s*S?\d.*$", "", first_line).strip()
     return first_line or "未识别活动"
+
+
+def inline_direct_title(raw: str) -> str | None:
+    lines = nonempty_lines(raw)
+    if len(lines) < 2 or not is_direct_action_line(lines[0]):
+        return None
+
+    match = CODED_TITLE_RE.match(lines[1])
+    if not match:
+        return None
+    return lines[1]
 
 
 def normalize_mapping_text(value: str) -> str:
@@ -285,6 +345,9 @@ def regular_activity_id_map() -> dict[str, str]:
 def display_activity_name(raw: str) -> str:
     if is_marmot_shield_mail(raw):
         return MARMOT_SHIELD_MAIL_TITLE
+    direct_title = inline_direct_title(raw)
+    if direct_title:
+        return direct_title
     name = activity_name(raw)
     if name in DISPLAY_NAME_OVERRIDES:
         return DISPLAY_NAME_OVERRIDES[name]
@@ -482,6 +545,54 @@ def time_range(start_day: date, duration_label: str, days: int | None, name: str
     return f"{start:%Y-%m-%d %H:%M:%S} ~ {end:%Y-%m-%d %H:%M:%S}（{duration_label}） UTC+8"
 
 
+def display_server_group(value: str) -> str:
+    return value.replace("-", "~")
+
+
+def migration_activity_setup_lines(item: Reminder) -> list[str]:
+    duration_label, days = duration_for("区域迁徙", item.raw)
+    days = days or 3
+    start = datetime(item.start_day.year, item.start_day.month, item.start_day.day, 9, 0, 0)
+    end = datetime(item.start_day.year, item.start_day.month, item.start_day.day, 7, 59, 59) + timedelta(days=days)
+    server = server_text(item.raw, item.start_day)
+    group = display_server_group(server)
+    if server == "排期表未标明":
+        scope_line = "范围：S1，排期表未标明"
+    else:
+        scope_line = f"范围：S1，{group}；{group}为1组"
+    return [
+        "活动预设+公布分组",
+        display_activity_name(item.raw),
+        f"时间：{start:%Y-%m-%d %H:%M:%S} - {end:%Y-%m-%d %H:%M:%S} UTC+8【{duration_label}】",
+        scope_line,
+        "备注：",
+        "1. 北京时间09:00:00开启，避免跨天结算问题",
+        "2. 1服确认已选，分组已设置",
+    ]
+
+
+def direct_detail_lines(detail_raw: str) -> list[str] | None:
+    title = inline_direct_title(detail_raw)
+    if not title:
+        return None
+
+    lines = nonempty_lines(detail_raw)
+    return [title, lines[0], *lines[2:]]
+
+
+def custom_reminder_lines(item: Reminder) -> list[str] | None:
+    if activity_name(item.raw) == "区域迁徙" and item.action == "设置礼包+分组" and item.detail_raw:
+        return direct_detail_lines(item.detail_raw)
+
+    if activity_name(item.raw) == "区域迁徙" and item.action == "设置活动+公布分组":
+        return migration_activity_setup_lines(item)
+
+    if item.detail_raw:
+        return direct_detail_lines(item.detail_raw)
+
+    return direct_detail_lines(item.raw)
+
+
 def compact_one_day_range(start_day: date) -> str:
     start = datetime(start_day.year, start_day.month, start_day.day, 8, 0, 0)
     end = start + timedelta(days=1) - timedelta(seconds=1)
@@ -519,6 +630,11 @@ def render(reminders: list[Reminder], target: date) -> str:
 
     chunks = [header]
     for item in todays:
+        custom_lines = custom_reminder_lines(item)
+        if custom_lines:
+            chunks.append("\n".join(custom_lines))
+            continue
+
         if is_marmot_shield_mail(item.raw):
             chunks.append(marmot_shield_mail_text(item.start_day))
             continue
