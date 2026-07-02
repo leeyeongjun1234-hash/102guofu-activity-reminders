@@ -46,4 +46,4 @@ jobs:
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: "chore: update reminder page"
-          file_pattern: "index.html site/index.html 全部每日提醒.html 每日活动提醒.txt 活动设置提醒.tsv"
+          file_pattern: "index.html 全部每日提醒.html 每日活动提醒.txt 活动设置提醒.tsv"

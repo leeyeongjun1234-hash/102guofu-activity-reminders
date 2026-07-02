@@ -2,62 +2,32 @@
 
 这个仓库用于从活动排期表生成每日活动提醒页面。
 
-## 本地生成
-
-```bash
-python3 generate_reminders.py
-python3 daily_reminder.py
-python3 build_reminders_html.py
-```
-
-生成文件：
-
-- `活动设置提醒.tsv`
-- `每日活动提醒.txt`
-- `全部每日提醒.html`
-- `index.html`
-- `site/index.html`
-
-## 日常更新
+## 日常使用
 
 ### Mac
 
-编辑并保存 `102国服活动排期表.xlsx` 后，双击：
-
-```text
-一键同步GitHub.command
-```
-
-它会自动完成：
-
-- 重新生成提醒文本和 HTML
-- 提交本地修改
-- 拉取 GitHub 最新内容
-- 推送到 GitHub
-
-如果只想本地自动更新 HTML、不推送 GitHub，双击：
+只想本地自动更新 HTML、不上传 GitHub，双击：
 
 ```text
 自动更新HTML.command
 ```
 
-打开后保持窗口不关；之后每次保存 `102国服活动排期表.xlsx` 或 `活动与礼包对应关系.xlsx`，都会自动重新生成 `活动设置提醒.tsv`、`每日活动提醒.txt`、`全部每日提醒.html`、`index.html` 和 `site/index.html`。
+打开后保持窗口不关；之后每次保存 `102国服活动排期表.xlsx`、`活动与礼包对应关系.xlsx` 或 `工作休日日历.xlsx`，都会自动重新生成：
+
+- `活动设置提醒.tsv`
+- `每日活动提醒.txt`
+- `全部每日提醒.html`
+- `index.html`
+
+改完本地内容并确认要更新线上网址时，双击：
+
+```text
+一键同步GitHub.command
+```
+
+它会自动拉取 GitHub 最新内容、重新生成提醒文件和 HTML、提交本地修改，并推送到 GitHub。
 
 自动更新也会监听 `工作休日日历.xlsx`。普通活动的设置日期如果落在休息日，会自动提前到最近的工作日；`1000905：国服-拯救蚜虫-跨服` 和 `1000927：飞蜥之战` 保持固定周末设置。
-
-### Windows
-
-编辑并保存 `102国服活动排期表.xlsx` 后，双击：
-
-```text
-一键同步GitHub.bat
-```
-
-如果只想本地生成、不推送 GitHub，双击：
-
-```text
-一键更新提醒.bat
-```
 
 ## 协作规则
 

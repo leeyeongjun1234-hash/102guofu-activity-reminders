@@ -19,7 +19,6 @@ echo "  - 活动设置提醒.tsv"
 echo "  - 每日活动提醒.txt"
 echo "  - 全部每日提醒.html"
 echo "  - index.html"
-echo "  - site/index.html"
 echo
 echo "停止自动更新：按 Ctrl+C，或关闭这个窗口。"
 echo

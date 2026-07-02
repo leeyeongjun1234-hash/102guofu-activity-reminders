@@ -27,7 +27,6 @@ from daily_reminder import (
 
 OUTPUT = Path("全部每日提醒.html")
 ROOT_OUTPUT = Path("index.html")
-SITE_OUTPUT = Path("site/index.html")
 CHINA_TZ = ZoneInfo("Asia/Shanghai")
 GENERATED_DAY = datetime.now(CHINA_TZ).date()
 THEME_PACKAGES = {
@@ -211,6 +210,22 @@ def package_details(item: Reminder) -> str:
             raw_time_range(next((line for line in lines if line.startswith("时间：")), default_details[1])),
         ]
         return package_section("配套礼包", package_lines, details)
+
+    if name == "双倍盛典":
+        giant_offer_lines = [line for line in lines if line.startswith(("32244", "32245", "32246"))]
+        limited_offer_lines = [line for line in lines if line.startswith(("32173", "31924", "31925", "31926"))]
+        package_time = next((line for line in reversed(lines) if line.startswith("时间：")), "")
+        details = ["服务器：" + server_text(item.raw, item.start_day)]
+        if package_time:
+            details.append(raw_time_range(package_time))
+        details.append("新服不自动开启，每日不刷新")
+
+        sections = []
+        if giant_offer_lines:
+            sections.append(package_section("双倍巨献特惠", giant_offer_lines, details))
+        if limited_offer_lines:
+            sections.append(package_section("盛典限定", limited_offer_lines, details))
+        return "\n".join(sections)
 
     if name == "落潮海岸" and any(package_id in item.raw for package_id in ("32346", "29681")):
         five_day_lines = [
@@ -1057,11 +1072,8 @@ def main() -> None:
     html = build_html(reminders)
     OUTPUT.write_text(html, encoding="utf-8")
     ROOT_OUTPUT.write_text(html, encoding="utf-8")
-    SITE_OUTPUT.parent.mkdir(exist_ok=True)
-    SITE_OUTPUT.write_text(html, encoding="utf-8")
     print(f"已生成：{OUTPUT}")
     print(f"已生成：{ROOT_OUTPUT}")
-    print(f"已生成：{SITE_OUTPUT}")
 
 
 if __name__ == "__main__":

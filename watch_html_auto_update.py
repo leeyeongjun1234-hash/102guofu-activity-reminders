@@ -52,7 +52,7 @@ def rebuild() -> bool:
             log(f"{label} 更新失败，请查看上面的错误信息。")
             return False
 
-    log("已更新：活动设置提醒.tsv / 每日活动提醒.txt / 全部每日提醒.html / index.html / site/index.html")
+    log("已更新：活动设置提醒.tsv / 每日活动提醒.txt / 全部每日提醒.html / index.html")
     return True
 
 
