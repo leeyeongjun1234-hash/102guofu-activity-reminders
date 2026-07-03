@@ -27,6 +27,7 @@ from daily_reminder import (
 
 OUTPUT = Path("全部每日提醒.html")
 ROOT_OUTPUT = Path("index.html")
+SITE_OUTPUT = Path("site/index.html")
 CHINA_TZ = ZoneInfo("Asia/Shanghai")
 GENERATED_DAY = datetime.now(CHINA_TZ).date()
 THEME_PACKAGES = {
@@ -1072,8 +1073,11 @@ def main() -> None:
     html = build_html(reminders)
     OUTPUT.write_text(html, encoding="utf-8")
     ROOT_OUTPUT.write_text(html, encoding="utf-8")
+    SITE_OUTPUT.parent.mkdir(parents=True, exist_ok=True)
+    SITE_OUTPUT.write_text(html, encoding="utf-8")
     print(f"已生成：{OUTPUT}")
     print(f"已生成：{ROOT_OUTPUT}")
+    print(f"已生成：{SITE_OUTPUT}")
 
 
 if __name__ == "__main__":

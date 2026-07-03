@@ -12,6 +12,7 @@ from workday_calendar import adjusted_setup_rules, has_fixed_sunday_setup
 SOURCE = Path("102国服活动排期表.xlsx")
 OUTPUT = Path("活动设置提醒.tsv")
 YEAR = 2026
+MARMOT_PACKAGE_LINE = "32364: 火力全开：进攻土拨鼠（26/6/30版本）"
 
 
 def week_monday(day: date) -> date:
@@ -23,6 +24,34 @@ def clean_text(value: str) -> str:
     value = re.sub(r"[ \t]+", " ", value)
     value = re.sub(r"\n{3,}", "\n\n", value)
     return value
+
+
+def normalize_marmot_package_line(value: str) -> list[str]:
+    line = value.strip()
+    if not (
+        "火力全开" in line
+        and "土拨鼠" in line
+        and ("29145" in line or "32364" in line)
+    ):
+        return [value]
+
+    wrapped = line.startswith(("（", "("))
+    package = f"（{MARMOT_PACKAGE_LINE}）" if wrapped else MARMOT_PACKAGE_LINE
+    server_match = re.search(
+        r"(?:[）)]\s*)?((?:S\s*)?1\s*[-~～—–]\s*(?:xxx|XXX|\d+)|S\s*\d+\s*[-~～—–]\s*S?\s*(?:xxx|XXX|\d+))\s*(?:[）)]\s*)?$",
+        line,
+        re.I,
+    )
+    if server_match:
+        return [package, server_match.group(1).strip()]
+    return [package]
+
+
+def normalize_marmot_activity_text(value: str) -> str:
+    lines: list[str] = []
+    for line in value.splitlines():
+        lines.extend(normalize_marmot_package_line(line))
+    return "\n".join(lines)
 
 
 def parse_month_day(value: str) -> date | None:
@@ -49,7 +78,7 @@ def reminder_rules(activity: str, start_day: date, row_context: str = "") -> lis
         rules = [(week_monday(start_day), "设置活动")]
     elif "联盟远征" in activity or "功勋商店" in activity:
         rules = [(start_day, "设置活动")]
-    elif "29145" in activity or "火力全开" in activity:
+    elif "29145" in activity or "32364" in activity or "火力全开" in activity:
         rules = [(start_day - timedelta(days=1), "设置活动")]
     elif "土拨鼠" in activity:
         rules = [(start_day - timedelta(days=2), "设置活动")]
@@ -79,7 +108,7 @@ def main() -> None:
         for col, start_day in dates.items():
             if col >= len(row):
                 continue
-            activity = clean_text(row[col])
+            activity = normalize_marmot_activity_text(clean_text(row[col]))
             if not activity:
                 continue
             for setup_day, action in reminder_rules(activity, start_day, row_context):

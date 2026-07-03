@@ -30,7 +30,7 @@ DISPLAY_NAME_OVERRIDES = {
     "进化连冲": "\n".join(EVOLUTION_RECHARGE_ACTIVITY_LINES),
 }
 MARMOT_SHIELD_MAIL_TITLE = "土拨鼠、罩子、邮件"
-MARMOT_PACKAGE_LINE = "29145: 火力全开：进攻土拨鼠128~648"
+MARMOT_PACKAGE_LINE = "32364: 火力全开：进攻土拨鼠（26/6/30版本）"
 MARMOT_MAIL_ITEMS = [
     "204115：野怪饲料 * 30000",
     "202042：2小时兵蚁孵化加速 * 10",
@@ -117,6 +117,38 @@ def nonempty_lines(value: str) -> list[str]:
     return [line.strip() for line in value.splitlines() if line.strip()]
 
 
+def normalize_marmot_package_line(value: str) -> list[str]:
+    line = value.strip()
+    if not (
+        "火力全开" in line
+        and "土拨鼠" in line
+        and ("29145" in line or "32364" in line)
+    ):
+        return [value]
+
+    wrapped = line.startswith(("（", "("))
+    package = f"（{MARMOT_PACKAGE_LINE}）" if wrapped else MARMOT_PACKAGE_LINE
+    server_match = re.search(
+        r"(?:[）)]\s*)?((?:S\s*)?1\s*[-~～—–]\s*(?:xxx|XXX|\d+)|S\s*\d+\s*[-~～—–]\s*S?\s*(?:xxx|XXX|\d+))\s*(?:[）)]\s*)?$",
+        line,
+        re.I,
+    )
+    if server_match:
+        return [package, server_match.group(1).strip()]
+    return [package]
+
+
+def normalize_marmot_package_lines(lines: list[str]) -> list[str]:
+    normalized: list[str] = []
+    for line in lines:
+        normalized.extend(normalize_marmot_package_line(line))
+    return normalized
+
+
+def normalize_marmot_activity_text(value: str) -> str:
+    return "\n".join(normalize_marmot_package_lines(value.splitlines()))
+
+
 def normalized_direct_action(value: str) -> str:
     value = re.sub(r"【.*?】", "", value)
     value = re.sub(r"\s+", "", value)
@@ -165,7 +197,7 @@ def reminder_rules(activity: str, start_day: date, row_context: str = "") -> lis
         rules = [(week_monday(start_day), "设置活动")]
     elif "联盟远征" in activity or "功勋商店" in activity:
         rules = [(start_day, "设置活动")]
-    elif "29145" in activity or "火力全开" in activity:
+    elif "29145" in activity or "32364" in activity or "火力全开" in activity:
         rules = [(start_day - timedelta(days=1), "设置活动")]
     elif "土拨鼠" in activity:
         rules = [(start_day - timedelta(days=2), "设置活动")]
@@ -193,7 +225,7 @@ def load_reminders() -> list[Reminder]:
         for col, start_day in dates.items():
             if col >= len(row):
                 continue
-            activity = clean_text(row[col])
+            activity = normalize_marmot_activity_text(clean_text(row[col]))
             if not activity:
                 continue
             if is_non_activity_note(activity):
@@ -352,12 +384,15 @@ def display_activity_name(raw: str) -> str:
     name = activity_name(raw)
     if name in DISPLAY_NAME_OVERRIDES:
         return DISPLAY_NAME_OVERRIDES[name]
+    if name == "土拨鼠":
+        return MARMOT_PACKAGE_LINE
     mapped = regular_activity_id_map().get(activity_key(name))
     if mapped:
         return mapped
     inline_id = re.match(r"\s*(\d{5,7})[:：]\s*([^\n]+)", raw)
     if inline_id:
-        return normalize_mapping_text(f"{inline_id.group(1)}:{inline_id.group(2)}")
+        inline_name = normalize_mapping_text(f"{inline_id.group(1)}:{inline_id.group(2)}")
+        return normalize_marmot_package_line(inline_name)[0]
     return name
 
 
@@ -577,7 +612,8 @@ def direct_detail_lines(detail_raw: str) -> list[str] | None:
     if not title:
         return None
 
-    lines = nonempty_lines(detail_raw)
+    title = normalize_marmot_package_line(title)[0]
+    lines = normalize_marmot_package_lines(nonempty_lines(detail_raw))
     return [title, lines[0], *lines[2:]]
 
 
