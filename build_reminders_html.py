@@ -252,6 +252,19 @@ def package_details(item: Reminder) -> str:
             ]
         )
 
+    if name == "蚁群派对" and "29750" in item.raw:
+        package_lines = [
+            line
+            for line in lines
+            if line.startswith(("29750", "29751", "29752", "29753", "31975", "31976", "29734"))
+        ]
+        details = ["服务器：" + server_text(item.raw, item.start_day)]
+        package_time = next((line for line in lines if re.match(r"^\d{4}-\d{2}-\d{2} ", line)), "")
+        if package_time:
+            details.append(raw_time_range(package_time))
+        details.append("每日刷新，新服不自动开启")
+        return package_section("配套礼包", package_lines, details)
+
     if name == "蚁群狂欢":
         free_lines = following_line_details(lines, ("31714", "31715", "31716"))
         paid_lines = [line for line in lines if line.startswith(("32295", "32163", "32164", "32165", "32166"))]
