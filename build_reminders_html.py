@@ -212,6 +212,18 @@ def package_details(item: Reminder) -> str:
         ]
         return package_section("配套礼包", package_lines, details)
 
+    if name == "无限寻宝" and "32134" in item.raw:
+        package_lines = [line for line in lines if line.startswith("32134")]
+        package_index = next((index for index, line in enumerate(lines) if line.startswith("32134")), -1)
+        package_details = []
+        if package_index >= 0:
+            package_details = [
+                raw_server_text(line) if line.startswith("服务器：") else f"时间：{raw_time_range(line)}" if line.startswith("时间：") else line
+                for line in lines[package_index + 1 :]
+                if line.startswith(("服务器：", "时间：", "每日刷新"))
+            ]
+        return package_section("配套礼包", package_lines, package_details or default_details)
+
     if name == "双倍盛典":
         giant_offer_lines = [line for line in lines if line.startswith(("32244", "32245", "32246"))]
         limited_offer_lines = [line for line in lines if line.startswith(("32173", "31924", "31925", "31926"))]
