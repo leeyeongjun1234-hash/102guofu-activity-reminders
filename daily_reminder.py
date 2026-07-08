@@ -311,6 +311,45 @@ def inline_direct_title(raw: str) -> str | None:
     return lines[1]
 
 
+GENERIC_PACKAGE_LINE_RE = re.compile(r"^\s*\d{5,6}\s*[:：]")
+ACTIVITY_CODE_LINE_RE = re.compile(r"^\s*\d{7}\s*[:：]")
+PACKAGE_META_PREFIXES = ("服务器", "时间", "开启时间", "每日刷新", "新服")
+
+
+def generic_package_blocks(raw: str) -> list[tuple[list[str], list[str]]]:
+    """通用识别活动内容下方的配套礼包分组。
+
+    单元格内以空行分隔的每一段，若包含 5~6 位 ID 的礼包行，则视为一个礼包分组。
+    返回 [(展示行, 附加信息行), ...]：
+    - 展示行保留原始顺序（含紧跟礼包前的分组“服务器：”行）；
+    - 附加信息行为该分组的服务器/时间/每日刷新/新服等元信息。
+    """
+    blocks = [block for block in re.split(r"\n\s*\n", raw) if block.strip()]
+    results: list[tuple[list[str], list[str]]] = []
+    for block in blocks:
+        lines = [line.strip() for line in block.splitlines() if line.strip()]
+        if not any(GENERIC_PACKAGE_LINE_RE.match(line) for line in lines):
+            continue
+        display: list[str] = []
+        details: list[str] = []
+        for index, line in enumerate(lines):
+            if ACTIVITY_CODE_LINE_RE.match(line):
+                continue  # 活动标题行，卡片已单独展示
+            if GENERIC_PACKAGE_LINE_RE.match(line):
+                display.append(line)
+                continue
+            next_line = lines[index + 1] if index + 1 < len(lines) else ""
+            if line.startswith("服务器") and GENERIC_PACKAGE_LINE_RE.match(next_line):
+                display.append(line)  # 分组服务器行，保留在礼包列表中
+            elif line.startswith(PACKAGE_META_PREFIXES) or re.match(r"^\d{4}-\d{2}-\d{2}", line):
+                details.append(line)
+            else:
+                display.append(line)
+        if display:
+            results.append((display, details))
+    return results
+
+
 def normalize_mapping_text(value: str) -> str:
     return value.replace("\xa0", " ").replace("：", ":").strip()
 
@@ -682,16 +721,17 @@ def render(reminders: list[Reminder], target: date) -> str:
         action_line = "" if item.action == "设置活动" else f"{item.action}\n"
         server = server_text(item.raw, item.start_day)
         server_line = server if base_name == "进化连冲" else labeled_text("服务器", server)
-        chunks.append(
-            "\n".join(
-                [
-                    name,
-                    f"{action_line}开始时间~结束时间",
-                    server_line,
-                    f"时间：{time_range(item.start_day, duration_label, days, base_name)}",
-                ]
-            )
-        )
+        chunk_lines = [
+            name,
+            f"{action_line}开始时间~结束时间",
+            server_line,
+            f"时间：{time_range(item.start_day, duration_label, days, base_name)}",
+        ]
+        for display, details in generic_package_blocks(item.raw):
+            chunk_lines.append("配套礼包：")
+            chunk_lines.extend(display)
+            chunk_lines.extend(details)
+        chunks.append("\n".join(chunk_lines))
     return "\n\n".join(chunks) + "\n"
 
 

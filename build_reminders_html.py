@@ -17,6 +17,7 @@ from daily_reminder import (
     custom_reminder_lines,
     display_activity_name,
     duration_for,
+    generic_package_blocks,
     is_marmot_shield_mail,
     load_reminders,
     marmot_shield_mail_text,
@@ -292,7 +293,19 @@ def package_details(item: Reminder) -> str:
             sections.append(package_section("付费礼包", paid_lines, details))
         return "\n".join(sections)
 
-    return ""
+    # 通用识别：活动内容下方的礼包分组（5~6 位 ID 行）
+    generic_sections = []
+    for display, detail_lines in generic_package_blocks(item.raw):
+        details = []
+        for line in detail_lines:
+            if line.startswith("服务器"):
+                details.append(raw_server_text(line))
+            elif line.startswith(("时间", "开启时间")) or re.match(r"^\d{4}-\d{2}-\d{2}", line):
+                details.append(f"时间：{raw_time_range(line)}")
+            else:
+                details.append(line)
+        generic_sections.append(package_section("配套礼包", display, details))
+    return "\n".join(generic_sections)
 
 
 def render_card(item: Reminder) -> str:
