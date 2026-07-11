@@ -577,6 +577,16 @@ def server_text(raw: str, start_day: date | None = None) -> str:
         if parts:
             return "；".join(parts)
 
+    # 通服跨服联盟GVE：范围之外还有一个单独的通服服务器（如 "通服跨服联盟GVE S859 ... S1-S857" → S1-S857，S859）
+    if "通服跨服联盟GVE" in raw_one_line:
+        single = re.search(r"通服跨服联盟GVE\s*S?(\d+)", raw_one_line, re.I)
+        ranges = re.findall(r"S\s*\d+\s*[-~～—–]+\s*S?\s*(?:xxx|\d+)", raw_one_line, re.I)
+        parts = [normalize_server(item) for item in ranges]
+        if single:
+            parts.append(f"S{single.group(1)}")
+        if parts:
+            return "，".join(dict.fromkeys(parts))
+
     server_matches = re.findall(r"S\s*\d+\s*[-~～—–]+\s*S?\s*(?:xxx|\d+)|S\s*xxx", raw_one_line, re.I)
     if server_matches:
         return "，".join(dict.fromkeys(normalize_server(item) for item in server_matches))
