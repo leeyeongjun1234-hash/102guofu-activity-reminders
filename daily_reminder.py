@@ -350,6 +350,18 @@ def generic_package_blocks(raw: str) -> list[tuple[list[str], list[str]]]:
     return results
 
 
+def activity_scope_text(raw: str) -> str:
+    lines = raw.splitlines()
+    if not any(ACTIVITY_CODE_LINE_RE.match(line.strip()) for line in lines):
+        return raw
+
+    package_index = next(
+        (index for index, line in enumerate(lines) if GENERIC_PACKAGE_LINE_RE.match(line.strip())),
+        len(lines),
+    )
+    return "\n".join(lines[:package_index])
+
+
 def normalize_mapping_text(value: str) -> str:
     return value.replace("\xa0", " ").replace("：", ":").strip()
 
@@ -545,12 +557,13 @@ def computed_server_text(raw: str, start_day: date) -> str | None:
 
 
 def server_text(raw: str, start_day: date | None = None) -> str:
-    raw_one_line = " ".join(raw.split())
+    scope_raw = activity_scope_text(raw)
+    raw_one_line = " ".join(scope_raw.split())
     if re.search(r"服务器[:：]\s*全服", raw_one_line):
         return "全服"
 
     explicit_servers = []
-    for line in raw.splitlines():
+    for line in scope_raw.splitlines():
         line = line.strip()
         if not line.startswith("服务器"):
             continue
