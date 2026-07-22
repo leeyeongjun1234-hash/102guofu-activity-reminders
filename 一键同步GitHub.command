@@ -39,6 +39,7 @@ echo "开始生成提醒文件..."
 $PYTHON generate_reminders.py
 $PYTHON daily_reminder.py
 $PYTHON build_reminders_html.py
+$PYTHON build_season_reminders.py
 
 echo
 echo "开始提交本地修改..."

@@ -35,6 +35,35 @@
       padding: 24px;
     }
 
+    .page-nav {
+      display: inline-flex;
+      gap: 4px;
+      margin-bottom: 18px;
+      padding: 4px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #f8fafc;
+      white-space: nowrap;
+    }
+
+    .nav-link {
+      padding: 7px 11px;
+      border-radius: 5px;
+      color: #475467;
+      text-decoration: none;
+      font-weight: 700;
+    }
+
+    .nav-link:hover {
+      background: #eef2f6;
+    }
+
+    .nav-link.active {
+      background: #ffffff;
+      color: #111827;
+      box-shadow: 0 1px 3px rgba(15, 23, 42, 0.12);
+    }
+
     .top {
       display: grid;
       gap: 8px;
@@ -347,6 +376,11 @@
         padding: 16px;
       }
 
+      .page-nav {
+        display: flex;
+        overflow-x: auto;
+      }
+
       h1 {
         font-size: 24px;
       }
@@ -402,6 +436,11 @@
     </form>
   </section>
   <div class="wrap">
+    <nav class="page-nav" aria-label="页面导航">
+      <a href="index.html" class="nav-link active" aria-current="page">活动提醒</a>
+      <a href="season-cn.html" class="nav-link">国服赛季</a>
+      <a href="season-overseas.html" class="nav-link">海外赛季</a>
+    </nav>
     <header class="top">
       <h1>全部每日活动提醒</h1>
       <div class="sub">按设置日期汇总展示，日期与时间均按北京时间 UTC+8 计算。</div>

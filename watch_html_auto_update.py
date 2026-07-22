@@ -10,11 +10,15 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent
 WATCHED_FILES = [
     ROOT / "102国服活动排期表.xlsx",
+    ROOT / "102国服赛季排期表.xlsx",
+    ROOT / "102海外赛季排期表.xlsx",
     ROOT / "活动与礼包对应关系.xlsx",
     ROOT / "工作休日日历.xlsx",
     ROOT / "generate_reminders.py",
     ROOT / "daily_reminder.py",
     ROOT / "build_reminders_html.py",
+    ROOT / "build_season_pages.py",
+    ROOT / "build_season_reminders.py",
     ROOT / "workday_calendar.py",
     ROOT / "watch_html_auto_update.py",
 ]
@@ -43,6 +47,7 @@ def rebuild() -> bool:
         ("活动设置提醒 TSV", ROOT / "generate_reminders.py"),
         ("每日活动提醒", ROOT / "daily_reminder.py"),
         ("HTML", ROOT / "build_reminders_html.py"),
+        ("赛季提醒页面", ROOT / "build_season_reminders.py"),
     ]
 
     log("开始更新 TSV、提醒文本和 HTML...")
@@ -52,7 +57,7 @@ def rebuild() -> bool:
             log(f"{label} 更新失败，请查看上面的错误信息。")
             return False
 
-    log("已更新：活动设置提醒.tsv / 每日活动提醒.txt / 全部每日提醒.html / index.html")
+    log("已更新：活动提醒页面 / 国服赛季提醒页面 / 海外赛季提醒页面")
     return True
 
 

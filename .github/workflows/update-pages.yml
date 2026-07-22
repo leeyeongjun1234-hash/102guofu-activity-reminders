@@ -12,10 +12,14 @@ on:
       - main
     paths:
       - "102国服活动排期表.xlsx"
+      - "102国服赛季排期表.xlsx"
+      - "102海外赛季排期表.xlsx"
       - "活动与礼包对应关系.xlsx"
       - "工作休日日历.xlsx"
       - "daily_reminder.py"
       - "build_reminders_html.py"
+      - "build_season_pages.py"
+      - "build_season_reminders.py"
       - "workday_calendar.py"
       - ".github/workflows/update-pages.yml"
 
@@ -41,9 +45,10 @@ jobs:
           python generate_reminders.py
           python daily_reminder.py
           python build_reminders_html.py
+          python build_season_reminders.py
 
       - name: Commit generated files
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: "chore: update reminder page"
-          file_pattern: "index.html 全部每日提醒.html 每日活动提醒.txt 活动设置提醒.tsv"
+          file_pattern: "index.html season-cn.html season-overseas.html site/index.html site/season-cn.html site/season-overseas.html 全部每日提醒.html 每日活动提醒.txt 活动设置提醒.tsv"

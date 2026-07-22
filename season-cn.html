@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>国服赛季提醒</title>
+  <style>
+    :root { color-scheme: light; --bg:#f5f6f8; --panel:#fff; --text:#1f2937; --muted:#667085; --line:#d8dee8; --green:#166534; --orange:#c2410c; }
+    * { box-sizing:border-box; }
+    body { margin:0; min-height:100vh; background:var(--bg); color:var(--text); font:14px/1.5 "Segoe UI","PingFang SC","Microsoft YaHei",sans-serif; }
+    body.locked .app { visibility:hidden; }
+    body:not(.locked) .lock-screen { display:none; }
+    .lock-screen { position:fixed; inset:0; z-index:100; display:grid; place-items:center; padding:20px; background:var(--bg); }
+    .lock-panel { width:min(400px,100%); display:grid; gap:14px; padding:24px; border:1px solid var(--line); border-radius:8px; background:var(--panel); box-shadow:0 12px 32px rgba(15,23,42,.12); }
+    .lock-panel h1 { margin:0; font-size:24px; }
+    .lock-panel label { color:var(--muted); font-weight:700; }
+    .lock-row { display:grid; grid-template-columns:minmax(0,1fr) auto; gap:10px; }
+    .lock-row input, .lock-row button { min-height:40px; border:1px solid var(--line); border-radius:6px; font:inherit; }
+    .lock-row input { min-width:0; padding:9px 11px; background:#fff; color:var(--text); }
+    .lock-row button { padding:9px 14px; border-color:var(--green); background:var(--green); color:#fff; font-weight:700; cursor:pointer; }
+    .lock-error { min-height:20px; color:#b91c1c; font-weight:700; }
+    .app { max-width:1200px; margin:0 auto; padding:24px; }
+    .page-header { display:flex; align-items:flex-start; justify-content:space-between; gap:20px; margin-bottom:18px; }
+    h1 { margin:0; font-size:28px; line-height:1.25; }
+    .subtitle { margin-top:5px; color:var(--muted); }
+    .page-nav { display:flex; gap:4px; padding:4px; border:1px solid var(--line); border-radius:8px; background:#f8fafc; white-space:nowrap; }
+    .nav-link { padding:7px 11px; border-radius:5px; color:#475467; text-decoration:none; font-weight:700; }
+    .nav-link:hover { background:#eef2f6; }
+    .nav-link.active { background:#fff; color:#111827; box-shadow:0 1px 3px rgba(15,23,42,.12); }
+    .rule-strip { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:10px; margin-bottom:18px; }
+    .rule { padding:12px 14px; border:1px solid var(--line); border-radius:8px; background:var(--panel); }
+    .rule strong { display:block; margin-bottom:2px; }
+    .rule span { color:var(--muted); }
+    .schedule-table-wrap { overflow-x:auto; border:1px solid var(--line); border-radius:8px; background:#fff; }
+    .schedule-table { width:100%; min-width:760px; border-collapse:collapse; table-layout:fixed; }
+    .schedule-table th, .schedule-table td { padding:11px 12px; border:1px solid var(--line); text-align:center; vertical-align:middle; white-space:nowrap; }
+    .schedule-table th { background:#eef2f6; color:#475467; font-weight:700; }
+    .schedule-table th:first-child, .schedule-table td:first-child { width:24%; text-align:left; }
+    .schedule-table tbody tr:hover { background:#fffaf5; }
+    .batch-cell { position:relative; }
+    .batch-cell strong { display:block; }
+    .date-cell { font-variant-numeric:tabular-nums; }
+    .today-date-value { display:inline-block; padding:3px 9px; border:2px solid #d4a017; border-radius:999px; background:#fffaf0; color:#8a5a00; font-weight:700; box-shadow:0 0 0 3px rgba(212,160,23,.2), 0 0 14px rgba(212,160,23,.45); }
+    .nearest-row { background:#fff7ed; box-shadow:inset 0 0 0 2px #dc2626; }
+    .nearest-marker { display:inline-block; width:12px; height:12px; margin-right:7px; border:3px solid #dc2626; border-radius:50%; vertical-align:-1px; }
+    .empty { padding:24px; border:1px solid var(--line); border-radius:8px; background:#fff; color:var(--muted); }
+    .download { display:inline-flex; margin-top:2px; padding:8px 11px; border:1px solid var(--line); border-radius:6px; background:#fff; color:var(--text); text-decoration:none; }
+    @media (max-width:760px) {
+      .app { padding:16px; }
+      .page-header { flex-direction:column; gap:10px; }
+      .page-nav { width:100%; overflow-x:auto; }
+      .rule-strip { grid-template-columns:1fr; }
+      .lock-row { grid-template-columns:1fr; }
+    }
+  </style>
+</head>
+<body class="locked">
+  <section class="lock-screen" aria-label="密码验证">
+    <form id="lockForm" class="lock-panel">
+      <h1>请输入密码</h1>
+      <label for="lockPassword">密码</label>
+      <div class="lock-row"><input id="lockPassword" type="password" autocomplete="current-password" autofocus><button type="submit">进入</button></div>
+      <div id="lockError" class="lock-error" role="alert"></div>
+    </form>
+  </section>
+  <div class="app">
+    <header class="page-header">
+      <div><h1>国服赛季提醒</h1><div class="subtitle">报名期早于 2026-07-22 的批次已隐藏 · 已生成未来三年排期 · 最近批次已标红</div></div>
+      <nav class="page-nav" aria-label="页面导航"><a href="index.html" class="nav-link">活动提醒</a><a href="season-cn.html" class="nav-link active" aria-current="page">国服赛季</a><a href="season-overseas.html" class="nav-link">海外赛季</a></nav>
+    </header>
+    <section class="rule-strip">
+      <div class="rule"><strong>预告周期</strong><span>10天</span></div>
+      <div class="rule"><strong>报名期</strong><span>10天</span></div>
+      <div class="rule"><strong>报名活动提醒</strong><span>报名期开始前3天</span></div>
+    </section>
+    <a class="download" href="102%E5%9B%BD%E6%9C%8D%E8%B5%9B%E5%AD%A3%E6%8E%92%E6%9C%9F%E8%A1%A8.xlsx" download>下载原始排期表</a>
+    <main>
+      <div class="schedule-table-wrap">
+        <table class="schedule-table">
+          <thead><tr><th>批次</th><th>预告日期</th><th>提醒日期</th><th>报名日期</th><th>提醒日期</th></tr></thead>
+          <tbody><tr class="nearest-row"><td class="batch-cell"><span class="nearest-marker" title="最近的批次"></span><strong>第65批</strong></td><td class="date-cell">2026-07-17</td><td class="date-cell">2026-07-14</td><td class="date-cell">2026-07-27</td><td class="date-cell">2026-07-24</td></tr><tr><td class="batch-cell"><strong>第68批</strong></td><td class="date-cell">2026-09-18</td><td class="date-cell">2026-09-15</td><td class="date-cell">2026-09-28</td><td class="date-cell">2026-09-25</td></tr><tr><td class="batch-cell"><strong>第71批</strong></td><td class="date-cell">2026-11-20</td><td class="date-cell">2026-11-17</td><td class="date-cell">2026-11-30</td><td class="date-cell">2026-11-27</td></tr><tr><td class="batch-cell"><strong>第74批</strong></td><td class="date-cell">2027-01-22</td><td class="date-cell">2027-01-19</td><td class="date-cell">2027-02-01</td><td class="date-cell">2027-01-29</td></tr><tr><td class="batch-cell"><strong>第77批</strong></td><td class="date-cell">2027-03-26</td><td class="date-cell">2027-03-23</td><td class="date-cell">2027-04-05</td><td class="date-cell">2027-04-02</td></tr><tr><td class="batch-cell"><strong>第80批</strong></td><td class="date-cell">2027-05-28</td><td class="date-cell">2027-05-25</td><td class="date-cell">2027-06-07</td><td class="date-cell">2027-06-04</td></tr><tr><td class="batch-cell"><strong>第83批</strong></td><td class="date-cell">2027-07-30</td><td class="date-cell">2027-07-27</td><td class="date-cell">2027-08-09</td><td class="date-cell">2027-08-06</td></tr><tr><td class="batch-cell"><strong>第86批</strong></td><td class="date-cell">2027-10-01</td><td class="date-cell">2027-09-28</td><td class="date-cell">2027-10-11</td><td class="date-cell">2027-10-08</td></tr><tr><td class="batch-cell"><strong>第89批</strong></td><td class="date-cell">2027-12-03</td><td class="date-cell">2027-11-30</td><td class="date-cell">2027-12-13</td><td class="date-cell">2027-12-10</td></tr><tr><td class="batch-cell"><strong>第92批</strong></td><td class="date-cell">2028-02-04</td><td class="date-cell">2028-02-01</td><td class="date-cell">2028-02-14</td><td class="date-cell">2028-02-11</td></tr><tr><td class="batch-cell"><strong>第95批</strong></td><td class="date-cell">2028-04-07</td><td class="date-cell">2028-04-04</td><td class="date-cell">2028-04-17</td><td class="date-cell">2028-04-14</td></tr><tr><td class="batch-cell"><strong>第98批</strong></td><td class="date-cell">2028-06-09</td><td class="date-cell">2028-06-06</td><td class="date-cell">2028-06-19</td><td class="date-cell">2028-06-16</td></tr><tr><td class="batch-cell"><strong>第101批</strong></td><td class="date-cell">2028-08-11</td><td class="date-cell">2028-08-08</td><td class="date-cell">2028-08-21</td><td class="date-cell">2028-08-18</td></tr><tr><td class="batch-cell"><strong>第104批</strong></td><td class="date-cell">2028-10-13</td><td class="date-cell">2028-10-10</td><td class="date-cell">2028-10-23</td><td class="date-cell">2028-10-20</td></tr><tr><td class="batch-cell"><strong>第107批</strong></td><td class="date-cell">2028-12-15</td><td class="date-cell">2028-12-12</td><td class="date-cell">2028-12-25</td><td class="date-cell">2028-12-22</td></tr><tr><td class="batch-cell"><strong>第110批</strong></td><td class="date-cell">2029-02-16</td><td class="date-cell">2029-02-13</td><td class="date-cell">2029-02-26</td><td class="date-cell">2029-02-23</td></tr><tr><td class="batch-cell"><strong>第113批</strong></td><td class="date-cell">2029-04-20</td><td class="date-cell">2029-04-17</td><td class="date-cell">2029-04-30</td><td class="date-cell">2029-04-27</td></tr><tr><td class="batch-cell"><strong>第116批</strong></td><td class="date-cell">2029-06-22</td><td class="date-cell">2029-06-19</td><td class="date-cell">2029-07-02</td><td class="date-cell">2029-06-29</td></tr></tbody>
+        </table>
+      </div>
+    </main>
+  </div>
+  <script>
+    const AUTH_KEY = 'activity-reminders-authenticated-until';
+    const AUTH_TTL_MS = 48 * 60 * 60 * 1000;
+    const PASSWORD_HASH = '542df2c1e629af51b87cf02f575af7fc8cd25a26d6cf9a54e7ac3775bce0d8f6';
+    const lockForm = document.getElementById('lockForm');
+    const lockPassword = document.getElementById('lockPassword');
+    const lockError = document.getElementById('lockError');
+    function unlockPage() { document.body.classList.remove('locked'); }
+    async function sha256(value) {
+      const bytes = new TextEncoder().encode(value);
+      const digest = await crypto.subtle.digest('SHA-256', bytes);
+      return [...new Uint8Array(digest)].map((byte) => byte.toString(16).padStart(2, '0')).join('');
+    }
+    if (Number(localStorage.getItem(AUTH_KEY) || 0) > Date.now()) unlockPage();
+    lockForm.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      if (await sha256(lockPassword.value) === PASSWORD_HASH) {
+        localStorage.setItem(AUTH_KEY, String(Date.now() + AUTH_TTL_MS));
+        lockPassword.value = ''; lockError.textContent = ''; unlockPage();
+      } else { lockError.textContent = '密码错误'; lockPassword.select(); }
+    });
+  </script>
+</body>
+</html>
