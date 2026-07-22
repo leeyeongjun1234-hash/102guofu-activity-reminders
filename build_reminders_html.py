@@ -460,9 +460,12 @@ def build_html(reminders: list[Reminder]) -> str:
     }}
 
     .page-nav {{
+      position: fixed;
+      top: 24px;
+      right: max(24px, calc((100vw - 1200px) / 2 + 24px));
+      z-index: 50;
       display: inline-flex;
       gap: 4px;
-      margin-bottom: 18px;
       padding: 4px;
       border: 1px solid var(--line);
       border-radius: 8px;
@@ -797,11 +800,14 @@ def build_html(reminders: list[Reminder]) -> str:
 
     @media (max-width: 720px) {{
       .wrap {{
-        padding: 16px;
+        padding: 76px 16px 16px;
       }}
 
       .page-nav {{
         display: flex;
+        top: 12px;
+        right: 12px;
+        max-width: calc(100vw - 24px);
         overflow-x: auto;
       }}
 
