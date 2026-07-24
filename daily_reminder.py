@@ -41,6 +41,10 @@ MARMOT_MAIL_ITEMS = [
 ]
 CODED_TITLE_RE = re.compile(r"^\s*(\d{5,7})\s*[:：]\s*(.+)$")
 DIRECT_ACTION_NAMES = {"礼包+分组预设+活动确认", "活动预设+公布分组"}
+SPECIAL_SETUP_OVERRIDES = {
+    ("32364", date(2026, 7, 26)): date(2026, 7, 24),
+    ("1000296", date(2026, 7, 27)): date(2026, 7, 24),
+}
 
 
 DURATIONS = [
@@ -181,6 +185,10 @@ def parse_query_date(value: str | None) -> date:
 
 
 def reminder_rules(activity: str, start_day: date, row_context: str = "") -> list[tuple[date, str]]:
+    for activity_id, special_start_day in SPECIAL_SETUP_OVERRIDES:
+        if activity_id in activity and start_day == special_start_day:
+            return [(SPECIAL_SETUP_OVERRIDES[(activity_id, special_start_day)], "设置活动")]
+
     if has_fixed_sunday_setup(activity, row_context):
         rules = [(week_monday(start_day) - timedelta(days=1), "设置活动")]
     elif "区域迁徙" in activity:
@@ -485,11 +493,8 @@ def rotating_recharge_server(start_day: date) -> str | None:
     return f"S1-S{854 + cycles * 2}"
 
 
-def evolution_recharge_server_text(start_day: date) -> str | None:
-    rotating_server = rotating_recharge_server(start_day)
-    if rotating_server is None:
-        return None
-    config_server = rotating_server.replace("S1-S", "1～S", 1)
+def evolution_recharge_server_text(raw: str, start_day: date | None = None) -> str:
+    source_server = raw_server_text(raw, start_day)
     return "\n".join(
         [
             EVOLUTION_RECHARGE_ACTIVITY_LINES[0],
@@ -498,7 +503,7 @@ def evolution_recharge_server_text(start_day: date) -> str | None:
             "服务器：平台设置全服，实际开启读取配置",
             "",
             EVOLUTION_RECHARGE_ACTIVITY_LINES[3],
-            f"服务器：{config_server}（读实际配置）",
+            f"服务器：{source_server}",
         ]
     )
 
@@ -530,7 +535,7 @@ def computed_server_text(raw: str, start_day: date) -> str | None:
         return "全服"
 
     if name == "进化连冲":
-        return evolution_recharge_server_text(start_day)
+        return evolution_recharge_server_text(raw, start_day)
 
     if name in {"新野怪连储 & 7充5", "新变异连储 & 7充5 / 随心储"}:
         return rotating_recharge_server(start_day)
@@ -556,7 +561,7 @@ def computed_server_text(raw: str, start_day: date) -> str | None:
     return None
 
 
-def server_text(raw: str, start_day: date | None = None) -> str:
+def raw_server_text(raw: str, start_day: date | None = None) -> str:
     scope_raw = activity_scope_text(raw)
     raw_one_line = " ".join(scope_raw.split())
     if re.search(r"服务器[:：]\s*全服", raw_one_line):
@@ -618,6 +623,12 @@ def server_text(raw: str, start_day: date | None = None) -> str:
             return computed
 
     return "排期表未标明"
+
+
+def server_text(raw: str, start_day: date | None = None) -> str:
+    if activity_name(raw) == "进化连冲":
+        return evolution_recharge_server_text(raw, start_day)
+    return raw_server_text(raw, start_day)
 
 
 def normalize_server(value: str) -> str:

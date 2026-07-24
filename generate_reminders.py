@@ -13,6 +13,10 @@ SOURCE = Path("102国服活动排期表.xlsx")
 OUTPUT = Path("活动设置提醒.tsv")
 YEAR = 2026
 MARMOT_PACKAGE_LINE = "32364: 火力全开：进攻土拨鼠（26/6/30版本）"
+SPECIAL_SETUP_OVERRIDES = {
+    ("32364", date(2026, 7, 26)): date(2026, 7, 24),
+    ("1000296", date(2026, 7, 27)): date(2026, 7, 24),
+}
 
 
 def week_monday(day: date) -> date:
@@ -62,6 +66,10 @@ def parse_month_day(value: str) -> date | None:
 
 
 def reminder_rules(activity: str, start_day: date, row_context: str = "") -> list[tuple[date, str]]:
+    for activity_id, special_start_day in SPECIAL_SETUP_OVERRIDES:
+        if activity_id in activity and start_day == special_start_day:
+            return [(SPECIAL_SETUP_OVERRIDES[(activity_id, special_start_day)], "设置活动")]
+
     if has_fixed_sunday_setup(activity, row_context):
         rules = [(week_monday(start_day) - timedelta(days=1), "设置活动")]
     elif "区域迁徙" in activity:
