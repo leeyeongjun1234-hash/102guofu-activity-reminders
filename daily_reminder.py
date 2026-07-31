@@ -39,6 +39,7 @@ MARMOT_MAIL_ITEMS = [
     "200077：100钻石 * 4",
     "203001：巢穴保护8小时 * 1",
 ]
+WEEKEND_VIP_ACTIVITY_LINE = "1000198: VIP商店-周末狂欢"
 CODED_TITLE_RE = re.compile(r"^\s*(\d{5,7})\s*[:：]\s*(.+)$")
 DIRECT_ACTION_NAMES = {"礼包+分组预设+活动确认", "活动预设+公布分组"}
 SPECIAL_SETUP_OVERRIDES = {
@@ -229,6 +230,7 @@ def load_reminders() -> list[Reminder]:
             dates[col] = parsed
 
     reminders: list[Reminder] = []
+    activities_by_day: dict[date, list[str]] = defaultdict(list)
     for row in rows[2:]:
         row_context = clean_text("\n".join(value for value in row[:4] if value.strip()))
         direct_details = direct_details_by_day(row, dates)
@@ -240,9 +242,21 @@ def load_reminders() -> list[Reminder]:
                 continue
             if is_non_activity_note(activity):
                 continue
+            activities_by_day[start_day].append(activity)
             for setup_day, action in reminder_rules(activity, start_day, row_context):
                 detail_raw = direct_detail_for_action(direct_details, setup_day, action)
                 reminders.append(Reminder(setup_day, start_day, action, activity, detail_raw))
+
+    for start_day, activities in activities_by_day.items():
+        weekend = next((item for item in activities if is_weekend_carnival(item)), None)
+        vip_store = next((item for item in activities if is_vip_store_activity(item)), None)
+        if not weekend or not vip_store or any(WEEKEND_VIP_ACTIVITY_LINE in item for item in activities):
+            continue
+
+        vip_server = server_text(vip_store, start_day)
+        linked_activity = f"{WEEKEND_VIP_ACTIVITY_LINE}\n服务器：{vip_server}"
+        for setup_day, action in reminder_rules(weekend, start_day):
+            reminders.append(Reminder(setup_day, start_day, action, linked_activity))
     return reminders
 
 
@@ -281,6 +295,14 @@ def is_non_activity_note(activity: str) -> bool:
 
 def is_marmot_shield_mail(raw: str) -> bool:
     return "土拨鼠" in raw and "罩子" in raw and "邮件" in raw
+
+
+def is_weekend_carnival(raw: str) -> bool:
+    return "周末狂欢" in raw and ("31700" in raw or "32167" in raw)
+
+
+def is_vip_store_activity(raw: str) -> bool:
+    return "VIP商店" in raw
 
 
 def activity_name(raw: str) -> str:
@@ -437,6 +459,8 @@ def regular_activity_id_map() -> dict[str, str]:
 
 
 def display_activity_name(raw: str) -> str:
+    if WEEKEND_VIP_ACTIVITY_LINE in raw:
+        return WEEKEND_VIP_ACTIVITY_LINE
     if is_marmot_shield_mail(raw):
         return MARMOT_SHIELD_MAIL_TITLE
     direct_title = inline_direct_title(raw)

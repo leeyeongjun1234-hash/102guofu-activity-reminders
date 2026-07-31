@@ -6,6 +6,7 @@ from collections import defaultdict
 from datetime import date, timedelta
 from pathlib import Path
 
+from daily_reminder import server_text
 from workday_calendar import adjusted_setup_rules, has_fixed_sunday_setup
 
 
@@ -13,6 +14,7 @@ SOURCE = Path("102国服活动排期表.xlsx")
 OUTPUT = Path("活动设置提醒.tsv")
 YEAR = 2026
 MARMOT_PACKAGE_LINE = "32364: 火力全开：进攻土拨鼠（26/6/30版本）"
+WEEKEND_VIP_ACTIVITY_LINE = "1000198: VIP商店-周末狂欢"
 SPECIAL_SETUP_OVERRIDES = {
     ("32364", date(2026, 7, 26)): date(2026, 7, 24),
     ("1000296", date(2026, 7, 27)): date(2026, 7, 24),
@@ -57,6 +59,14 @@ def normalize_marmot_activity_text(value: str) -> str:
     for line in value.splitlines():
         lines.extend(normalize_marmot_package_line(line))
     return "\n".join(lines)
+
+
+def is_weekend_carnival(raw: str) -> bool:
+    return "周末狂欢" in raw and ("31700" in raw or "32167" in raw)
+
+
+def is_vip_store_activity(raw: str) -> bool:
+    return "VIP商店" in raw
 
 
 def parse_month_day(value: str) -> date | None:
@@ -113,6 +123,7 @@ def main() -> None:
             dates[col] = parsed
 
     reminders: dict[date, list[tuple[date, str, str]]] = defaultdict(list)
+    activities_by_day: dict[date, list[str]] = defaultdict(list)
     for row in rows[2:]:
         row_context = clean_text("\n".join(value for value in row[:4] if value.strip()))
         for col, start_day in dates.items():
@@ -121,8 +132,22 @@ def main() -> None:
             activity = normalize_marmot_activity_text(clean_text(row[col]))
             if not activity:
                 continue
+            activities_by_day[start_day].append(activity)
             for setup_day, action in reminder_rules(activity, start_day, row_context):
                 reminders[setup_day].append((start_day, action, activity))
+
+    for start_day, activities in activities_by_day.items():
+        weekend = next((item for item in activities if is_weekend_carnival(item)), None)
+        vip_store = next((item for item in activities if is_vip_store_activity(item)), None)
+        if not weekend or not vip_store or any(WEEKEND_VIP_ACTIVITY_LINE in item for item in activities):
+            continue
+
+        linked_activity = (
+            f"{WEEKEND_VIP_ACTIVITY_LINE}\n"
+            f"服务器：{server_text(vip_store, start_day)}"
+        )
+        for setup_day, action in reminder_rules(weekend, start_day):
+            reminders[setup_day].append((start_day, action, linked_activity))
 
     with OUTPUT.open("w", encoding="utf-8-sig", newline="") as f:
         writer = csv.writer(f, delimiter="\t", lineterminator="\n")
