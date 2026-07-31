@@ -257,7 +257,7 @@ def load_reminders() -> list[Reminder]:
         linked_activity = f"{WEEKEND_VIP_ACTIVITY_LINE}\n服务器：{vip_server}"
         for setup_day, action in reminder_rules(weekend, start_day):
             reminders.append(Reminder(setup_day, start_day, action, linked_activity))
-    return reminders
+    return merge_weekend_vip_reminders(reminders)
 
 
 def direct_details_by_day(row: list[str], dates: dict[int, date]) -> dict[date, str]:
@@ -303,6 +303,44 @@ def is_weekend_carnival(raw: str) -> bool:
 
 def is_vip_store_activity(raw: str) -> bool:
     return "VIP商店" in raw
+
+
+def is_weekend_vip_activity(raw: str) -> bool:
+    return WEEKEND_VIP_ACTIVITY_LINE in raw
+
+
+def merge_weekend_vip_reminders(reminders: list[Reminder]) -> list[Reminder]:
+    weekend_by_key: dict[tuple[date, date], Reminder] = {}
+    for item in reminders:
+        if is_weekend_carnival(item.raw):
+            weekend_by_key[(item.setup_day, item.start_day)] = item
+
+    linked_keys = {
+        (item.setup_day, item.start_day)
+        for item in reminders
+        if is_weekend_vip_activity(item.raw)
+        and (item.setup_day, item.start_day) in weekend_by_key
+    }
+    merged: list[Reminder] = []
+    for item in reminders:
+        key = (item.setup_day, item.start_day)
+        if is_weekend_carnival(item.raw) and key in linked_keys:
+            continue
+        if is_weekend_vip_activity(item.raw):
+            weekend = weekend_by_key.get(key)
+            if weekend is not None:
+                merged.append(
+                    Reminder(
+                        item.setup_day,
+                        item.start_day,
+                        item.action,
+                        f"{item.raw}\n\n{weekend.raw}",
+                        item.detail_raw,
+                    )
+                )
+                continue
+        merged.append(item)
+    return merged
 
 
 def activity_name(raw: str) -> str:

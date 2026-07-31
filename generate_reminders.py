@@ -6,7 +6,12 @@ from collections import defaultdict
 from datetime import date, timedelta
 from pathlib import Path
 
-from daily_reminder import server_text
+from daily_reminder import (
+    WEEKEND_VIP_ACTIVITY_LINE,
+    is_weekend_carnival,
+    is_vip_store_activity,
+    server_text,
+)
 from workday_calendar import adjusted_setup_rules, has_fixed_sunday_setup
 
 
@@ -14,7 +19,6 @@ SOURCE = Path("102国服活动排期表.xlsx")
 OUTPUT = Path("活动设置提醒.tsv")
 YEAR = 2026
 MARMOT_PACKAGE_LINE = "32364: 火力全开：进攻土拨鼠（26/6/30版本）"
-WEEKEND_VIP_ACTIVITY_LINE = "1000198: VIP商店-周末狂欢"
 SPECIAL_SETUP_OVERRIDES = {
     ("32364", date(2026, 7, 26)): date(2026, 7, 24),
     ("1000296", date(2026, 7, 27)): date(2026, 7, 24),
@@ -144,10 +148,28 @@ def main() -> None:
 
         linked_activity = (
             f"{WEEKEND_VIP_ACTIVITY_LINE}\n"
-            f"服务器：{server_text(vip_store, start_day)}"
+            f"服务器：{server_text(vip_store, start_day)}\n\n"
+            f"{weekend}"
         )
         for setup_day, action in reminder_rules(weekend, start_day):
             reminders[setup_day].append((start_day, action, linked_activity))
+
+    linked_weekend_days = {
+        start_day
+        for start_day, activities in activities_by_day.items()
+        if any(is_weekend_carnival(item) for item in activities)
+        and any(is_vip_store_activity(item) for item in activities)
+    }
+    for setup_day, entries in reminders.items():
+        reminders[setup_day] = [
+            entry
+            for entry in entries
+            if not (
+                entry[0] in linked_weekend_days
+                and is_weekend_carnival(entry[2])
+                and WEEKEND_VIP_ACTIVITY_LINE not in entry[2]
+            )
+        ]
 
     with OUTPUT.open("w", encoding="utf-8-sig", newline="") as f:
         writer = csv.writer(f, delimiter="\t", lineterminator="\n")
