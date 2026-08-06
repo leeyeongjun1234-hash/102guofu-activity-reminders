@@ -630,6 +630,8 @@ def raw_server_text(raw: str, start_day: date | None = None) -> str:
     raw_one_line = " ".join(scope_raw.split())
     if re.search(r"服务器[:：]\s*全服", raw_one_line):
         return "全服"
+    if any(line.strip() == "全服" for line in scope_raw.splitlines()):
+        return "全服"
 
     explicit_servers = []
     for line in scope_raw.splitlines():
