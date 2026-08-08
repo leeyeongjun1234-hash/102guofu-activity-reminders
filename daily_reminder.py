@@ -41,6 +41,11 @@ MARMOT_MAIL_ITEMS = [
 ]
 WEEKEND_VIP_ACTIVITY_LINE = "1000198: VIP商店-周末狂欢"
 CODED_TITLE_RE = re.compile(r"^\s*(\d{5,7})\s*[:：]\s*(.+)$")
+EXPLICIT_TIME_RANGE_RE = re.compile(
+    r"(?P<start>\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2}:\d{2})\s*"
+    r"(?:~|～|——|—|–|----)\s*"
+    r"(?P<end>\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2}:\d{2})"
+)
 DIRECT_ACTION_NAMES = {"礼包+分组预设+活动确认", "活动预设+公布分组"}
 SPECIAL_SETUP_OVERRIDES = {
     ("32364", date(2026, 7, 26)): date(2026, 7, 24),
@@ -524,12 +529,19 @@ def duration_for(name: str, raw: str) -> tuple[str, int | None]:
         return "10年", None
     for line in raw.splitlines():
         line = line.strip()
-        if not line.startswith("时间："):
+        if not line.startswith(("时间：", "开启时间：")):
             continue
         explicit_duration = re.search(r"[（(]\s*(\d+)\s*天\s*[)）]", line)
         if explicit_duration:
             days = int(explicit_duration.group(1))
             return f"{days}天", days
+        explicit_range = EXPLICIT_TIME_RANGE_RE.search(line)
+        if explicit_range:
+            start = datetime.strptime(explicit_range.group("start"), "%Y-%m-%d %H:%M:%S")
+            end = datetime.strptime(explicit_range.group("end"), "%Y-%m-%d %H:%M:%S")
+            days = round((end - start).total_seconds() / 86400)
+            if days > 0:
+                return f"{days}天", days
     for key, label, days in DURATIONS:
         if key in name or key in raw:
             return label, days
