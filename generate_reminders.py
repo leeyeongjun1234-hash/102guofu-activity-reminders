@@ -86,6 +86,9 @@ def reminder_rules(activity: str, start_day: date, row_context: str = "") -> lis
         if activity_id in context and start_day == special_start_day:
             return [(SPECIAL_SETUP_OVERRIDES[(activity_id, special_start_day)], "设置活动")]
 
+    if "特化蚁对决" in activity:
+        return [(start_day - timedelta(days=1), "设置活动")]
+
     if has_fixed_sunday_setup(activity, row_context):
         rules = [(week_monday(start_day) - timedelta(days=1), "设置活动")]
     elif "区域迁徙" in activity:
