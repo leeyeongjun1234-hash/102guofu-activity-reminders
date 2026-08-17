@@ -352,6 +352,8 @@ def merge_weekend_vip_reminders(reminders: list[Reminder]) -> list[Reminder]:
 
 
 def activity_name(raw: str) -> str:
+    if re.match(r"^\s*1000151\s*[:：]", raw):
+        return "蚁巢装扮兑换商店"
     if "功勋商店" in raw:
         return "延长功勋商店 / 功勋商店"
     if "战斗礼包" in raw or "最强限定：战斗特供" in raw:
