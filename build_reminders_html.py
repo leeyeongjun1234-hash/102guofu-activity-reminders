@@ -9,6 +9,7 @@ from textwrap import dedent
 from zoneinfo import ZoneInfo
 
 from daily_reminder import (
+    GENERIC_PACKAGE_LINE_RE,
     MARMOT_MAIL_ITEMS,
     MARMOT_PACKAGE_LINE,
     Reminder,
@@ -173,15 +174,29 @@ def marmot_shield_mail_details(item: Reminder) -> str:
     """
 
 
-def following_line_details(lines: list[str], prefixes: tuple[str, ...]) -> list[str]:
-    details: list[str] = []
-    for index, line in enumerate(lines):
-        if not line.startswith(prefixes):
-            continue
-        details.append(line)
-        if index + 1 < len(lines) and lines[index + 1].startswith("时间："):
-            details.append(raw_time_range(lines[index + 1]))
-    return details
+def package_segments(raw: str) -> list[list[str]]:
+    """按空行切分单元格，返回其中含礼包行的分段（每段已去掉空行）。"""
+    segments: list[list[str]] = []
+    for block in re.split(r"\n\s*\n", raw):
+        segment = [line.strip() for line in block.splitlines() if line.strip()]
+        if any(GENERIC_PACKAGE_LINE_RE.match(line) for line in segment):
+            segments.append(segment)
+    return segments
+
+
+def package_id_lines(lines: list[str]) -> list[str]:
+    """取出行中所有礼包行（5~6 位 ID 开头），不依赖具体 ID 批次。"""
+    return [line for line in lines if GENERIC_PACKAGE_LINE_RE.match(line)]
+
+
+def has_per_item_time(segment: list[str]) -> bool:
+    """分段内时间行是否与礼包行一一对应（每日免费礼包的特征）。
+
+    付费分段只在末尾共用一条时间行，时间行数会少于礼包行数，据此区分。
+    """
+    package_count = sum(1 for line in segment if GENERIC_PACKAGE_LINE_RE.match(line))
+    time_count = sum(1 for line in segment if line.startswith(("时间：", "开启时间：")))
+    return package_count > 0 and time_count >= package_count
 
 
 def package_details(item: Reminder) -> str:
@@ -193,9 +208,10 @@ def package_details(item: Reminder) -> str:
         f"时间：{time_range(item.start_day, duration_label, days, name)}",
     ]
 
-    if name == "蜂群宝藏" and "29811" in item.raw:
-        package_lines = [line for line in lines if line.startswith(("29811", "29812", "29813", "29814"))]
-        return package_section("配套礼包", package_lines, [*default_details, "每日刷新，新服不自动开启"])
+    if name == "蜂群宝藏":
+        package_lines = package_id_lines(lines)
+        if package_lines:
+            return package_section("配套礼包", package_lines, [*default_details, "每日刷新，新服不自动开启"])
 
     if name in THEME_PACKAGES:
         return package_section(
@@ -204,94 +220,105 @@ def package_details(item: Reminder) -> str:
             [*default_details, "每日刷新：是", "新服自动开启：否"],
         )
 
-    if name == "惊喜转盘" and "31444" in item.raw:
-        package_lines = [line for line in lines if line.startswith(("31444", "31445", "31446", "31447"))]
-        details = [
-            raw_server_text(next((line for line in lines if line.startswith("服务器：")), default_details[0])),
-            "新服不自动开，每日不刷新",
-            raw_time_range(next((line for line in lines if line.startswith("时间：")), default_details[1])),
-        ]
-        return package_section("配套礼包", package_lines, details)
+    if name == "惊喜转盘":
+        package_lines = package_id_lines(lines)
+        if package_lines:
+            details = [
+                raw_server_text(next((line for line in lines if line.startswith("服务器：")), default_details[0])),
+                "新服不自动开，每日不刷新",
+                raw_time_range(next((line for line in lines if line.startswith("时间：")), default_details[1])),
+            ]
+            return package_section("配套礼包", package_lines, details)
 
-    if name == "无限寻宝" and "32134" in item.raw:
-        package_lines = [line for line in lines if line.startswith("32134")]
-        package_index = next((index for index, line in enumerate(lines) if line.startswith("32134")), -1)
-        package_details = []
-        if package_index >= 0:
+    if name == "无限寻宝":
+        package_lines = package_id_lines(lines)
+        if package_lines:
+            package_index = lines.index(package_lines[0])
             package_details = [
                 raw_server_text(line) if line.startswith("服务器：") else f"时间：{raw_time_range(line)}" if line.startswith("时间：") else line
                 for line in lines[package_index + 1 :]
                 if line.startswith(("服务器：", "时间：", "每日刷新"))
             ]
-        return package_section("配套礼包", package_lines, package_details or default_details)
+            return package_section("配套礼包", package_lines, package_details or default_details)
 
     if name == "双倍盛典":
-        giant_offer_lines = [line for line in lines if line.startswith(("32244", "32245", "32246"))]
-        limited_offer_lines = [line for line in lines if line.startswith(("32173", "31924", "31925", "31926"))]
         package_time = next((line for line in reversed(lines) if line.startswith("时间：")), "")
         details = ["服务器：" + server_text(item.raw, item.start_day)]
         if package_time:
             details.append(raw_time_range(package_time))
         details.append("新服不自动开启，每日不刷新")
 
+        # 单元格内以空行分隔的顺序分组：前者双倍巨献特惠，后者盛典限定
         sections = []
-        if giant_offer_lines:
-            sections.append(package_section("双倍巨献特惠", giant_offer_lines, details))
-        if limited_offer_lines:
-            sections.append(package_section("盛典限定", limited_offer_lines, details))
+        for title, segment in zip(("双倍巨献特惠", "盛典限定"), package_segments(item.raw)):
+            package_lines = package_id_lines(segment)
+            if package_lines:
+                sections.append(package_section(title, package_lines, details))
         return "\n".join(sections)
 
-    if name == "落潮海岸" and any(package_id in item.raw for package_id in ("32346", "29681")):
-        five_day_lines = [
-            line
-            for line in lines
-            if line.startswith(("32346", "32347", "32348", "32351", "29681", "29682", "29683", "31937", "31938", "29686"))
-        ]
-        six_day_lines = [line for line in lines if line.startswith(("32345", "29680"))]
-        five_day_details = ["服务器：" + server_text(item.raw, item.start_day)]
-        five_day_time = next((line for line in lines if line.startswith("开启时间：")), "")
-        if five_day_time:
-            five_day_details.append(raw_time_range(five_day_time))
-        five_day_details.append("每日刷新：是，新服自动开启：否")
-        six_day_details = ["服务器：" + server_text(item.raw, item.start_day)]
-        six_day_time = next((line for line in lines if line.startswith("时间：") and "（6天）" in line), "")
-        if six_day_time:
-            six_day_details.append(raw_time_range(six_day_time))
-        six_day_details.append("每日刷新：是，新服自动开启：否")
-        return "\n".join(
-            [
-                package_section("每日刷新礼包（5天）", five_day_lines, five_day_details),
-                package_section("每日刷新礼包（6天）", six_day_lines, six_day_details),
-            ]
-        )
+    if name == "落潮海岸":
+        five_day_lines: list[str] = []
+        six_day_lines: list[str] = []
+        for segment in package_segments(item.raw):
+            package_lines = package_id_lines(segment)
+            if not package_lines:
+                continue
+            # 分段内时间行标注（6天）的归入 6 天礼包，其余归入 5 天礼包
+            if any("（6天）" in line or "(6天)" in line for line in segment):
+                six_day_lines.extend(package_lines)
+            else:
+                five_day_lines.extend(package_lines)
+        if five_day_lines or six_day_lines:
+            five_day_details = ["服务器：" + server_text(item.raw, item.start_day)]
+            five_day_time = next((line for line in lines if line.startswith("开启时间：")), "")
+            if five_day_time:
+                five_day_details.append(raw_time_range(five_day_time))
+            five_day_details.append("每日刷新：是，新服自动开启：否")
+            six_day_details = ["服务器：" + server_text(item.raw, item.start_day)]
+            six_day_time = next((line for line in lines if line.startswith("时间：") and "（6天）" in line), "")
+            if six_day_time:
+                six_day_details.append(raw_time_range(six_day_time))
+            six_day_details.append("每日刷新：是，新服自动开启：否")
+            return "\n".join(
+                [
+                    package_section("每日刷新礼包（5天）", five_day_lines, five_day_details),
+                    package_section("每日刷新礼包（6天）", six_day_lines, six_day_details),
+                ]
+            )
 
-    if name == "蚁群派对" and "29750" in item.raw:
-        package_lines = [
-            line
-            for line in lines
-            if line.startswith(("29750", "29751", "29752", "29753", "31975", "31976", "29734"))
-        ]
-        details = ["服务器：" + server_text(item.raw, item.start_day)]
-        package_time = next((line for line in lines if re.match(r"^\d{4}-\d{2}-\d{2} ", line)), "")
-        if package_time:
-            details.append(raw_time_range(package_time))
-        details.append("每日刷新，新服不自动开启")
-        return package_section("配套礼包", package_lines, details)
+    if name == "蚁群派对":
+        package_lines = package_id_lines(lines)
+        if package_lines:
+            details = ["服务器：" + server_text(item.raw, item.start_day)]
+            package_time = next((line for line in lines if re.match(r"^\d{4}-\d{2}-\d{2} ", line)), "")
+            if package_time:
+                details.append(raw_time_range(package_time))
+            details.append("每日刷新，新服不自动开启")
+            return package_section("配套礼包", package_lines, details)
 
     if name == "蚁群狂欢":
-        free_lines = following_line_details(lines, ("31714", "31715", "31716"))
-        paid_lines = [line for line in lines if line.startswith(("32295", "32163", "32164", "32165", "32166"))]
+        server_line = "服务器：" + server_text(item.raw, item.start_day)
         sections = []
-        if free_lines:
-            sections.append(package_section("免费礼包", free_lines, ["服务器：" + server_text(item.raw, item.start_day)]))
-        if paid_lines:
-            detail_time = next((line for line in lines if line.startswith("时间：") and "----" in line), "")
-            details = ["服务器：" + server_text(item.raw, item.start_day)]
-            if detail_time:
-                details.append(raw_time_range(detail_time))
+        for segment in package_segments(item.raw):
+            if has_per_item_time(segment):
+                # 每条礼包各带一条时间 → 每日免费礼包，时间行随礼包一起展示
+                daily_lines = [
+                    raw_time_range(line) if line.startswith(("时间：", "开启时间：")) else line
+                    for line in segment
+                    if not line.startswith("服务器")
+                ]
+                sections.append(package_section("免费礼包", daily_lines, [server_line]))
+                continue
+            # 时间行不在各礼包之后 → 付费礼包，共用一条时间
+            package_lines = [line for line in segment if GENERIC_PACKAGE_LINE_RE.match(line)]
+            details = [server_line]
+            details.extend(
+                raw_time_range(line) for line in segment if line.startswith(("时间：", "开启时间："))
+            )
             details.append("新服不自动开启，每日不刷新")
-            sections.append(package_section("付费礼包", paid_lines, details))
-        return "\n".join(sections)
+            sections.append(package_section("付费礼包", package_lines, details))
+        if sections:
+            return "\n".join(sections)
 
     # 通用识别：活动内容下方的礼包分组（5~6 位 ID 行）
     generic_sections = []
