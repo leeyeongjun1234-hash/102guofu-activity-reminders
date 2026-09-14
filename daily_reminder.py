@@ -418,6 +418,17 @@ def inline_coded_title(raw: str) -> str | None:
     return None
 
 
+def activity_note(raw: str) -> str:
+    """提取单元格首行的括号说明（如「（活动不需要在平台设置）」），用于展示在活动标题旁。"""
+    lines = nonempty_lines(raw)
+    if not lines:
+        return ""
+    m = re.search(r"[（(]([^（）()]*不需要在平台设置[^（）()]*)[）)]", lines[0])
+    if m:
+        return f"（{m.group(1)}）"
+    return ""
+
+
 def generic_package_blocks(raw: str) -> list[tuple[list[str], list[str]]]:
     """通用识别活动内容下方的配套礼包分组。
 
@@ -435,12 +446,19 @@ def generic_package_blocks(raw: str) -> list[tuple[list[str], list[str]]]:
         display: list[str] = []
         details: list[str] = []
         for index, line in enumerate(lines):
+            next_line = lines[index + 1] if index + 1 < len(lines) else ""
+            # 标题前的章节名/说明行（如「第1章（活动不需要在平台设置）」）：标题已用其下的 7 位编号行展示，此处跳过
+            if (
+                not ACTIVITY_CODE_LINE_RE.match(line)
+                and not GENERIC_PACKAGE_LINE_RE.match(line)
+                and ACTIVITY_CODE_LINE_RE.match(next_line)
+            ):
+                continue
             if ACTIVITY_CODE_LINE_RE.match(line):
                 continue  # 活动标题行，卡片已单独展示
             if GENERIC_PACKAGE_LINE_RE.match(line):
                 display.append(line)
                 continue
-            next_line = lines[index + 1] if index + 1 < len(lines) else ""
             if line.startswith("服务器") and GENERIC_PACKAGE_LINE_RE.match(next_line):
                 display.append(line)  # 分组服务器行，保留在礼包列表中
             elif line.startswith(PACKAGE_META_PREFIXES) or re.match(r"^\d{4}-\d{2}-\d{2}", line):
@@ -858,6 +876,9 @@ def render(reminders: list[Reminder], target: date) -> str:
             continue
 
         name = display_activity_name(item.raw)
+        note = activity_note(item.raw)
+        if note:
+            name = f"{name}{note}"
         base_name = activity_name(item.raw)
         duration_label, days = duration_for(base_name, item.raw)
         action_line = "" if item.action == "设置活动" else f"{item.action}\n"

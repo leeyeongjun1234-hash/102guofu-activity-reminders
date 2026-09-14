@@ -14,6 +14,7 @@ from daily_reminder import (
     MARMOT_PACKAGE_LINE,
     Reminder,
     activity_name,
+    activity_note,
     compact_one_day_range,
     custom_reminder_lines,
     display_activity_name,
@@ -362,6 +363,9 @@ def render_card(item: Reminder) -> str:
         """
 
     name = display_activity_name(item.raw)
+    note = activity_note(item.raw)
+    if note:
+        name = f"{name}{note}"
     if is_marmot_shield_mail(item.raw):
         action = "" if item.action == "设置活动" else f'<div class="meta action">{escape(item.action)}</div>'
         return f"""
@@ -393,7 +397,9 @@ def summary_display_name(item: Reminder) -> str:
         if len(custom_lines) > 1 and custom_lines[1].startswith(("100", "190", "291")):
             return custom_lines[1]
         return custom_lines[0]
-    return display_activity_name(item.raw)
+    name = display_activity_name(item.raw)
+    note = activity_note(item.raw)
+    return f"{name}{note}" if note else name
 
 
 def render_summary(
