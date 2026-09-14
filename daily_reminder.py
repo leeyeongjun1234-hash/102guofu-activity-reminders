@@ -399,6 +399,25 @@ ACTIVITY_CODE_LINE_RE = re.compile(r"^\s*\d{7}\s*[:：]")
 PACKAGE_META_PREFIXES = ("服务器", "时间", "开启时间", "每日刷新", "新服")
 
 
+def inline_coded_title(raw: str) -> str | None:
+    """首行是说明性文字（本身不带活动编号）时，改用其下第一个带编号的标题行。
+
+    例如「第1章（活动不需要在平台设置）\\n1000365: 欢庆四周年第1章\\n32466: ...」
+    的标题应为 `1000365: 欢庆四周年第1章`，而不是被 generic 清洗成「第」。
+
+    只认 7 位**活动**编号（ACTIVITY_CODE_LINE_RE），以免把 5~6 位的礼包行当成标题。
+    """
+    lines = nonempty_lines(raw)
+    if len(lines) < 2 or ACTIVITY_CODE_LINE_RE.match(lines[0]):
+        return None
+    for line in lines[1:]:
+        if ACTIVITY_CODE_LINE_RE.match(line):
+            return line
+        if GENERIC_PACKAGE_LINE_RE.match(line):
+            break
+    return None
+
+
 def generic_package_blocks(raw: str) -> list[tuple[list[str], list[str]]]:
     """通用识别活动内容下方的配套礼包分组。
 
@@ -517,6 +536,9 @@ def display_activity_name(raw: str) -> str:
     direct_title = inline_direct_title(raw)
     if direct_title:
         return direct_title
+    coded_title = inline_coded_title(raw)
+    if coded_title:
+        return coded_title
     name = activity_name(raw)
     if name in DISPLAY_NAME_OVERRIDES:
         return DISPLAY_NAME_OVERRIDES[name]
@@ -650,7 +672,7 @@ def raw_server_text(raw: str, start_day: date | None = None) -> str:
     raw_one_line = " ".join(scope_raw.split())
     if re.search(r"服务器[:：]\s*全服", raw_one_line):
         return "全服"
-    if any(line.strip() == "全服" for line in scope_raw.splitlines()):
+    if any(re.match(r"全服\s*(?:[，,。;；]|$)", line.strip()) for line in raw.splitlines()):
         return "全服"
 
     explicit_servers = []
