@@ -155,8 +155,12 @@ def marmot_shield_mail_details(item: Reminder) -> str:
     active_range = compact_one_day_range(item.start_day)
     mail_time_text = marmot_shield_mail_text(item.start_day).splitlines()[5].replace("邮件，赛季外，定时：", "")
     mail_rows = "\n".join(f'<div>{render_coded_line(line)}</div>' for line in MARMOT_MAIL_ITEMS)
+    # 排期表的「土拨鼠、罩子、邮件」单元格补了区服范围（如 "土拨鼠、罩子、邮件 1~866"）才显示服务器行；
+    # 单元格没写范围时 server_text 返回「排期表未标明」，此时维持原样不显示。
+    server = server_text(item.raw, item.start_day)
+    server_row = "" if server == "排期表未标明" else f'{render_labeled_meta("服务器", server)}\n'
     return f"""
-      <div class="package-block package-block-package">
+{server_row}      <div class="package-block package-block-package">
         <div class="package-title">土拨鼠服</div>
         <div class="package-lines"><div>{render_coded_line(MARMOT_PACKAGE_LINE)}</div></div>
         <div class="meta">时间：{escape(active_range)} UTC+8</div>
