@@ -62,6 +62,11 @@ def raw_server_text(line: str) -> str:
     return line
 
 
+def coded_text_key(value: str) -> str:
+    """比较用归一化：忽略全/半角冒号、不换行空格与空白差异。"""
+    return re.sub(r"\s+", "", value.replace("：", ":").replace("\xa0", ""))
+
+
 def leading_code_kind(value: str) -> str:
     match = CODED_LINE_RE.match(value.strip())
     if not match:
@@ -325,8 +330,12 @@ def package_details(item: Reminder) -> str:
             return "\n".join(sections)
 
     # 通用识别：活动内容下方的礼包分组（5~6 位 ID 行）
+    card_title = coded_text_key(display_activity_name(item.raw))
     generic_sections = []
     for display, detail_lines in generic_package_blocks(item.raw):
+        # 整段内容就是卡片标题本身时，不再作为配套礼包重复展示一次
+        if all(coded_text_key(line) == card_title for line in display):
+            continue
         details = []
         for line in detail_lines:
             if line.startswith("服务器"):
