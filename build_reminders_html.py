@@ -44,10 +44,19 @@ CODE_KIND_LABELS = {
     "activity": "活动",
     "package": "礼包",
 }
+HIDDEN_ACTIVITY_IDS = {"1000366"}
 
 
 def sort_key(item: Reminder) -> tuple[date, str, str]:
     return (item.start_day, activity_name(item.raw), item.raw)
+
+
+def is_hidden_activity(item: Reminder) -> bool:
+    return any(
+        re.match(rf"^\s*{re.escape(activity_id)}\s*[:：]", line)
+        for activity_id in HIDDEN_ACTIVITY_IDS
+        for line in item.raw.splitlines()
+    )
 
 
 def raw_time_range(line: str) -> str:
@@ -1198,7 +1207,7 @@ def build_html(reminders: list[Reminder]) -> str:
 
 
 def main() -> None:
-    reminders = load_reminders()
+    reminders = [item for item in load_reminders() if not is_hidden_activity(item)]
     html = build_html(reminders)
     OUTPUT.write_text(html, encoding="utf-8")
     ROOT_OUTPUT.write_text(html, encoding="utf-8")
