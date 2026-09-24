@@ -8,8 +8,10 @@ from pathlib import Path
 
 from daily_reminder import (
     WEEKEND_VIP_ACTIVITY_LINE,
+    is_structure_note,
     is_weekend_carnival,
     is_vip_store_activity,
+    parse_month_day_row,
     server_text,
 )
 from workday_calendar import adjusted_setup_rules, has_fixed_sunday_setup
@@ -17,7 +19,6 @@ from workday_calendar import adjusted_setup_rules, has_fixed_sunday_setup
 
 SOURCE = Path("102国服活动排期表.xlsx")
 OUTPUT = Path("活动设置提醒.tsv")
-YEAR = 2026
 MARMOT_PACKAGE_LINE = "32364: 火力全开：进攻土拨鼠（26/6/30版本）"
 SPECIAL_SETUP_OVERRIDES = {
     ("32364", date(2026, 7, 26)): date(2026, 7, 24),
@@ -74,13 +75,6 @@ def is_vip_store_activity(raw: str) -> bool:
     return "VIP商店" in raw
 
 
-def parse_month_day(value: str) -> date | None:
-    match = re.fullmatch(r"\s*(\d{1,2})月(\d{1,2})日\s*", value or "")
-    if not match:
-        return None
-    return date(YEAR, int(match.group(1)), int(match.group(2)))
-
-
 def reminder_rules(activity: str, start_day: date, row_context: str = "") -> list[tuple[date, str]]:
     context = f"{activity}\n{row_context}"
     for activity_id, special_start_day in SPECIAL_SETUP_OVERRIDES:
@@ -124,11 +118,7 @@ def main() -> None:
     if len(rows) < 2:
         raise SystemExit("排期表缺少日期行")
 
-    dates: dict[int, date] = {}
-    for col, value in enumerate(rows[1]):
-        parsed = parse_month_day(value)
-        if parsed:
-            dates[col] = parsed
+    dates = parse_month_day_row(rows[1])
 
     reminders: dict[date, list[tuple[date, str, str]]] = defaultdict(list)
     activities_by_day: dict[date, list[str]] = defaultdict(list)
@@ -138,7 +128,7 @@ def main() -> None:
             if col >= len(row):
                 continue
             activity = normalize_marmot_activity_text(clean_text(row[col]))
-            if not activity:
+            if not activity or is_structure_note(activity):
                 continue
             activities_by_day[start_day].append(activity)
             for setup_day, action in reminder_rules(activity, start_day, row_context):
