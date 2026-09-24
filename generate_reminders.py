@@ -23,6 +23,7 @@ SPECIAL_SETUP_OVERRIDES = {
     ("32364", date(2026, 7, 26)): date(2026, 7, 24),
     ("1000296", date(2026, 7, 27)): date(2026, 7, 24),
     ("1000927", date(2026, 7, 27)): date(2026, 7, 25),
+    ("1000927", date(2026, 9, 28)): date(2026, 9, 24),
     ("进化连冲", date(2026, 9, 7)): date(2026, 9, 5),
 }
 
@@ -74,11 +75,28 @@ def is_vip_store_activity(raw: str) -> bool:
     return "VIP商店" in raw
 
 
-def parse_month_day(value: str) -> date | None:
+def parse_month_day(value: str, year: int = YEAR) -> date | None:
     match = re.fullmatch(r"\s*(\d{1,2})月(\d{1,2})日\s*", value or "")
     if not match:
         return None
-    return date(YEAR, int(match.group(1)), int(match.group(2)))
+    return date(year, int(match.group(1)), int(match.group(2)))
+
+
+def parse_schedule_dates(values: list[str]) -> dict[int, date]:
+    """按日期表头的顺序推断跨年日期，支持跨多个年份的排期表。"""
+    dates: dict[int, date] = {}
+    current_year = YEAR
+    previous_month: int | None = None
+    for col, value in enumerate(values):
+        match = re.fullmatch(r"\s*(\d{1,2})月(\d{1,2})日\s*", value or "")
+        if not match:
+            continue
+        month = int(match.group(1))
+        if previous_month is not None and month < previous_month:
+            current_year += 1
+        dates[col] = parse_month_day(value, current_year)  # type: ignore[assignment]
+        previous_month = month
+    return dates
 
 
 def reminder_rules(activity: str, start_day: date, row_context: str = "") -> list[tuple[date, str]]:
@@ -124,11 +142,7 @@ def main() -> None:
     if len(rows) < 2:
         raise SystemExit("排期表缺少日期行")
 
-    dates: dict[int, date] = {}
-    for col, value in enumerate(rows[1]):
-        parsed = parse_month_day(value)
-        if parsed:
-            dates[col] = parsed
+    dates = parse_schedule_dates(rows[1])
 
     reminders: dict[date, list[tuple[date, str, str]]] = defaultdict(list)
     activities_by_day: dict[date, list[str]] = defaultdict(list)
