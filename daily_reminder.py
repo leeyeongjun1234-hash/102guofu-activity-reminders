@@ -10,7 +10,6 @@ from dataclasses import dataclass
 from datetime import date, datetime, timedelta
 from pathlib import Path
 from xml.etree import ElementTree as ET
-from zoneinfo import ZoneInfo
 
 from workday_calendar import adjusted_setup_rules, has_fixed_sunday_setup
 
@@ -18,6 +17,7 @@ from workday_calendar import adjusted_setup_rules, has_fixed_sunday_setup
 SOURCE = Path("102国服活动排期表.xlsx")
 OUTPUT = Path("每日活动提醒.txt")
 ACTIVITY_MAPPING_SOURCE = Path("活动与礼包对应关系.xlsx")
+YEAR = 2026
 FORCED_ACTIVITY_ID_NAMES = {"落潮海岸", "黑骑士", "珍宝商店", "自选周卡", "特化蚁对决", "蚁后对决"}
 EIGHT_FIFTEEN_ACTIVITIES = {"特化蚁对决", "蚁后对决"}
 EVOLUTION_RECHARGE_ACTIVITY_LINES = [
@@ -181,50 +181,11 @@ def direct_action_name(value: str) -> str:
     return normalized if normalized in DIRECT_ACTION_NAMES else ""
 
 
-def parse_month_day_row(cells: list[str]) -> dict[int, date]:
-    """按表头逐列推算日期。
-
-    表头只写“X月X日”不带年份，相邻列严格相隔一天，
-    因此先用最接近今天的那一年给首列定年，之后逐列递增，跨年自动进位。
-    """
-    parsed: dict[int, date] = {}
-    current: date | None = None
-    for col, value in enumerate(cells):
-        match = re.fullmatch(r"\s*(\d{1,2})月(\d{1,2})日\s*", value or "")
-        if not match:
-            continue
-        month, day = int(match.group(1)), int(match.group(2))
-        if current is None:
-            current = nearest_year_date(month, day)
-        else:
-            candidate = date(current.year, month, day)
-            if candidate < current:
-                candidate = date(current.year + 1, month, day)
-            current = candidate
-        parsed[col] = current
-    return parsed
-
-
-def nearest_year_date(month: int, day: int) -> date:
-    """取与今天最接近的那一年，用于给表头首列定年。"""
-    today = datetime.now(ZoneInfo("Asia/Shanghai")).date()
-    candidates = []
-    for year in (today.year - 1, today.year, today.year + 1):
-        try:
-            candidates.append(date(year, month, day))
-        except ValueError:
-            continue
-    if not candidates:
-        raise SystemExit(f"排期表首列表头日期无效：{month}月{day}日")
-    return min(candidates, key=lambda item: abs((item - today).days))
-
-
-STRUCTURE_NOTE_PATTERN = re.compile(r"(?:\d{1,4}|第\d{1,3}周)")
-
-
-def is_structure_note(activity: str) -> bool:
-    """“第几天/第几周”这类计数标注（开服天数、开服周数、野怪孵化周）不是活动，跳过。"""
-    return bool(STRUCTURE_NOTE_PATTERN.fullmatch(activity))
+def parse_month_day(value: str) -> date | None:
+    match = re.fullmatch(r"\s*(\d{1,2})月(\d{1,2})日\s*", value or "")
+    if not match:
+        return None
+    return date(YEAR, int(match.group(1)), int(match.group(2)))
 
 
 def parse_query_date(value: str | None) -> date:
@@ -273,7 +234,11 @@ def load_reminders() -> list[Reminder]:
     with SOURCE.open("r", encoding="utf-8-sig", newline="") as f:
         rows = list(csv.reader(f, delimiter="\t"))
 
-    dates = parse_month_day_row(rows[1])
+    dates: dict[int, date] = {}
+    for col, value in enumerate(rows[1]):
+        parsed = parse_month_day(value)
+        if parsed:
+            dates[col] = parsed
 
     reminders: list[Reminder] = []
     activities_by_day: dict[date, list[str]] = defaultdict(list)
@@ -287,8 +252,6 @@ def load_reminders() -> list[Reminder]:
             if not activity:
                 continue
             if is_non_activity_note(activity):
-                continue
-            if is_structure_note(activity):
                 continue
             activities_by_day[start_day].append(activity)
             for setup_day, action in reminder_rules(activity, start_day, row_context):
