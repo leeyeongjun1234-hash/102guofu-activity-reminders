@@ -13,6 +13,8 @@ CALENDAR_SHEET_NAME = "每日明细"
 FIXED_REST_DAY_SETUP_IDS = {"1000905", "1000927"}
 FIXED_SUNDAY_SETUP_IDS = {"1000927"}
 FIXED_REST_DAY_SETUP_KEYWORDS = {"国服-拯救蚜虫-跨服", "飞蜥之战"}
+# 2026 年国庆档期临时按原始设置日执行，不提前到节前工作日；10 月 8 日起恢复常规休息日调整。
+REST_DAY_ADJUSTMENT_EXEMPT_RANGE = (date(2026, 10, 1), date(2026, 10, 7))
 
 NS = {
     "a": "http://schemas.openxmlformats.org/spreadsheetml/2006/main",
@@ -196,4 +198,8 @@ def adjusted_setup_rules(
 ) -> list[tuple[date, str]]:
     if has_fixed_rest_day_setup(activity, row_context):
         return rules
-    return [(previous_workday(setup_day), action) for setup_day, action in rules]
+    exempt_start, exempt_end = REST_DAY_ADJUSTMENT_EXEMPT_RANGE
+    return [
+        (setup_day if exempt_start <= setup_day <= exempt_end else previous_workday(setup_day), action)
+        for setup_day, action in rules
+    ]
