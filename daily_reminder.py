@@ -48,6 +48,7 @@ EXPLICIT_TIME_RANGE_RE = re.compile(
 )
 DIRECT_ACTION_NAMES = {"礼包+分组预设+活动确认", "活动预设+公布分组"}
 SPECIAL_SETUP_OVERRIDES = {
+    ("土拨鼠、罩子、邮件", date(2026, 10, 11)): date(2026, 10, 10),
     ("32364", date(2026, 7, 26)): date(2026, 7, 24),
     ("1000296", date(2026, 7, 27)): date(2026, 7, 24),
     ("1000927", date(2026, 7, 27)): date(2026, 7, 25),
