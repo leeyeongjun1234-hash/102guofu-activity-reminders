@@ -45,6 +45,16 @@ CODE_KIND_LABELS = {
     "package": "礼包",
 }
 HIDDEN_ACTIVITY_IDS = {"1000366"}
+# 临时隐藏指定批次，保留原始排期及其他月份的同名活动。
+HIDDEN_ACTIVITY_IDS_BY_START_DAY = {
+    date(2026, 10, 13): {"1000312", "1000150", "1000151"},
+}
+HIDDEN_ACTIVITY_NAMES_BY_START_DAY = {
+    date(2026, 10, 13): {"一口价更新第五代"},
+}
+HIDDEN_ACTIVITY_META_BY_START_DAY = {
+    date(2026, 10, 13): {"周年庆第五章"},
+}
 
 
 def sort_key(item: Reminder) -> tuple[date, str, str]:
@@ -52,9 +62,13 @@ def sort_key(item: Reminder) -> tuple[date, str, str]:
 
 
 def is_hidden_activity(item: Reminder) -> bool:
+    if item.raw.strip() in HIDDEN_ACTIVITY_NAMES_BY_START_DAY.get(item.start_day, set()):
+        return True
+
+    hidden_ids = HIDDEN_ACTIVITY_IDS | HIDDEN_ACTIVITY_IDS_BY_START_DAY.get(item.start_day, set())
     return any(
         re.match(rf"^\s*{re.escape(activity_id)}\s*[:：]", line)
-        for activity_id in HIDDEN_ACTIVITY_IDS
+        for activity_id in hidden_ids
         for line in item.raw.splitlines()
     )
 
@@ -389,13 +403,19 @@ def render_card(item: Reminder) -> str:
     duration_label, days = duration_for(base_name, item.raw)
     action = "" if item.action == "设置活动" else f'<div class="meta action">{escape(item.action)}</div>'
     packages = package_details(item)
+    activity_meta = ""
+    if base_name not in HIDDEN_ACTIVITY_META_BY_START_DAY.get(item.start_day, set()):
+        activity_meta = (
+            "      " + render_server_meta(base_name, server_text(item.raw, item.start_day))
+            + "\n      "
+            + render_labeled_meta("时间", time_range(item.start_day, duration_label, days, base_name))
+            + "\n"
+        )
     return f"""
     <article class="card{card_code_class(name)}">
       <h3 class="activity-name">{render_activity_name_lines(name)}</h3>
       {action}
-      {render_server_meta(base_name, server_text(item.raw, item.start_day))}
-      {render_labeled_meta("时间", time_range(item.start_day, duration_label, days, base_name))}
-      {packages}
+{activity_meta}      {packages}
     </article>
     """
 
