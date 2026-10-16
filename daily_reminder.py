@@ -21,10 +21,12 @@ YEAR = 2026
 FORCED_ACTIVITY_ID_NAMES = {"落潮海岸", "黑骑士", "珍宝商店", "自选周卡", "特化蚁对决", "蚁后对决"}
 EIGHT_FIFTEEN_ACTIVITIES = {"特化蚁对决", "蚁后对决"}
 EVOLUTION_RECHARGE_ACTIVITY_LINES = [
+    "1900180：连续充值（进化开启第一套）",
     "1900133: 连续充值（进化开启第二套）",
     "1900162: 连续充值（进化开启第三套）",
-    "1900163: 连续充值（改造，开启进化第2/3套以外的服务器）",
-    "1900084:【国服】五日随心储",
+    "1900135：连续充值（进化开启第四套）",
+    "1900136: 连续充值（变异（41≤开服时间≤69））",
+    "1900163: 连续充值（开服时间70天且未开第一套进化）",
 ]
 DISPLAY_NAME_OVERRIDES = {
     "进化连冲": "\n".join(EVOLUTION_RECHARGE_ACTIVITY_LINES),
@@ -54,6 +56,10 @@ SPECIAL_SETUP_OVERRIDES = {
     ("1000927", date(2026, 7, 27)): date(2026, 7, 25),
     ("1000927", date(2026, 9, 28)): date(2026, 9, 24),
     ("进化连冲", date(2026, 9, 7)): date(2026, 9, 5),
+    ("32364", date(2026, 10, 18)): date(2026, 10, 16),
+    ("1900148", date(2026, 10, 19)): date(2026, 10, 16),
+    ("1000202", date(2026, 10, 19)): date(2026, 10, 16),
+    ("1000372", date(2026, 10, 19)): date(2026, 10, 16),
 }
 
 
@@ -414,6 +420,24 @@ ACTIVITY_CODE_LINE_RE = re.compile(r"^\s*\d{7}\s*[:：]")
 PACKAGE_META_PREFIXES = ("服务器", "时间", "开启时间", "每日刷新", "新服")
 
 
+def activity_variant_blocks(raw: str) -> list[str]:
+    """Split one cell into independent coded activity blocks when applicable."""
+    blocks = [
+        "\n".join(line.strip() for line in block.splitlines() if line.strip())
+        for block in re.split(r"\n\s*\n", raw)
+        if block.strip()
+    ]
+    if len(blocks) < 2:
+        return [raw]
+    if not all(
+        ACTIVITY_CODE_LINE_RE.match(block.splitlines()[0].strip())
+        and any(line.strip().startswith(("服务器：", "服务器:")) for line in block.splitlines())
+        for block in blocks
+    ):
+        return [raw]
+    return blocks
+
+
 def inline_coded_title(raw: str) -> str | None:
     """首行是说明性文字（本身不带活动编号）时，改用其下第一个带编号的标题行。
 
@@ -636,12 +660,8 @@ def evolution_recharge_server_text(raw: str, start_day: date | None = None) -> s
     source_server = raw_server_text(raw, start_day)
     return "\n".join(
         [
-            EVOLUTION_RECHARGE_ACTIVITY_LINES[0],
-            EVOLUTION_RECHARGE_ACTIVITY_LINES[1],
-            EVOLUTION_RECHARGE_ACTIVITY_LINES[2],
+            *EVOLUTION_RECHARGE_ACTIVITY_LINES,
             "服务器：平台设置全服，实际开启读取配置",
-            "",
-            EVOLUTION_RECHARGE_ACTIVITY_LINES[3],
             f"服务器：{source_server}",
         ]
     )
@@ -881,6 +901,14 @@ def render(reminders: list[Reminder], target: date) -> str:
 
     chunks = [header]
     for item in todays:
+        variants = activity_variant_blocks(item.raw)
+        if len(variants) > 1:
+            for variant in variants:
+                variant_item = Reminder(item.setup_day, item.start_day, item.action, variant, item.detail_raw)
+                rendered_variant = render([variant_item], target)
+                chunks.append(rendered_variant.split("\n\n", 1)[1].rstrip("\n"))
+            continue
+
         custom_lines = custom_reminder_lines(item)
         if custom_lines:
             chunks.append("\n".join(custom_lines))

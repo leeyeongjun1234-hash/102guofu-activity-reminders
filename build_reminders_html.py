@@ -15,6 +15,7 @@ from daily_reminder import (
     Reminder,
     activity_name,
     activity_note,
+    activity_variant_blocks,
     compact_one_day_range,
     custom_reminder_lines,
     display_activity_name,
@@ -59,6 +60,16 @@ HIDDEN_ACTIVITY_META_BY_START_DAY = {
 
 def sort_key(item: Reminder) -> tuple[date, str, str]:
     return (item.start_day, activity_name(item.raw), item.raw)
+
+
+def expand_activity_variants(item: Reminder) -> list[Reminder]:
+    blocks = activity_variant_blocks(item.raw)
+    if len(blocks) == 1:
+        return [item]
+    return [
+        Reminder(item.setup_day, item.start_day, item.action, block, item.detail_raw)
+        for block in blocks
+    ]
 
 
 def is_hidden_activity(item: Reminder) -> bool:
@@ -471,7 +482,7 @@ def build_html(reminders: list[Reminder]) -> str:
     for item in reminders:
         if item.setup_day < GENERATED_DAY:
             continue
-        grouped[item.setup_day].append(item)
+        grouped[item.setup_day].extend(expand_activity_variants(item))
 
     ordered_days = sorted(grouped)
     today_items = sorted(grouped.get(GENERATED_DAY, []), key=sort_key)
