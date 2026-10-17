@@ -28,6 +28,7 @@ EVOLUTION_RECHARGE_ACTIVITY_LINES = [
     "1900136: 连续充值（变异（41≤开服时间≤69））",
     "1900163: 连续充值（开服时间70天且未开第一套进化）",
 ]
+EVOLUTION_RECHARGE_RANGE_ACTIVITY_LINE = "1900084：【国服】五日随心储"
 DISPLAY_NAME_OVERRIDES = {
     "进化连冲": "\n".join(EVOLUTION_RECHARGE_ACTIVITY_LINES),
 }
@@ -662,6 +663,7 @@ def evolution_recharge_server_text(raw: str, start_day: date | None = None) -> s
         [
             *EVOLUTION_RECHARGE_ACTIVITY_LINES,
             "服务器：平台设置全服，实际开启读取配置",
+            EVOLUTION_RECHARGE_RANGE_ACTIVITY_LINE,
             f"服务器：{source_server}",
         ]
     )

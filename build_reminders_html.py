@@ -187,7 +187,16 @@ def render_labeled_meta(label: str, value: str) -> str:
 
 def render_server_meta(base_name: str, value: str) -> str:
     if base_name == "进化连冲":
-        return f'<div class="meta meta-lines">{render_text_lines(value)}</div>'
+        rows = []
+        for line in value.splitlines():
+            if line.strip().startswith("1900084"):
+                rows.append(f'<span class="text-line evolution-range-title">{render_coded_line(line)}</span>')
+            elif not line.strip():
+                rows.append('<span class="text-line text-line-empty"></span>')
+            else:
+                rows.append(f'<span class="text-line">{render_coded_line(line)}</span>')
+        rendered_rows = "\n".join(rows)
+        return f'<div class="meta meta-lines">{rendered_rows}</div>'
     return render_labeled_meta("服务器", value)
 
 
@@ -778,6 +787,12 @@ def build_html(reminders: list[Reminder]) -> str:
 
     .text-line {{
       display: block;
+    }}
+
+    .evolution-range-title {{
+      color: var(--text);
+      font-size: 18px;
+      font-weight: 700;
     }}
 
     .package-block {{
