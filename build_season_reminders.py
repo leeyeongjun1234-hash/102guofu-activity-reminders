@@ -326,10 +326,27 @@ def render_schedule_table(items: list[SeasonSchedule], region: str) -> str:
         rows.append(f"<tr{row_class}>{''.join(cells)}</tr>")
 
     if region == "国服赛季":
-        headers = ["批次", "预告日期", "提醒日期", "报名日期", "提醒日期"]
+        headers = [
+            ("批次", ""),
+            ("预告日期", "th-blue"),
+            ("提醒日期", "th-blue"),
+            ("报名日期", "th-red"),
+            ("提醒日期", "th-red"),
+        ]
     else:
-        headers = ["批次", "一二赛季预告日期", "提醒日期", "预告日期", "提醒日期", "报名日期", "提醒日期"]
-    header_html = "".join(f"<th>{escape(header)}</th>" for header in headers)
+        headers = [
+            ("批次", ""),
+            ("一二赛季预告日期", "th-green"),
+            ("提醒日期", "th-green"),
+            ("预告日期", "th-blue"),
+            ("提醒日期", "th-blue"),
+            ("报名日期", "th-red"),
+            ("提醒日期", "th-red"),
+        ]
+    header_html = "".join(
+        f'<th class="{cls}">{escape(header)}</th>' if cls else f"<th>{escape(header)}</th>"
+        for header, cls in headers
+    )
     return f"""
       <div class="schedule-table-wrap">
         <table class="schedule-table">
@@ -389,6 +406,9 @@ def render_page(
     .schedule-table {{ width:100%; min-width:760px; border-collapse:collapse; table-layout:fixed; }}
     .schedule-table th, .schedule-table td {{ padding:11px 12px; border:1px solid var(--line); text-align:center; vertical-align:middle; white-space:nowrap; }}
     .schedule-table th {{ background:#eef2f6; color:#475467; font-weight:700; }}
+    .schedule-table th.th-green {{ background:#dcfce7; color:#166534; border-bottom:3px solid #16a34a; }}
+    .schedule-table th.th-blue {{ background:#dbeafe; color:#1d4ed8; border-bottom:3px solid #2563eb; }}
+    .schedule-table th.th-red {{ background:#fee2e2; color:#b91c1c; border-bottom:3px solid #dc2626; }}
     .schedule-table th:first-child, .schedule-table td:first-child {{ width:24%; text-align:left; }}
     .schedule-table tbody tr:hover {{ background:#fffaf5; }}
     .batch-cell {{ position:relative; }}

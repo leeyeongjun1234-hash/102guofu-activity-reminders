@@ -768,6 +768,12 @@ def raw_server_text(raw: str, start_day: date | None = None) -> str:
         if parts:
             return "，".join(dict.fromkeys(parts))
 
+    # 本服联盟 GVE 的排期表用“开 S875”标记本批次服务器。
+    if "本服联盟GVE" in raw_one_line:
+        single = re.search(r"本服联盟GVE\s*开\s*S?(\d+)", raw_one_line, re.I)
+        if single:
+            return f"S{single.group(1)}"
+
     server_matches = re.findall(r"S\s*\d+\s*[-~～—–]+\s*S?\s*(?:xxx|\d+)|S\s*xxx", raw_one_line, re.I)
     if server_matches:
         return "，".join(dict.fromkeys(normalize_server(item) for item in server_matches))
