@@ -336,7 +336,7 @@ def render_schedule_table(items: list[SeasonSchedule], region: str) -> str:
     else:
         headers = [
             ("批次", ""),
-            ("一二赛季预告日期", "th-green"),
+            ("新手赛季预告期", "th-green"),
             ("提醒日期", "th-green"),
             ("预告日期", "th-blue"),
             ("提醒日期", "th-blue"),
