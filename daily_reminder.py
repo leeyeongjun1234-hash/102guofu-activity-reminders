@@ -346,21 +346,28 @@ def is_weekend_vip_activity(raw: str) -> bool:
 def merge_weekend_vip_reminders(reminders: list[Reminder]) -> list[Reminder]:
     weekend_by_key: dict[tuple[date, date], Reminder] = {}
     for item in reminders:
-        if is_weekend_carnival(item.raw):
+        # 同一单元格可能同时写了 VIP 商店和周末狂欢。
+        # 这种情况本身就是完整卡片，不能当作“待合并的周末狂欢项”删除。
+        if is_weekend_carnival(item.raw) and not is_weekend_vip_activity(item.raw):
             weekend_by_key[(item.setup_day, item.start_day)] = item
 
     linked_keys = {
         (item.setup_day, item.start_day)
         for item in reminders
         if is_weekend_vip_activity(item.raw)
+        and not is_weekend_carnival(item.raw)
         and (item.setup_day, item.start_day) in weekend_by_key
     }
     merged: list[Reminder] = []
     for item in reminders:
         key = (item.setup_day, item.start_day)
-        if is_weekend_carnival(item.raw) and key in linked_keys:
+        if (
+            is_weekend_carnival(item.raw)
+            and not is_weekend_vip_activity(item.raw)
+            and key in linked_keys
+        ):
             continue
-        if is_weekend_vip_activity(item.raw):
+        if is_weekend_vip_activity(item.raw) and not is_weekend_carnival(item.raw):
             weekend = weekend_by_key.get(key)
             if weekend is not None:
                 merged.append(
