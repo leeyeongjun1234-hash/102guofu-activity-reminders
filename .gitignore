@@ -4,3 +4,5 @@ __pycache__/
 site.zip
 ~$*.xlsx
 .~*.xlsx
+artifacts/
+_bubble_test*.html

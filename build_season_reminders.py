@@ -4,6 +4,7 @@ from collections import defaultdict
 from dataclasses import dataclass, field
 from datetime import date, datetime, timedelta
 from html import escape
+import json
 from pathlib import Path
 import re
 from urllib.parse import quote
@@ -289,6 +290,41 @@ def render_date_cell(value: date) -> str:
     return f'<td class="date-cell">{date_value}</td>'
 
 
+def schedule_reminder_days(item: SeasonSchedule, region: str) -> list[tuple[date, str, str]]:
+    """列出该批次的所有（提醒日期, 提醒类型, 需要开启的活动）。"""
+    registration_day = item.registration_day
+    if region == "国服赛季":
+        preview_day = registration_day - timedelta(days=10)
+        return [
+            (preview_day - timedelta(days=3), "预告活动", PREVIEW_ACTIVITY),
+            (registration_day - timedelta(days=3), "报名活动", REGISTRATION_ACTIVITY),
+        ]
+    early_preview_day = registration_day - timedelta(days=28)
+    regular_preview_day = registration_day - timedelta(days=10)
+    return [
+        (early_preview_day - timedelta(days=7), "新手赛季预告", PREVIEW_ACTIVITY),
+        (regular_preview_day - timedelta(days=3), "预告活动", PREVIEW_ACTIVITY),
+        (registration_day - timedelta(days=3), "报名活动", REGISTRATION_ACTIVITY),
+    ]
+
+
+def reminder_payload(items: list[SeasonSchedule], region: str) -> str:
+    """导出所有提醒日期为 JSON，供页面按当天日期弹气泡。"""
+    entries = []
+    for item in items:
+        for reminder_day, kind, activity in schedule_reminder_days(item, region):
+            entries.append(
+                {
+                    "date": date_text(reminder_day),
+                    "batch": item.batch,
+                    "kind": kind,
+                    "activity": activity,
+                    "registration": date_text(item.registration_day),
+                }
+            )
+    return json.dumps(entries, ensure_ascii=False, separators=(",", ":")).replace("<", "\\u003c")
+
+
 def render_schedule_table(items: list[SeasonSchedule], region: str) -> str:
     if not items:
         return '<div class="empty">当前没有需要显示的赛季提醒。</div>'
@@ -366,9 +402,46 @@ def render_page(
     season_columns: list[tuple[int, str]],
     output: Path,
 ) -> str:
+    bubble_css = """    .reminder-bubble { position:fixed; right:20px; bottom:20px; z-index:60; display:none; width:min(380px, calc(100vw - 40px)); padding:14px 16px; border:1px solid #f59e0b; border-left:6px solid #f59e0b; border-radius:10px; background:#fffbeb; box-shadow:0 12px 32px rgba(15,23,42,.18); }
+    .reminder-bubble.show { display:block; animation:bubble-in .28s ease-out; }
+    @keyframes bubble-in { from { opacity:0; transform:translateY(14px); } to { opacity:1; transform:none; } }
+    .bubble-title { display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:8px; color:#92400e; font-size:16px; font-weight:800; }
+    .bubble-close { width:26px; height:26px; border:1px solid #f0c36d; border-radius:50%; background:#fff; color:#92400e; font:inherit; font-size:15px; line-height:1; cursor:pointer; }
+    .bubble-close:hover { background:#fef3c7; }
+    .bubble-list { display:grid; gap:8px; margin:0; padding:0; max-height:46vh; overflow:auto; list-style:none; }
+    .bubble-item { padding:9px 11px; border:1px solid #fde68a; border-radius:7px; background:#fff; }
+    .bubble-batch { font-weight:800; }
+    .bubble-kind { margin-left:6px; padding:1px 7px; border-radius:999px; background:#fef3c7; color:#92400e; font-size:12px; font-weight:700; }
+    .bubble-line { margin-top:3px; color:#475467; font-size:13px; }
+    .bubble-activity { color:#b91c1c; font-weight:700; }
+    @media (max-width:760px) { .reminder-bubble { right:12px; left:12px; bottom:12px; width:auto; } }
+"""
+    bubble_html = """  <aside id="reminderBubble" class="reminder-bubble" role="status" aria-live="polite">
+    <div class="bubble-title"><span>有需要设置的活动</span><button id="bubbleClose" class="bubble-close" type="button" aria-label="关闭提醒">×</button></div>
+    <ul id="bubbleList" class="bubble-list"></ul>
+  </aside>
+"""
+    bubble_js = """    const SEASON_REMINDERS = __PAYLOAD__;
+    const bubble = document.getElementById('reminderBubble');
+    const bubbleList = document.getElementById('bubbleList');
+    const BUBBLE_DISMISS_KEY = 'season-reminder-bubble-dismissed-__PAGE__';
+    const beijingParts = Object.fromEntries(new Intl.DateTimeFormat('en-US', { timeZone: 'Asia/Shanghai', year: 'numeric', month: '2-digit', day: '2-digit' }).formatToParts(new Date()).map((part) => [part.type, part.value]));
+    const beijingToday = beijingParts.year + '-' + beijingParts.month + '-' + beijingParts.day;
+    const todayReminders = (SEASON_REMINDERS || []).filter((item) => item.date === beijingToday);
+    if (todayReminders.length && localStorage.getItem(BUBBLE_DISMISS_KEY) !== beijingToday) {
+      bubbleList.innerHTML = todayReminders.map((item) => '<li class="bubble-item"><div><span class="bubble-batch">' + item.batch + '</span><span class="bubble-kind">' + item.kind + '</span></div><div class="bubble-line">需要开启：<span class="bubble-activity">' + item.activity + '</span></div><div class="bubble-line">报名期开始：' + item.registration + '</div></li>').join('');
+      bubble.classList.add('show');
+    }
+    document.getElementById('bubbleClose').addEventListener('click', () => {
+      bubble.classList.remove('show');
+      localStorage.setItem(BUBBLE_DISMISS_KEY, beijingToday);
+    });
+"""
     items = collect_schedules(source, region, registration_column, season_columns)
     source_href = ("../" if output.parent.name == "site" else "") + quote(source.name)
     subtitle = f"报名期早于 {date_text(TODAY)} 的批次已隐藏 · 已生成未来三年排期 · 最近批次已标红"
+    bubble_payload = reminder_payload(items, region)
+    bubble_script = bubble_js.replace("__PAYLOAD__", bubble_payload).replace("__PAGE__", 'overseas' if region == "海外赛季" else 'cn')
     return f"""<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -381,6 +454,7 @@ def render_page(
     body {{ margin:0; min-height:100vh; background:var(--bg); color:var(--text); font:14px/1.5 "Segoe UI","PingFang SC","Microsoft YaHei",sans-serif; }}
     body.locked .app {{ visibility:hidden; }}
     body:not(.locked) .lock-screen {{ display:none; }}
+    body.locked .reminder-bubble {{ display:none !important; }}
     .lock-screen {{ position:fixed; inset:0; z-index:100; display:grid; place-items:center; padding:20px; background:var(--bg); }}
     .lock-panel {{ width:min(400px,100%); display:grid; gap:14px; padding:24px; border:1px solid var(--line); border-radius:8px; background:var(--panel); box-shadow:0 12px 32px rgba(15,23,42,.12); }}
     .lock-panel h1 {{ margin:0; font-size:24px; }}
@@ -419,7 +493,7 @@ def render_page(
     .nearest-marker {{ display:inline-block; width:12px; height:12px; margin-right:7px; border:3px solid #dc2626; border-radius:50%; vertical-align:-1px; }}
     .empty {{ padding:24px; border:1px solid var(--line); border-radius:8px; background:#fff; color:var(--muted); }}
     .download {{ display:inline-flex; margin-top:2px; padding:8px 11px; border:1px solid var(--line); border-radius:6px; background:#fff; color:var(--text); text-decoration:none; }}
-    @media (max-width:760px) {{
+{bubble_css}    @media (max-width:760px) {{
       .app {{ padding:76px 16px 16px; }}
       .page-header {{ flex-direction:column; gap:10px; }}
       .page-nav {{ top:12px; right:12px; max-width:calc(100vw - 24px); overflow-x:auto; }}
@@ -450,7 +524,7 @@ def render_page(
     <a class="download" href="{source_href}" download>下载原始排期表</a>
     <main>{render_schedule_table(items, region)}</main>
   </div>
-  <script>
+{bubble_html}  <script>
     const AUTH_KEY = 'activity-reminders-authenticated-until';
     const AUTH_TTL_MS = 48 * 60 * 60 * 1000;
     const PASSWORD_HASH = '542df2c1e629af51b87cf02f575af7fc8cd25a26d6cf9a54e7ac3775bce0d8f6';
@@ -471,7 +545,7 @@ def render_page(
         lockPassword.value = ''; lockError.textContent = ''; unlockPage();
       }} else {{ lockError.textContent = '密码错误'; lockPassword.select(); }}
     }});
-  </script>
+{bubble_script}  </script>
 </body>
 </html>
 """
