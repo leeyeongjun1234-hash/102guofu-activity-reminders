@@ -489,9 +489,15 @@ def render_summary(
 def build_html(reminders: list[Reminder]) -> str:
     grouped: dict[date, list[Reminder]] = defaultdict(list)
     for item in reminders:
+        # 常规情况按设置日展示。若网页生成时已经错过设置日，
+        # 但活动尚未开始，则临时放到活动开启日，避免即将开启的
+        # 活动和配套礼包随着已过设置日一起从网页消失。
+        display_day = item.setup_day
         if item.setup_day < GENERATED_DAY:
-            continue
-        grouped[item.setup_day].extend(expand_activity_variants(item))
+            if item.start_day < GENERATED_DAY:
+                continue
+            display_day = item.start_day
+        grouped[display_day].extend(expand_activity_variants(item))
 
     ordered_days = sorted(grouped)
     today_items = sorted(grouped.get(GENERATED_DAY, []), key=sort_key)
@@ -499,15 +505,15 @@ def build_html(reminders: list[Reminder]) -> str:
     next_items = sorted(grouped.get(next_day, []), key=sort_key) if next_day else []
 
     sections: list[str] = []
-    for setup_day in ordered_days:
-        items = sorted(grouped[setup_day], key=sort_key)
-        marker = '<span class="inline-badge">下一次</span>' if setup_day == next_day else ""
+    for display_day in ordered_days:
+        items = sorted(grouped[display_day], key=sort_key)
+        marker = '<span class="inline-badge">下一次</span>' if display_day == next_day else ""
         cards = "\n".join(render_card(item) for item in items)
         sections.append(
             f"""
-            <details class="day" data-date="{setup_day:%Y-%m-%d}" open>
+            <details class="day" data-date="{display_day:%Y-%m-%d}" open>
               <summary>
-                <span class="date"><span class="date-text">{setup_day:%Y-%m-%d}</span>{marker}</span>
+                <span class="date"><span class="date-text">{display_day:%Y-%m-%d}</span>{marker}</span>
                 <span class="count">{len(items)} 个提醒</span>
               </summary>
               <div class="cards">
@@ -974,7 +980,7 @@ def build_html(reminders: list[Reminder]) -> str:
     </nav>
     <header class="top">
       <h1>全部每日活动提醒</h1>
-      <div class="sub">按设置日期汇总展示，日期与时间均按北京时间 UTC+8 计算。</div>
+      <div class="sub">按设置日期汇总展示；已过设置日但尚未开启的活动会临时显示在开启日。日期与时间均按北京时间 UTC+8 计算。</div>
     </header>
 
     <div class="toolbar">
