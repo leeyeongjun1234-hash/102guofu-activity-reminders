@@ -310,34 +310,27 @@ def package_details(item: Reminder) -> str:
         return "\n".join(sections)
 
     if name == "落潮海岸":
-        five_day_lines: list[str] = []
-        six_day_lines: list[str] = []
+        sections = []
         for segment in package_segments(item.raw):
             package_lines = package_id_lines(segment)
             if not package_lines:
                 continue
-            # 分段内时间行标注（6天）的归入 6 天礼包，其余归入 5 天礼包
-            if any("（6天）" in line or "(6天)" in line for line in segment):
-                six_day_lines.extend(package_lines)
-            else:
-                five_day_lines.extend(package_lines)
-        if five_day_lines or six_day_lines:
-            five_day_details = ["服务器：" + server_text(item.raw, item.start_day)]
-            five_day_time = next((line for line in lines if line.startswith("开启时间：")), "")
-            if five_day_time:
-                five_day_details.append(raw_time_range(five_day_time))
-            five_day_details.append("每日刷新：是，新服自动开启：否")
-            six_day_details = ["服务器：" + server_text(item.raw, item.start_day)]
-            six_day_time = next((line for line in lines if line.startswith("时间：") and "（6天）" in line), "")
-            if six_day_time:
-                six_day_details.append(raw_time_range(six_day_time))
-            six_day_details.append("每日刷新：是，新服自动开启：否")
-            return "\n".join(
-                [
-                    package_section("每日刷新礼包（5天）", five_day_lines, five_day_details),
-                    package_section("每日刷新礼包（6天）", six_day_lines, six_day_details),
-                ]
-            )
+            # 每个分段是一份独立配置；天数和详情只读取本段，避免串用其他组的时间。
+            segment_duration, _ = duration_for("", "\n".join(segment))
+            title = "配套礼包" if segment_duration == "未知" else f"配套礼包（{segment_duration}）"
+            details = []
+            for line in segment:
+                if line.startswith("服务器"):
+                    details.append(raw_server_text(line))
+                elif line.startswith(("时间：", "开启时间：")):
+                    details.append("时间：" + raw_time_range(line))
+                elif line.startswith(("每日刷新", "新服")):
+                    details.append(line)
+            if not any(line.startswith("服务器") for line in details):
+                details.insert(0, default_details[0])
+            sections.append(package_section(title, package_lines, details))
+        if sections:
+            return "\n".join(sections)
 
     if name == "蚁群派对":
         package_lines = package_id_lines(lines)
