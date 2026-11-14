@@ -43,6 +43,8 @@ MARMOT_MAIL_ITEMS = [
     "203001：巢穴保护8小时 * 1",
 ]
 WEEKEND_VIP_ACTIVITY_LINE = "1000198: VIP商店-周末狂欢"
+MIGRATION_PACKAGE_LINE = "29184: 全新征途：迁徙必备！"
+MIGRATION_PACKAGE_DAYS = 8
 CODED_TITLE_RE = re.compile(r"^\s*(\d{5,7})\s*[:：]\s*(.+)$")
 EXPLICIT_TIME_RANGE_RE = re.compile(
     r"(?P<start>\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2}:\d{2})\s*"
@@ -840,6 +842,19 @@ def display_server_group(value: str) -> str:
     return value.replace("-", "~")
 
 
+def migration_package_setup_lines(item: Reminder) -> list[str]:
+    # 礼包在迁徙开启周的前一周周三 08:00 开始，持续 8 天。
+    # 从活动所在周推导，避免设置日因休息日提前后带偏礼包时间。
+    package_start_day = week_monday(item.start_day) - timedelta(days=5)
+    return [
+        MIGRATION_PACKAGE_LINE,
+        "设置礼包+分组",
+        f"时间：{time_range(package_start_day, f'{MIGRATION_PACKAGE_DAYS}天', MIGRATION_PACKAGE_DAYS)}",
+        f"服务器范围：{display_server_group(server_text(item.raw, item.start_day))}",
+        "新服不自动开启，每日刷新，Pop3",
+    ]
+
+
 def migration_activity_setup_lines(item: Reminder) -> list[str]:
     duration_label, days = duration_for("区域迁徙", item.raw)
     days = days or 3
@@ -873,8 +888,8 @@ def direct_detail_lines(detail_raw: str) -> list[str] | None:
 
 
 def custom_reminder_lines(item: Reminder) -> list[str] | None:
-    if activity_name(item.raw) == "区域迁徙" and item.action == "设置礼包+分组" and item.detail_raw:
-        return direct_detail_lines(item.detail_raw)
+    if activity_name(item.raw) == "区域迁徙" and item.action == "设置礼包+分组":
+        return direct_detail_lines(item.detail_raw) or migration_package_setup_lines(item)
 
     if activity_name(item.raw) == "区域迁徙" and item.action == "设置活动+公布分组":
         return migration_activity_setup_lines(item)
