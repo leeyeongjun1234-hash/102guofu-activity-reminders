@@ -52,6 +52,7 @@ HIDDEN_ACTIVITY_IDS_BY_START_DAY = {
 }
 HIDDEN_ACTIVITY_NAMES_BY_START_DAY = {
     date(2026, 10, 13): {"一口价更新第五代"},
+    date(2026, 11, 24): {"弹珠", "标头展示活动 / 强力野怪", "珍宝商店"},
 }
 HIDDEN_ACTIVITY_META_BY_START_DAY = {
     date(2026, 10, 13): {"周年庆第五章"},
@@ -73,7 +74,8 @@ def expand_activity_variants(item: Reminder) -> list[Reminder]:
 
 
 def is_hidden_activity(item: Reminder) -> bool:
-    if item.raw.strip() in HIDDEN_ACTIVITY_NAMES_BY_START_DAY.get(item.start_day, set()):
+    hidden_names = HIDDEN_ACTIVITY_NAMES_BY_START_DAY.get(item.start_day, set())
+    if item.raw.strip() in hidden_names or activity_name(item.raw) in hidden_names:
         return True
 
     hidden_ids = HIDDEN_ACTIVITY_IDS | HIDDEN_ACTIVITY_IDS_BY_START_DAY.get(item.start_day, set())
