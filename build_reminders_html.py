@@ -193,6 +193,8 @@ def render_server_meta(base_name: str, value: str) -> str:
         for line in value.splitlines():
             if line.strip().startswith("1900084"):
                 rows.append(f'<span class="text-line evolution-range-title">{render_coded_line(line)}</span>')
+            elif re.match(r"^\s*\d{7}\s*[:：]\s*连续充值", line):
+                continue
             elif not line.strip():
                 rows.append('<span class="text-line text-line-empty"></span>')
             else:
