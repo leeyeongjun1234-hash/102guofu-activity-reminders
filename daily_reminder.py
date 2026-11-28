@@ -65,6 +65,7 @@ SPECIAL_SETUP_OVERRIDES = {
     ("1000927", date(2026, 9, 28)): date(2026, 9, 24),
     ("进化连冲", date(2026, 9, 7)): date(2026, 9, 5),
     ("进化连冲", date(2026, 11, 30)): date(2026, 11, 28),
+    ("自选周卡", date(2026, 11, 30)): date(2026, 11, 28),
     ("1000198", date(2026, 11, 7)): date(2026, 11, 6),
     ("32364", date(2026, 10, 18)): date(2026, 10, 16),
     ("1900148", date(2026, 10, 19)): date(2026, 10, 16),
@@ -835,6 +836,9 @@ def time_range(start_day: date, duration_label: str, days: int | None, name: str
     start = datetime(start_day.year, start_day.month, start_day.day, start_hour, start_minute, 0)
     if days is None:
         end = datetime(start_day.year + 10, start_day.month, start_day.day, 7, 59, 59) + timedelta(days=1)
+    elif name in EIGHT_FIFTEEN_ACTIVITIES:
+        # 8:15 只影响首日开启时间，结束日仍按标准 07:59:59 结束。
+        end = datetime(start_day.year, start_day.month, start_day.day, 7, 59, 59) + timedelta(days=days)
     else:
         end = start + timedelta(days=days) - timedelta(seconds=1)
     return f"{start:%Y-%m-%d %H:%M:%S} ~ {end:%Y-%m-%d %H:%M:%S}（{duration_label}） UTC+8"
